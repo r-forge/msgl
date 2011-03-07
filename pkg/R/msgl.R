@@ -3,8 +3,8 @@
 # Author: martin
 ###############################################################################
 
-
-dyn.load("/home/martin/SGL/SGLRInterface/Release/libSGLRInterface.so")
+#TODO load .so
+#dyn.load("/inst/SGLRInterface/Release/libSGLRInterface.so")
 
 sparseGroupLasso.experimental <- function(x, classes, lambdaMin = 0.02, numberOfModels = 50L, alpha = 0.5, featureWeights = rep(1, ncol(x)), classWeights = rep(1, length(levels(classes))), standardize = TRUE, refit = FALSE, delta = 0.001) {
 	
