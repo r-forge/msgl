@@ -4,9 +4,9 @@
 
 #include <time.h>
 
-#include "RSglTools.h"
-#include "SglCInterface.h"
-#include "SglRInterface.h"
+#include "interface_R/RSglTools.h"
+#include "interface_R/SglCInterface.h"
+#include "interface_R/SglRInterface.h"
 
 //R - C interface
 

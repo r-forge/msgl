@@ -3,8 +3,12 @@
 # Author: martin
 ###############################################################################
 
-#TODO load .so
-#dyn.load("/inst/SGLRInterface/Release/libSGLRInterface.so")
+.First.lib <- function(lib, pkg)  {
+	library.dynam("msgl", pkg, lib)
+	packageStartupMessage("Package msgl ",
+			utils::packageDescription("msgl", field="Version"),
+			appendLF = TRUE)
+}
 
 sparseGroupLasso.experimental <- function(x, classes, lambdaMin = 0.02, numberOfModels = 50L, alpha = 0.5, featureWeights = rep(1, ncol(x)), classWeights = rep(1, length(levels(classes))), standardize = TRUE, refit = FALSE, delta = 0.001) {
 	

@@ -10,7 +10,7 @@
 
 #include "Parameter.h"
 
-#include <armadillo>
+#include <armadillo.hpp>
 using namespace arma;
 
 template<typename Data>

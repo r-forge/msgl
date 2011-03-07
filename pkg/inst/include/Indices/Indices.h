@@ -8,13 +8,13 @@
 #ifndef INDICES_H
 #define	INDICES_H
 
-#include <boost/random.hpp>
-
 #include <string>
 #include <iostream>
 using namespace std;
 
-#include <armadillo>
+#include <boost/random.hpp>
+
+#include <armadillo.hpp>
 using namespace arma;
 
 #include "Exceptions.h"

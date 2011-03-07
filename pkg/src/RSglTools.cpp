@@ -2,7 +2,7 @@
 #include <Rinternals.h>
 #include <Rmath.h>
 
-#include "RSglTools.h"
+#include "interface_R/RSglTools.h"
 
 SEXP createRIntMatrix(unsigned int nrow, unsigned int ncol) {
 

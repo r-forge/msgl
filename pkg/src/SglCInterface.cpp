@@ -1,9 +1,9 @@
 
-#include "SglCInterface.h"
-#include "../SGL/Interface.h"
-#include "../SGL/MultinomialPredictor.h"
+#include "interface_R/SglCInterface.h"
+#include "msgl/Interface.h"
+#include "msgl/MultinomialPredictor.h"
 
-#include "../SGL/ExperimentalLikelihood.h"
+#include "msgl/ExperimentalLikelihood.h"
 
 void c_sgl_experimental(double * x_ptr, unsigned int * classes_ptr, double * featureWeights_ptr, double * classWeights_ptr, double ** betaList_ptrs, unsigned int n, unsigned int p, unsigned int d, double lambdaMin, double alpha, double delta, int do_refit) {
 
