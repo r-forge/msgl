@@ -12,7 +12,7 @@
 #include <iostream>
 using namespace std;
 
-#include "tr1/random.hpp"
+#include "boost/random.hpp"
 
 #include "armadillo.hpp"
 using namespace arma;

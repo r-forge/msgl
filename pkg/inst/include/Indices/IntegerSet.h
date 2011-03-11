@@ -8,7 +8,7 @@
 #ifndef INTEGERSET_H
 #define	INTEGERSET_H
 
-#include "tr1/random.hpp"
+#include "boost/random.hpp"
 
 #include <string>
 #include <iostream>
