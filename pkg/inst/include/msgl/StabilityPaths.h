@@ -9,7 +9,7 @@
 #define	STABILITYPATHS_H
 
 #include "ParameterList.h"
-#include <armadillo>
+#include "armadillo.hpp"
 using namespace arma;
 
 class StabilityPaths {

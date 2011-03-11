@@ -8,8 +8,7 @@
 #ifndef PARAMETER_H
 #define	PARAMETER_H
 
-#include <boost/noncopyable.hpp>
-#include <armadillo>
+#include "armadillo.hpp"
 using namespace arma;
 
 class Parameter {

@@ -8,7 +8,7 @@
 #ifndef SUBMATRIX_H
 #define	SUBMATRIX_H
 
-#include <armadillo.hpp>
+#include "armadillo.hpp"
 using namespace arma;
 
 #include "Exceptions.h"

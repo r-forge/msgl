@@ -16,7 +16,7 @@
 #include "BaseData.h"
 #include "StabilityPaths.h"
 
-#include <armadillo>
+#include "armadillo.hpp"
 using namespace arma;
 
 template<template<typename > class PartialLikelihoodFunction, typename LineSearch, typename Data>

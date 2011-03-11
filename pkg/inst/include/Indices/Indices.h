@@ -12,9 +12,9 @@
 #include <iostream>
 using namespace std;
 
-#include <boost/random.hpp>
+#include "tr1/random.hpp"
 
-#include <armadillo.hpp>
+#include "armadillo.hpp"
 using namespace arma;
 
 #include "Exceptions.h"

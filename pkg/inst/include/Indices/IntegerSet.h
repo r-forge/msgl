@@ -8,13 +8,13 @@
 #ifndef INTEGERSET_H
 #define	INTEGERSET_H
 
-#include <boost/random.hpp>
+#include "tr1/random.hpp"
 
 #include <string>
 #include <iostream>
 using namespace std;
 
-#include <armadillo>
+#include "armadillo.hpp"
 using namespace arma;
 
 #include "Exceptions.h"

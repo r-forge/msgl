@@ -110,6 +110,45 @@ umat sgl_simple_cv (mat const& X, uvec const& Y, vec const& featureWeights,
 	return predictedClasses;
 }
 
+//template<template<typename > class LikelihoodFunction>
+//field<ParameterList> sgl_simple_multiple_paths (BaseData data, vec const lambdaSeq, double const delta,
+//		double const alpha, u32 const numberOfSubsamples, double const subsampleFraction, u32 const numberOfThreads) {
+//
+//	SimpleLineSearch const lineSearch(delta, 0.1, 100);
+//
+//	//Cv split
+//	GroupedIndices const indices(0, data.getN() - 1, data.getGrouping());
+//
+//	//TODO seed
+//	boost::mt19937 gen;
+//	field<GroupedIndices> const subsamples = indices.blancedRandomSubsets(
+//			subsampleFraction, numberOfSubsamples, gen);
+//
+//	//Result list
+//	field<ParameterList> lists(numberOfSubsamples);
+//
+//#pragma omp parallel num_threads(numberOfThreads)
+//	{
+//		u32 i;
+//
+//#pragma omp for schedule(dynamic)
+//		for (i = 0; i < numberOfSubsamples; i++) {
+//
+//			//Data
+//			BaseData trainingData = data(subsamples(i));
+//
+//			//Fit
+//			SglBase<LikelihoodFunction, SimpleLineSearch, BaseData> fitter(
+//					lineSearch, trainingData, alpha, delta);
+//			lists(i) = fitter.fit(lambdaSeq);
+//
+//		}
+//
+//	}
+//
+//	return lists;
+//}
+
 template<template<typename > class LikelihoodFunction>
 StabilityPaths fit_stability_paths (BaseData data, vec const lambdaSeq, double const delta,
 		double const alpha, u32 const numberOfSubsamples, u32 const numberOfThreads) {

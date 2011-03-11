@@ -8,10 +8,10 @@
 #ifndef BASEDATA_H
 #define	BASEDATA_H
 
-#include <armadillo.hpp>
+#include "armadillo.hpp"
 using namespace arma;
 
-#include <Indices/Indices.h>
+#include "Indices/Indices.h"
 
 class BaseData {
 

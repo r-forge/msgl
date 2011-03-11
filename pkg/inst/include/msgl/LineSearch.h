@@ -15,7 +15,7 @@
 #ifndef LINESEARCH_H
 #define	LINESEARCH_H
 
-#include <armadillo>
+#include "armadillo.hpp"
 using namespace arma;
 
 class SimpleLineSearch {
