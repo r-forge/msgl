@@ -5,6 +5,8 @@
 
 #include "msgl/ExperimentalLikelihood.h"
 
+//FIXME number of classes should not be set equal to max(Y)+1
+
 void c_sgl_experimental(double * x_ptr, unsigned int * classes_ptr, double * featureWeights_ptr, double * classWeights_ptr, double ** betaList_ptrs, unsigned int n, unsigned int p, unsigned int d, double lambdaMin, double alpha, double delta, int do_refit) {
 
     const mat X(x_ptr, n, p, false, true);
@@ -36,12 +38,12 @@ void c_sgl_experimental_cv(double * x_ptr, unsigned int * classes_ptr, double * 
 
 }
 
-void c_sgl_simple(double * x_ptr, unsigned int * classes_ptr, double * featureWeights_ptr, double * classWeights_ptr, double ** betaList_ptrs, unsigned int n, unsigned int p, unsigned int d, double lambdaMin, double alpha, double delta, int do_refit) {
+void c_sgl_simple(double * x_ptr, unsigned int * classes_ptr, double * featureWeights_ptr, double * classWeights_ptr, double ** betaList_ptrs, unsigned int n, unsigned int p, unsigned int d, unsigned int k, double lambdaMin, double alpha, double delta, int do_refit) {
 
     const mat X(x_ptr, n, p, false, true);
     const uvec Y(classes_ptr, n, false, true);
     const vec featureWeights(featureWeights_ptr, p, false, true);
-    const vec classWeights(classWeights_ptr, max(Y) + 1, false, true);
+    const vec classWeights(classWeights_ptr, k, false, true);
 
     //DEBUG START
     //cout << "n = " << n << ", p = " << p << ", d = " << d << endl;
@@ -55,7 +57,7 @@ void c_sgl_simple(double * x_ptr, unsigned int * classes_ptr, double * featureWe
 
     //Copy to beta list
     for (u32 i = 0; i < parameters.getIndex(); i++) {
-        mat b(betaList_ptrs[i], p + 1, max(Y) + 1, false, true);
+        mat b(betaList_ptrs[i], p + 1, k, false, true);
         b = parameters.getParameterMatrixByIndex(i);
     }
 }

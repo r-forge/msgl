@@ -10,6 +10,13 @@
 			appendLF = TRUE)
 }
 
+mem.test <- function(d, p, k) {
+	
+	beta.list <- .Call("r_mem_test", d, p, k);
+	
+	return(beta.list)	
+}
+
 sparseGroupLasso.experimental <- function(x, classes, lambdaMin = 0.02, numberOfModels = 50L, alpha = 0.5, featureWeights = rep(1, ncol(x)), classWeights = rep(1, length(levels(classes))), standardize = TRUE, refit = FALSE, delta = 0.001) {
 	
 	if(!is.factor(classes)) {
@@ -34,8 +41,8 @@ sparseGroupLasso.experimental <- function(x, classes, lambdaMin = 0.02, numberOf
 		
 		if(standardize) {
 			
-			beta.org <- betaList[[l]] %*% diag(c(1,1/x.scale))
-			beta.org[,1] <- beta.org[,1] - rowSums(betaList[[l]][,-1] %*% diag(x.center/x.scale))
+			beta.org <- t(t(betaList[[l]])*c(1,1/x.scale))
+			beta.org[,1] <- beta.org[,1] - rowSums(t(t(betaList[[l]][,-1])*(x.center/x.scale)))
 			
 			betaList[[l]] <- beta.org
 			
@@ -91,20 +98,20 @@ sparseGroupLasso <- function(x, classes, lambdaMin = 0.02, numberOfModels = 50L,
 	}
 	
 	betaList <- .Call("r_sgl_simple", x, as.integer(classes)-1L, numberOfModels, lambdaMin, alpha, featureWeights, classWeights, delta, refit)
-	
+
 	for(l in 1:numberOfModels) {
 		
 		if(standardize) {
 			
-			beta.org <- betaList[[l]] %*% diag(c(1,1/x.scale))
-			beta.org[,1] <- beta.org[,1] - rowSums(betaList[[l]][,-1] %*% diag(x.center/x.scale))
+			beta.org <- t(t(betaList[[l]])*c(1,1/x.scale))
+			beta.org[,1] <- beta.org[,1] - rowSums(t(t(betaList[[l]][,-1])*(x.center/x.scale)))
 			
 			betaList[[l]] <- beta.org
 			
 		}
 		
-		colnames(betaList[[l]]) <- c("(Intercept)", colnames(x));
-		rownames(betaList[[l]]) <- levels(classes);
+		colnames(betaList[[l]]) <- c("(Intercept)", if(is.null(colnames(x))) 1:dim(x)[2] else colnames(x))
+		rownames(betaList[[l]]) <- levels(classes)
 		
 	}
 	
@@ -186,8 +193,8 @@ sparseGroupLasso.stability.selection <- function(x, classes, lambdaMin = 0.02, n
 		
 		if(standardize) {
 			
-			beta.org <- betas[[l]] %*% diag(c(1,1/x.scale))
-			beta.org[,1] <- beta.org[,1] - rowSums(betas[[l]][,-1] %*% diag(x.center/x.scale))
+			beta.org <- t(t(betaList[[l]])*c(1,1/x.scale))
+			beta.org[,1] <- beta.org[,1] - rowSums(t(t(betaList[[l]][,-1])*(x.center/x.scale)))
 			
 			betas[[l]] <- beta.org
 			

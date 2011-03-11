@@ -10,8 +10,9 @@
 
 //R - C interface
 
-SEXP r_sgl_experimental (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels, SEXP r_lambdaMin, SEXP r_alpha,
-		SEXP r_featureWeights, SEXP r_classWeights, SEXP r_delta, SEXP r_do_refit) {
+SEXP r_sgl_experimental(SEXP r_x, SEXP r_classes, SEXP r_numberOfModels,
+		SEXP r_lambdaMin, SEXP r_alpha, SEXP r_featureWeights,
+		SEXP r_classWeights, SEXP r_delta, SEXP r_do_refit) {
 
 	SEXP xDim = getAttrib(r_x, R_DimSymbol);
 	unsigned int n = INTEGER(xDim)[0]; //nrow - number of samples
@@ -28,20 +29,22 @@ SEXP r_sgl_experimental (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels, SEXP r
 	int end;
 	Rprintf("start fit : \n");
 	start = clock();
-	c_sgl_experimental(REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(r_featureWeights), REAL(
-			r_classWeights), list->_ptrs, n, p, d, *REAL(r_lambdaMin), *REAL(r_alpha), *REAL(
-			r_delta), *LOGICAL(r_do_refit));
+	c_sgl_experimental(REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(
+			r_featureWeights), REAL(r_classWeights), list->_ptrs, n, p, d,
+			*REAL(r_lambdaMin), *REAL(r_alpha), *REAL(r_delta), *LOGICAL(
+					r_do_refit));
 	end = clock();
-	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end - start)
-			/ CLOCKS_PER_SEC);
+	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end
+			- start) / CLOCKS_PER_SEC);
 
 	unprotectListOfMatrices(list);
 	return (list->_listSEXP);
 }
 
-SEXP r_sgl_experimental_cv (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels, SEXP r_lambdaMin,
-		SEXP r_alpha, SEXP r_featureWeights, SEXP r_classWeights, SEXP r_delta, SEXP r_do_refit,
-		SEXP r_fold, SEXP r_numberOfThreads) {
+SEXP r_sgl_experimental_cv(SEXP r_x, SEXP r_classes, SEXP r_numberOfModels,
+		SEXP r_lambdaMin, SEXP r_alpha, SEXP r_featureWeights,
+		SEXP r_classWeights, SEXP r_delta, SEXP r_do_refit, SEXP r_fold,
+		SEXP r_numberOfThreads) {
 
 	SEXP xDim = getAttrib(r_x, R_DimSymbol);
 	unsigned int n = INTEGER(xDim)[0]; //nrow - number of samples
@@ -64,23 +67,34 @@ SEXP r_sgl_experimental_cv (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels, SEX
 	int end;
 	Rprintf("start fit : \n");
 	start = clock();
-	c_sgl_experimental_cv(
-			REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(r_featureWeights), REAL(
-					r_classWeights), (unsigned int*) INTEGER(matrixSEXP), n, p, d, *REAL(
-					r_lambdaMin), *REAL(r_alpha), *REAL(r_delta), *LOGICAL(r_do_refit), *INTEGER(
-					r_fold), *INTEGER(r_numberOfThreads));
+	c_sgl_experimental_cv(REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(
+			r_featureWeights), REAL(r_classWeights), (unsigned int*) INTEGER(
+			matrixSEXP), n, p, d, *REAL(r_lambdaMin), *REAL(r_alpha), *REAL(
+			r_delta), *LOGICAL(r_do_refit), *INTEGER(r_fold), *INTEGER(
+			r_numberOfThreads));
 	end = clock();
-	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end - start)
-			/ CLOCKS_PER_SEC);
+	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end
+			- start) / CLOCKS_PER_SEC);
 
 	UNPROTECT(2);
 	return (matrixSEXP);
 }
 
-SEXP r_sgl_simple (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels, SEXP r_lambdaMin, SEXP r_alpha,
-		SEXP r_featureWeights, SEXP r_classWeights, SEXP r_delta, SEXP r_do_refit) {
+SEXP r_mem_test(SEXP d, SEXP p, SEXP k) {
+
+	struct ListOfMatrices * list = createListOfMatrices(*INTEGER(k),
+			*INTEGER(p) + 1, *INTEGER(d));
+
+	unprotectListOfMatrices(list);
+	return (list->_listSEXP);
+}
+
+SEXP r_sgl_simple(SEXP r_x, SEXP r_classes, SEXP r_numberOfModels,
+		SEXP r_lambdaMin, SEXP r_alpha, SEXP r_featureWeights,
+		SEXP r_classWeights, SEXP r_delta, SEXP r_do_refit) {
 
 	SEXP xDim = getAttrib(r_x, R_DimSymbol);
+
 	unsigned int n = INTEGER(xDim)[0]; //nrow - number of samples
 	unsigned int p = INTEGER(xDim)[1]; //ncol - number of features
 
@@ -95,18 +109,18 @@ SEXP r_sgl_simple (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels, SEXP r_lambd
 	int end;
 	Rprintf("start fit : \n");
 	start = clock();
-	c_sgl_simple(REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(r_featureWeights), REAL(
-			r_classWeights), list->_ptrs, n, p, d, *REAL(r_lambdaMin), *REAL(r_alpha), *REAL(
-			r_delta), *LOGICAL(r_do_refit));
+	c_sgl_simple(REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(
+			r_featureWeights), REAL(r_classWeights), list->_ptrs, n, p, d, k, *REAL(
+			r_lambdaMin), *REAL(r_alpha), *REAL(r_delta), *LOGICAL(r_do_refit));
 	end = clock();
-	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end - start)
-			/ CLOCKS_PER_SEC);
+	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end
+			- start) / CLOCKS_PER_SEC);
 
 	unprotectListOfMatrices(list);
 	return (list->_listSEXP);
 }
 
-SEXP r_sgl_predict_classes (SEXP r_x, SEXP r_beta) {
+SEXP r_sgl_predict_classes(SEXP r_x, SEXP r_beta) {
 
 	SEXP xDim = getAttrib(r_x, R_DimSymbol);
 	unsigned int n = INTEGER(xDim)[0]; //nrow - number of samples
@@ -118,16 +132,17 @@ SEXP r_sgl_predict_classes (SEXP r_x, SEXP r_beta) {
 	SEXP predictedClasses;
 	PROTECT(predictedClasses = allocVector(INTSXP, n));
 
-	c_sgl_predict_classes(
-			REAL(r_x), REAL(r_beta), (unsigned int*) INTEGER(predictedClasses), n, p, k);
+	c_sgl_predict_classes(REAL(r_x), REAL(r_beta), (unsigned int*) INTEGER(
+			predictedClasses), n, p, k);
 
 	UNPROTECT(1);
 	return predictedClasses;
 }
 
-SEXP r_sgl_simple_cv (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels, SEXP r_lambdaMin,
-		SEXP r_alpha, SEXP r_featureWeights, SEXP r_classWeights, SEXP r_delta, SEXP r_do_refit,
-		SEXP r_fold, SEXP r_numberOfThreads) {
+SEXP r_sgl_simple_cv(SEXP r_x, SEXP r_classes, SEXP r_numberOfModels,
+		SEXP r_lambdaMin, SEXP r_alpha, SEXP r_featureWeights,
+		SEXP r_classWeights, SEXP r_delta, SEXP r_do_refit, SEXP r_fold,
+		SEXP r_numberOfThreads) {
 
 	SEXP xDim = getAttrib(r_x, R_DimSymbol);
 	unsigned int n = INTEGER(xDim)[0]; //nrow - number of samples
@@ -150,21 +165,22 @@ SEXP r_sgl_simple_cv (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels, SEXP r_la
 	int end;
 	Rprintf("start fit : \n");
 	start = clock();
-	c_sgl_simple_cv(
-			REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(r_featureWeights), REAL(
-					r_classWeights), (unsigned int*) INTEGER(matrixSEXP), n, p, d, *REAL(
-					r_lambdaMin), *REAL(r_alpha), *REAL(r_delta), *LOGICAL(r_do_refit), *INTEGER(
-					r_fold), *INTEGER(r_numberOfThreads));
+	c_sgl_simple_cv(REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(
+			r_featureWeights), REAL(r_classWeights), (unsigned int*) INTEGER(
+			matrixSEXP), n, p, d, *REAL(r_lambdaMin), *REAL(r_alpha), *REAL(
+			r_delta), *LOGICAL(r_do_refit), *INTEGER(r_fold), *INTEGER(
+			r_numberOfThreads));
 	end = clock();
-	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end - start)
-			/ CLOCKS_PER_SEC);
+	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end
+			- start) / CLOCKS_PER_SEC);
 
 	UNPROTECT(2);
 	return (matrixSEXP);
 }
 
-SEXP r_sgl_simple_stability_paths (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels,
-		SEXP r_lambdaMin, SEXP r_alpha, SEXP r_featureWeights, SEXP r_classWeights, SEXP r_delta,
+SEXP r_sgl_simple_stability_paths(SEXP r_x, SEXP r_classes,
+		SEXP r_numberOfModels, SEXP r_lambdaMin, SEXP r_alpha,
+		SEXP r_featureWeights, SEXP r_classWeights, SEXP r_delta,
 		SEXP r_number_of_subsamples, SEXP r_number_of_threads) {
 
 	SEXP xDim = getAttrib(r_x, R_DimSymbol);
@@ -182,21 +198,23 @@ SEXP r_sgl_simple_stability_paths (SEXP r_x, SEXP r_classes, SEXP r_numberOfMode
 	int end;
 	Rprintf("start fit : \n");
 	start = clock();
-	c_sgl_simple_stability_paths(
-			REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(r_featureWeights), REAL(
-					r_classWeights), list->_ptrs, n, p, d, *REAL(r_lambdaMin), *REAL(r_alpha),
-			*REAL(r_delta), *INTEGER(r_number_of_subsamples), *INTEGER(r_number_of_threads));
+	c_sgl_simple_stability_paths(REAL(r_x), (unsigned int*) INTEGER(r_classes),
+			REAL(r_featureWeights), REAL(r_classWeights), list->_ptrs, n, p, d,
+			*REAL(r_lambdaMin), *REAL(r_alpha), *REAL(r_delta), *INTEGER(
+					r_number_of_subsamples), *INTEGER(r_number_of_threads));
 	end = clock();
-	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end - start)
-			/ CLOCKS_PER_SEC);
+	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end
+			- start) / CLOCKS_PER_SEC);
 
 	unprotectListOfMatrices(list);
 	return (list->_listSEXP);
 }
 
-SEXP r_sgl_simple_stability_selection (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels,
-		SEXP r_lambdaMin, SEXP r_alpha, SEXP r_featureWeights, SEXP r_classWeights, SEXP r_delta,
-		SEXP r_stability_cutoff, SEXP r_number_of_subsamples, SEXP r_number_of_threads) {
+SEXP r_sgl_simple_stability_selection(SEXP r_x, SEXP r_classes,
+		SEXP r_numberOfModels, SEXP r_lambdaMin, SEXP r_alpha,
+		SEXP r_featureWeights, SEXP r_classWeights, SEXP r_delta,
+		SEXP r_stability_cutoff, SEXP r_number_of_subsamples,
+		SEXP r_number_of_threads) {
 
 	SEXP xDim = getAttrib(r_x, R_DimSymbol);
 	unsigned int n = INTEGER(xDim)[0]; //nrow - number of samples
@@ -213,22 +231,24 @@ SEXP r_sgl_simple_stability_selection (SEXP r_x, SEXP r_classes, SEXP r_numberOf
 	int end;
 	Rprintf("start fit : \n");
 	start = clock();
-	c_sgl_simple_stability_selection(
-			REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(r_featureWeights), REAL(
-					r_classWeights), list->_ptrs, n, p, d, *REAL(r_lambdaMin), *REAL(r_alpha),
-			*REAL(r_delta), *REAL(r_stability_cutoff), *INTEGER(r_number_of_subsamples), *INTEGER(
-					r_number_of_threads));
+	c_sgl_simple_stability_selection(REAL(r_x), (unsigned int*) INTEGER(
+			r_classes), REAL(r_featureWeights), REAL(r_classWeights),
+			list->_ptrs, n, p, d, *REAL(r_lambdaMin), *REAL(r_alpha), *REAL(
+					r_delta), *REAL(r_stability_cutoff), *INTEGER(
+					r_number_of_subsamples), *INTEGER(r_number_of_threads));
 	end = clock();
-	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end - start)
-			/ CLOCKS_PER_SEC);
+	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end
+			- start) / CLOCKS_PER_SEC);
 
 	unprotectListOfMatrices(list);
 	return (list->_listSEXP);
 }
 
-SEXP r_sgl_simple_stability_selection_cv (SEXP r_x, SEXP r_classes, SEXP r_numberOfModels,
-		SEXP r_lambdaMin, SEXP r_alpha, SEXP r_featureWeights, SEXP r_classWeights, SEXP r_delta,
-		SEXP r_fold, SEXP r_stability_cutoff, SEXP r_number_of_subsamples, SEXP r_number_of_threads) {
+SEXP r_sgl_simple_stability_selection_cv(SEXP r_x, SEXP r_classes,
+		SEXP r_numberOfModels, SEXP r_lambdaMin, SEXP r_alpha,
+		SEXP r_featureWeights, SEXP r_classWeights, SEXP r_delta, SEXP r_fold,
+		SEXP r_stability_cutoff, SEXP r_number_of_subsamples,
+		SEXP r_number_of_threads) {
 
 	SEXP xDim = getAttrib(r_x, R_DimSymbol);
 	unsigned int n = INTEGER(xDim)[0]; //nrow - number of samples
@@ -251,15 +271,15 @@ SEXP r_sgl_simple_stability_selection_cv (SEXP r_x, SEXP r_classes, SEXP r_numbe
 	int end;
 	Rprintf("start fit : \n");
 	start = clock();
-	c_sgl_simple_stability_selection_cv(
-			REAL(r_x), (unsigned int*) INTEGER(r_classes), REAL(r_featureWeights), REAL(
-					r_classWeights), (unsigned int*) INTEGER(matrixSEXP), n, p, d, *REAL(
-					r_lambdaMin), *REAL(r_alpha), *REAL(r_delta), *INTEGER(r_fold), *REAL(
-					r_stability_cutoff), *INTEGER(r_number_of_subsamples), *INTEGER(
-					r_number_of_threads));
+	c_sgl_simple_stability_selection_cv(REAL(r_x), (unsigned int*) INTEGER(
+			r_classes), REAL(r_featureWeights), REAL(r_classWeights),
+			(unsigned int*) INTEGER(matrixSEXP), n, p, d, *REAL(r_lambdaMin),
+			*REAL(r_alpha), *REAL(r_delta), *INTEGER(r_fold), *REAL(
+					r_stability_cutoff), *INTEGER(r_number_of_subsamples),
+			*INTEGER(r_number_of_threads));
 	end = clock();
-	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end - start)
-			/ CLOCKS_PER_SEC);
+	Rprintf("end fit - Took %i clocks %f seconds \n", end - start, (float) (end
+			- start) / CLOCKS_PER_SEC);
 
 	UNPROTECT(2);
 	return (matrixSEXP);

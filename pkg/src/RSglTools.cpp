@@ -60,5 +60,7 @@ struct ListOfMatrices * createListOfMatrices(unsigned int nrow, unsigned int nco
 
 void unprotectListOfMatrices(struct ListOfMatrices * obj) {
 
+	//Rprintf("Debug: UNPROTECT(%i) \n", obj->length + 2);
+
     UNPROTECT(obj->length + 2);
 }
