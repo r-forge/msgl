@@ -13,99 +13,121 @@
 #include "armadillo.hpp"
 using namespace arma;
 
-template <typename T>
-T square(T x) {
-    return x*x;
-}
-
-template <template <typename> class PartialLikelihoodFunction, typename Data >
+template<template<typename > class PartialLikelihoodFunction, typename Data>
 class SubgradientFunction {
 private:
-    Data const& _data;
+	Data const& _data;
 
-    u32 _derFeatureIndex;
-    u32 _derClassIndex;
+	u32 _derFeatureIndex;
+	u32 _derClassIndex;
 
-    double const _alpha;
-    double _lambda;
+	double const _alpha;
+	double _lambda;
 
-    double _partialValue;
+	double _partialValue;
 
-    PartialLikelihoodFunction<Data> & _partialLikelihoodFunction;
+	double _sq_featureNorm;
+	double _sq_featureNormPartial;
+
+	PartialLikelihoodFunction<Data> & _partialLikelihoodFunction;
 
 public:
 
-    SubgradientFunction(PartialLikelihoodFunction<Data> & partialLikelihoodFunction, Data const& data, double const alpha) :
-    _data(data), _derFeatureIndex(0), _derClassIndex(0),
-    _alpha(alpha), _lambda(0), _partialValue(0), _partialLikelihoodFunction(partialLikelihoodFunction) {
-    };
+	SubgradientFunction(
+			PartialLikelihoodFunction<Data> & partialLikelihoodFunction,
+			Data const& data, double const alpha) :
+		_data(data), _derFeatureIndex(0), _derClassIndex(0), _alpha(alpha),
+				_lambda(0), _partialValue(0), _sq_featureNorm(0), _partialLikelihoodFunction(
+						partialLikelihoodFunction) {
+	}
+	;
 
-    /**
-     * Sets the partial derivative this function object should represent.
-     *
-     * @param classIndex
-     * @param featureIndex
-     * @return
-     */
-    SubgradientFunction& der(u32 classIndex, u32 featureIndex) {
+	/**
+	 * Sets the partial derivative this function object should represent.
+	 *
+	 * @param classIndex
+	 * @param featureIndex
+	 * @return
+	 */
+	SubgradientFunction& der(u32 classIndex, u32 featureIndex) {
 
-        _derFeatureIndex = featureIndex;
-        _derClassIndex = classIndex;
+		_partialLikelihoodFunction.der(classIndex, featureIndex).cor(
+				classIndex, featureIndex);
 
-        _partialLikelihoodFunction.der(classIndex, featureIndex).cor(classIndex, featureIndex);
+		_derFeatureIndex = featureIndex;
+		_derClassIndex = classIndex;
 
-        return *this;
-    }
+		return *this;
+	}
 
-    SubgradientFunction& lambda(double lambda) {
-        _lambda = lambda;
-        return *this;
-    }
+	SubgradientFunction& lambda(double lambda) {
+		_lambda = lambda;
+		return *this;
+	}
 
-    SubgradientFunction& at(double point) {
+	//TODO how to ensure this will be used correctly
+	SubgradientFunction& feature_norm(double featureNorm) {
+		_sq_featureNormPartial = featureNorm;
+		return *this;
+	}
 
-        _partialValue = _partialLikelihoodFunction(point);
-        return *this;
-    }
+	SubgradientFunction& at(double point) {
 
-    double eval() const;
+		_sq_featureNorm = _sq_featureNormPartial + square(point);
+		_partialValue = _partialLikelihoodFunction(point);
 
-    double operator()(double point) {
-        at(point);
-        return eval();
-    }
+		return *this;
+	}
+
+	double eval() const;
+
+	double operator()(double point) {
+
+		at(point);
+		return eval();
+	}
 };
 
-template <template <typename> class PartialLikelihoodFunction, typename Data >
+template<template<typename > class PartialLikelihoodFunction, typename Data>
 inline double SubgradientFunction<PartialLikelihoodFunction, Data>::eval() const {
 
-    // Return result if intercept, i.e. no panelization
-    if (_derFeatureIndex == 0) {
-        return (_partialValue);
-    }
+	// Return result if intercept, i.e. no panelization
+	if (_derFeatureIndex == 0) {
+		return (_partialValue);
+	}
 
-    double classWeight = _data.getClassWeights(_derClassIndex);
-    double featureWeight = _data.getFeatureWeights(_derFeatureIndex);
+	double classWeight = _data.getClassWeights(_derClassIndex);
+	double featureWeight = _data.getFeatureWeights(_derFeatureIndex);
 
-    //Calculate norm_2^2(beta_*q)
-    mat const& beta = _partialLikelihoodFunction.getBeta();
-    double s = sqrt(dot(beta.col(_derFeatureIndex), beta.col(_derFeatureIndex)));
+	mat const& beta = _partialLikelihoodFunction.getBeta();
 
-    double sgn;
-    if (_partialValue > 0) {
-        sgn = 1;
-    } else {
-        sgn = -1;
-    }
+	double featureNorm = sqrt(_sq_featureNorm);
 
-    double result;
-    if (s == 0) {
-        result = _partialValue - _lambda * (1 - _alpha) * featureWeight * sgn - _lambda * _alpha * classWeight*sgn;
-    } else {
-        result = _partialValue + _lambda * (1 - _alpha) * featureWeight * beta(_derClassIndex, _derFeatureIndex) / s - _lambda * _alpha * classWeight*sgn;
-    }
+//	double debug_featureNorm = sqrt(dot(beta.col(_derFeatureIndex), beta.col(
+//			_derFeatureIndex)));
+//
+//	cout << debug_featureNorm << " - ";
+//	cout << featureNorm << endl;
 
-    return (result);
+	double sgn;
+	if (_partialValue > 0) {
+		sgn = 1;
+	} else {
+		sgn = -1;
+	}
+
+	if(_alpha == 1) {
+		return _partialValue - _lambda * _alpha * classWeight * sgn;
+	}
+
+	if (featureNorm == 0) {
+		return _partialValue - _lambda * (1 - _alpha) * featureWeight * sgn
+				- _lambda * _alpha * classWeight * sgn;
+	} else {
+		return _partialValue + _lambda * (1 - _alpha) * featureWeight * beta(
+				_derClassIndex, _derFeatureIndex) / featureNorm - _lambda
+				* _alpha * classWeight * sgn;
+	}
 }
 
 #endif	/* SUBGRADIENTFUNCTION_H */

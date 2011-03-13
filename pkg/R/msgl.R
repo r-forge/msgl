@@ -17,7 +17,7 @@ mem.test <- function(d, p, k) {
 	return(beta.list)	
 }
 
-sparseGroupLasso.experimental <- function(x, classes, lambdaMin = 0.02, numberOfModels = 50L, alpha = 0.5, featureWeights = rep(1, ncol(x)), classWeights = rep(1, length(levels(classes))), standardize = TRUE, refit = FALSE, delta = 0.001) {
+sparseGroupLasso.experimental <- function(x, classes, lambdaMin = 0.02, numberOfModels = 50L, alpha = 0.5, featureWeights = rep(1, ncol(x)), classWeights = rep(1, length(levels(classes))), standardize = TRUE, refit = FALSE, delta = 0.00001) {
 	
 	if(!is.factor(classes)) {
 		stop("Parameter classes must be a factor - ")

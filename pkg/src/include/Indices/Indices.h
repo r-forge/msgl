@@ -56,7 +56,8 @@ public:
         //TODO assert that every element of indices is uniqe
     }
 
-    Indices(IntegerSet const& indices) : _indices(indices) {
+    //Prevent automatic conversion
+    explicit Indices(IntegerSet const& indices) : _indices(indices) {
         //TODO assert that every element of indices is uniqe
     }
 
@@ -82,14 +83,17 @@ public:
      * @param gen random number genrator
      * @return the subset of indices
      */
-    template <typename RandomNumberGenerator> Indices randomSubset(u32 size_of_subset, RandomNumberGenerator & gen) const {
+    template <typename RandomNumberGenerator>
+    Indices randomSubset(u32 size_of_subset, RandomNumberGenerator & gen) const {
 
         ASSERT(size() >= size_of_subset, "_randomSubset - To few elements.");
 
-        return Indices(_indices.randomSubset(size_of_subset, gen));
+        Indices subset(_indices.randomSubset(size_of_subset, gen));
+        return subset;
     }
 
-    template <typename RandomNumberGenerator> field<Indices> randomSubsets(u32 size_of_subset, u32 number_of_subsets, RandomNumberGenerator & gen) const {
+    template <typename RandomNumberGenerator>
+    field<Indices> randomSubsets(u32 size_of_subset, u32 number_of_subsets, RandomNumberGenerator & gen) const {
         field<Indices> subsets(number_of_subsets);
 
         for(u32 i=0; i < number_of_subsets; i++) {

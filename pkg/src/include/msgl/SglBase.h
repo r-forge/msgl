@@ -34,43 +34,33 @@ private:
 
 	LineSearch const& _lineSearch;
 
-	//Tempories
-	mutable mat _betaTemp;
-	mutable vec _featureTemp;
-
 public:
 
-	SglBase (LineSearch const& lineSearch, Data const& data, double alpha, double delta) :
-		_data(data), _alpha(alpha), _deltaFeatureLoop(delta), _deltaClassLoop(delta),
-				_partialLikelihoodFunction(PartialLikelihoodFunction<Data> (data)),
-				_subgradientFunction(SubgradientFunction<PartialLikelihoodFunction, Data> (
-						_partialLikelihoodFunction, data, alpha)), _lineSearch(lineSearch),
-				_betaTemp(mat(data.getK(), data.getP() + 1)), _featureTemp(vec(data.getP() + 1)) {
+	SglBase(LineSearch const& lineSearch, Data const& data, double alpha, double delta) :
+		_data(data), _alpha(alpha), _deltaFeatureLoop(delta), _deltaClassLoop(delta), _partialLikelihoodFunction(PartialLikelihoodFunction<Data> (data)),
+				_subgradientFunction(SubgradientFunction<PartialLikelihoodFunction, Data> (_partialLikelihoodFunction, data, alpha)), _lineSearch(lineSearch) {
 	}
-	;
 
-	ParameterList fit (vec const& lambdaSeq) const;
+	ParameterList fit(vec const& lambdaSeq) const;
 
-	mat refit (mat const& beta, mat const& stability_path, double stability_cutoff) const;
-	ParameterList refit (StabilityPaths const& stability_paths, double stability_cutoff) const;
-	ParameterList refit (ParameterList const& list) const;
+	mat refit(mat const& beta, mat const& stability_path, double stability_cutoff) const;
+	ParameterList refit(StabilityPaths const& stability_paths, double stability_cutoff) const;
+	ParameterList refit(ParameterList const& list) const;
 
-	vec lambdaSequence (double lambdaMin, u32 length) const;
+	vec lambdaSequence(double lambdaMin, u32 length) const;
 
-	double lambdaMax () const;
+	double lambdaMax() const;
 
 private:
 
-	bool isFeatureZero (Parameter const& parameters, vec const& partialAtZeroFeature,
-			u32 featureIndex) const;
+	bool isFeatureZero(Parameter const& parameters, vec const& partialAtZeroFeature, u32 featureIndex) const;
 	bool
-	isParameterZero (Parameter const& parameter, double s, u32 classIndex, u32 featureIndex) const;
+	isParameterZero(Parameter const& parameter, double s, u32 classIndex, u32 featureIndex) const;
 };
 
 //TODO note works for alpha=1,0
 template<template<typename > class PartialLikelihoodFunction, typename LineSearch, typename Data>
-bool SglBase<PartialLikelihoodFunction, LineSearch, Data>::isParameterZero (
-		Parameter const& parameter, double s, u32 classIndex, u32 featureIndex) const {
+bool SglBase<PartialLikelihoodFunction, LineSearch, Data>::isParameterZero(Parameter const& parameter, double s, u32 classIndex, u32 featureIndex) const {
 
 	u32 k = _data.getK();
 
@@ -82,11 +72,9 @@ bool SglBase<PartialLikelihoodFunction, LineSearch, Data>::isParameterZero (
 		if (parameter(j, featureIndex) != 0 || parameter(classIndex, featureIndex) != 0) {
 			if (s <= lambda * _alpha * _data.getClassWeights(classIndex)) {
 
-				//set beta to zero
 				return true;
 
-			}
-			else {
+			} else {
 
 				return false;
 
@@ -96,11 +84,9 @@ bool SglBase<PartialLikelihoodFunction, LineSearch, Data>::isParameterZero (
 
 	//if we reach this point then all beta element of the given feature are zero
 
-	if (s <= lambda * (_data.getFeatureWeights(featureIndex) + _alpha * (_data.getClassWeights(
-			classIndex) - _data.getFeatureWeights(featureIndex)))) {
+	if (s <= lambda * (_data.getFeatureWeights(featureIndex) + _alpha * (_data.getClassWeights(classIndex) - _data.getFeatureWeights(featureIndex)))) {
 		return true;
-	}
-	else {
+	} else {
 
 		return false;
 	}
@@ -108,8 +94,7 @@ bool SglBase<PartialLikelihoodFunction, LineSearch, Data>::isParameterZero (
 
 //TOOD note works for alpha=0, should be skiped for alpha=1
 template<template<typename > class PartialLikelihoodFunction, typename LineSearch, typename Data>
-bool SglBase<PartialLikelihoodFunction, LineSearch, Data>::isFeatureZero (
-		Parameter const& parameter, vec const& partialAtZeroFeature, u32 featureIndex) const {
+bool SglBase<PartialLikelihoodFunction, LineSearch, Data>::isFeatureZero(Parameter const& parameter, vec const& partialAtZeroFeature, u32 featureIndex) const {
 
 	double s, sqsum;
 	sqsum = 0;
@@ -133,15 +118,14 @@ bool SglBase<PartialLikelihoodFunction, LineSearch, Data>::isFeatureZero (
 
 		return (true);
 
-	}
-	else {
+	} else {
 
 		return (false);
 	}
 }
 
 template<template<typename > class PartialLikelihoodFunction, typename LineSearch, typename Data>
-double SglBase<PartialLikelihoodFunction, LineSearch, Data>::lambdaMax () const {
+double SglBase<PartialLikelihoodFunction, LineSearch, Data>::lambdaMax() const {
 
 	double lambdaMax = 0;
 
@@ -154,8 +138,7 @@ double SglBase<PartialLikelihoodFunction, LineSearch, Data>::lambdaMax () const 
 		for (u32 j = 0; j < k; j++) {
 
 			double s = _partialLikelihoodFunction.der(j, i).eval();
-			double lm = fabs(s) / ((1 - _alpha) * _data.getFeatureWeights(i) + _alpha
-					* _data.getClassWeights(j));
+			double lm = fabs(s) / ((1 - _alpha) * _data.getFeatureWeights(i) + _alpha * _data.getClassWeights(j));
 
 			//TODO remove cout << s << endl;
 
@@ -168,8 +151,7 @@ double SglBase<PartialLikelihoodFunction, LineSearch, Data>::lambdaMax () const 
 }
 
 template<template<typename > class PartialLikelihoodFunction, typename LineSearch, typename Data>
-vec SglBase<PartialLikelihoodFunction, LineSearch, Data>::lambdaSequence (double lambdaMin,
-		u32 length) const {
+vec SglBase<PartialLikelihoodFunction, LineSearch, Data>::lambdaSequence(double lambdaMin, u32 length) const {
 
 	double lambda_Max = lambdaMax();
 
@@ -187,13 +169,16 @@ vec SglBase<PartialLikelihoodFunction, LineSearch, Data>::lambdaSequence (double
 }
 
 template<template<typename > class PartialLikelihoodFunction, typename LineSearch, typename Data>
-ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::fit (vec const& lambdaSeq) const {
+ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::fit(vec const& lambdaSeq) const {
 
 	const u32 k = _data.getK();
 	const u32 p = _data.getP();
 
-	ParameterList parameters(lambdaSeq, k, p);
+	ParameterList parameters(lambdaSeq, k, p, _deltaClassLoop, _deltaFeatureLoop);
 	_partialLikelihoodFunction.at_zero();
+
+	uvec featreZero(p); // 0 if feature is zero otherwise feature is non zero
+	featreZero.zeros();
 
 	vec temp(k);
 
@@ -202,13 +187,11 @@ ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::fit (vec con
 		//Feature loop
 		u32 itrFeatureLoop = 0;
 		do {
-			_betaTemp = parameters.getParameterMatrix();
 
 			//Intercept
 			for (u32 j = 0; j < k; j++) {
 				//find and set the root
-				parameters(j, 0) = _lineSearch.lineSearch(_partialLikelihoodFunction.der(j, 0).cor(
-						j, 0), parameters(j, 0));
+				parameters.set(_lineSearch.lineSearch(_partialLikelihoodFunction.der(j, 0).cor(j, 0), parameters(j, 0)), j, 0);
 			}
 
 			for (u32 i = 1; i < p + 1; i++) {
@@ -216,7 +199,9 @@ ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::fit (vec con
 				//skip feature check if alpha = 1
 				if (_alpha != 1.0) {
 
-					_partialLikelihoodFunction.at_zero_feature(i);
+					if (featreZero(i - 1) != 0) {
+						_partialLikelihoodFunction.at_zero_feature(i);
+					}
 
 					for (u32 j = 0; j < k; j++) {
 						temp(j) = _partialLikelihoodFunction.der(j, i).eval();
@@ -225,13 +210,20 @@ ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::fit (vec con
 					if (isFeatureZero(parameters, temp, i)) {
 
 						//set feature i in beta set to zero
-						parameters.setFeatureZero(i);
+						if (featreZero(i - 1) != 0) {
+							parameters.setFeatureZero(i);
+							featreZero(i - 1) = 0;
+						}
+
 						continue;
 
+						featreZero(i - 1) = 1;
+
+						//Reset partial likelihood function
+						//TODO opt option here
+						_partialLikelihoodFunction.at(parameters.getParameterMatrix().col(i), i);
 					}
 
-					//beta unchanged
-					_partialLikelihoodFunction.at(parameters.getParameterMatrix().col(i), i);
 				}
 
 #ifdef SGL_VERBOSE
@@ -242,29 +234,34 @@ ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::fit (vec con
 				int itrClassLoop = 0;
 				do {
 
-					_featureTemp = parameters.getFeature(i);
-
 					for (u32 j = 0; j < k; j++) {
 
-						double s = _partialLikelihoodFunction.der(j, i).cor(j, i)(0);
+						double s = 0;
+						if (parameters(j, i) == 0) {
+							s = _partialLikelihoodFunction.der(j, i).cor(j, i).eval();
+						} else {
+							s = _partialLikelihoodFunction.der(j, i).cor(j, i)(0);
+						}
 
 						if (isParameterZero(parameters, s, j, i)) {
-							parameters(j, i) = 0;
+
+							parameters.set(0, j, i);
 							continue;
 
 						}
 
 						//reset likelihood function
-						_partialLikelihoodFunction.at(parameters(j, i));
+						if (parameters(j, i) == 0) {
+							_partialLikelihoodFunction.at(parameters(j, i));
+						}
 
 #ifdef SGL_VERBOSE
 						cout << "(" << parameters.getIndex() << ")" << " -> Class " << j << "non zero" << endl;
 #endif
 
 						//find and set the root
-						parameters(j, i) = _lineSearch.lineSearch(
-								_subgradientFunction.der(j, i).lambda(parameters.getLambda()),
-								parameters(j, i));
+						parameters.set(_lineSearch.lineSearch(_subgradientFunction.der(j, i).lambda(parameters.getLambda()).feature_norm(
+								parameters.getFeatureNorm(i) - square(parameters(j, i))), parameters(j, i)), j, i);
 
 					}
 
@@ -279,7 +276,7 @@ ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::fit (vec con
 
 					//cout << " - - > distance " << parameters.distanceToFeature(i, _featureTemp) << endl;
 
-				} while (parameters.distanceToFeature(i, _featureTemp) > _deltaClassLoop); //TODO opt non conv check??
+				} while (!parameters.classLoopConverged()); //TODO opt non conv check??
 			}
 
 			//TODO opt non conv check??
@@ -291,7 +288,7 @@ ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::fit (vec con
 				return parameters;
 			}
 
-		} while (parameters.distanceTo(_betaTemp) > _deltaFeatureLoop);
+		} while (!parameters.featureLoppConverged());
 
 		parameters.next();
 
@@ -301,12 +298,10 @@ ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::fit (vec con
 }
 
 template<template<typename > class PartialLikelihoodFunction, typename LineSearch, typename Data>
-ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit (
-		ParameterList const& org_parameters) const {
+ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit(ParameterList const& org_parameters) const {
 
-	ParameterList parameters(
-			org_parameters.getLambdaSequence(), org_parameters.numberOfClasses(),
-			org_parameters.numberOfFeatures());
+	//TODO do not use ParameterList as place holder
+	ParameterList parameters(org_parameters.getLambdaSequence().n_elem, org_parameters.numberOfClasses(), org_parameters.numberOfFeatures());
 
 	u32 i = 0;
 	while (parameters.hasNext()) {
@@ -322,18 +317,14 @@ ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit (
 }
 
 template<template<typename > class PartialLikelihoodFunction, typename LineSearch, typename Data>
-ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit (
-		StabilityPaths const& stability_paths, double stability_cutoff) const {
+ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit(StabilityPaths const& stability_paths, double stability_cutoff) const {
 
-	ParameterList parameters(
-			stability_paths.numberOfModels(), stability_paths.numberOfClasses(),
-			stability_paths.numberOfFeatures());
+	//TODO do not use ParameterList as place holder
+	ParameterList parameters(stability_paths.numberOfModels(), stability_paths.numberOfClasses(), stability_paths.numberOfFeatures());
 
 	u32 i = 0;
 	while (parameters.hasNext()) {
-		parameters = refit(
-				parameters.getParameterMatrix(), stability_paths.probabilityMatrix(i),
-				stability_cutoff);
+		parameters = refit(parameters.getParameterMatrix(), stability_paths.probabilityMatrix(i), stability_cutoff);
 		parameters.next();
 		i++;
 	}
@@ -342,8 +333,7 @@ ParameterList SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit (
 }
 
 template<template<typename > class PartialLikelihoodFunction, typename LineSearch, typename Data>
-mat SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit (mat const& beta,
-		mat const& stability_path, double stability_cutoff) const {
+mat SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit(mat const& beta, mat const& stability_path, double stability_cutoff) const {
 
 	//TODO check 0 <= statbility_cutoff <= 1
 
@@ -352,12 +342,11 @@ mat SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit (mat const& beta
 
 	_partialLikelihoodFunction.at(beta);
 
-	Parameter parameters(beta);
+	Parameter parameters(beta, _deltaClassLoop, _deltaFeatureLoop);
 
 	//Feature loop
 	u32 itrFeatureLoop = 0;
 	do {
-		_betaTemp = parameters.getParameterMatrix();
 
 		for (u32 i = 0; i < p + 1; i++) {
 
@@ -365,13 +354,10 @@ mat SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit (mat const& beta
 			int itrClassLoop = 0;
 			do {
 
-				_featureTemp = parameters.getFeature(i);
-
 				for (u32 j = 0; j < k; j++) {
 					if (stability_path(j, i) >= stability_cutoff) {
 						//find and set the root
-						parameters(j, i) = _lineSearch.lineSearch(_partialLikelihoodFunction.der(
-								j, i).cor(j, i), parameters(j, i));
+						parameters.set(_lineSearch.lineSearch(_partialLikelihoodFunction.der(j, i).cor(j, i), parameters(j, i)), j, i);
 					}
 				}
 
@@ -386,7 +372,7 @@ mat SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit (mat const& beta
 
 				//cout << " - - > distance " << parameters.distanceToFeature(i, _featureTemp) << endl;
 
-			} while (parameters.distanceToFeature(i, _featureTemp) > _deltaClassLoop); //TODO opt non conv check??
+			} while (!parameters.classLoopConverged()); //TODO opt non conv check??
 		}
 
 		//TODO opt non conv check??
@@ -398,7 +384,7 @@ mat SglBase<PartialLikelihoodFunction, LineSearch, Data>::refit (mat const& beta
 			return parameters.getParameterMatrix();
 		}
 
-	} while (parameters.distanceTo(_betaTemp) > _deltaFeatureLoop);
+	} while (!parameters.featureLoppConverged());
 
 	return parameters.getParameterMatrix();
 }

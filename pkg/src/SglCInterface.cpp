@@ -7,36 +7,36 @@
 
 //FIXME number of classes should not be set equal to max(Y)+1
 
-void c_sgl_experimental(double * x_ptr, unsigned int * classes_ptr, double * featureWeights_ptr, double * classWeights_ptr, double ** betaList_ptrs, unsigned int n, unsigned int p, unsigned int d, double lambdaMin, double alpha, double delta, int do_refit) {
-
-    const mat X(x_ptr, n, p, false, true);
-    const uvec Y(classes_ptr, n, false, true);
-    const vec featureWeights(featureWeights_ptr, p, false, true);
-    const vec classWeights(classWeights_ptr, max(Y) + 1, false, true);
-
-    ParameterList parameters = sgl_simple<ExperimentalLikelihood, MultinomialLikelihoodFunction > (X, Y, featureWeights, classWeights, delta, alpha, lambdaMin, d, do_refit);
-
-    //Copy to beta list
-    for (u32 i = 0; i < parameters.getIndex(); i++) {
-        mat b(betaList_ptrs[i], p + 1, max(Y) + 1, false, true);
-        b = parameters.getParameterMatrixByIndex(i);
-    }
-}
-
-void c_sgl_experimental_cv(double * x_ptr, unsigned int * classes_ptr, double * featureWeights_ptr, double * classWeights_ptr, unsigned int * pedictedClasses_ptr, unsigned int n, unsigned int p, unsigned int d, double lambdaMin, double alpha, double delta, int do_refit, unsigned int fold, unsigned int numberOfThreads) {
-
-    const mat X(x_ptr, n, p, false, true);
-    const uvec Y(classes_ptr, n, false, true);
-    const vec featureWeights(featureWeights_ptr, p, false, true);
-    const vec classWeights(classWeights_ptr, max(Y) + 1, false, true);
-
-    umat predictedClasses = sgl_simple_cv<ExperimentalLikelihood, MultinomialLikelihoodFunction, MultinomialPredictor > (X, Y, featureWeights, classWeights, delta, alpha, lambdaMin, d, do_refit, fold, numberOfThreads);
-
-    //Copy
-    umat b(pedictedClasses_ptr, n, d, false, true);
-    b = predictedClasses;
-
-}
+//void c_sgl_experimental(double * x_ptr, unsigned int * classes_ptr, double * featureWeights_ptr, double * classWeights_ptr, double ** betaList_ptrs, unsigned int n, unsigned int p, unsigned int d, double lambdaMin, double alpha, double delta, int do_refit) {
+//
+//    const mat X(x_ptr, n, p, false, true);
+//    const uvec Y(classes_ptr, n, false, true);
+//    const vec featureWeights(featureWeights_ptr, p, false, true);
+//    const vec classWeights(classWeights_ptr, max(Y) + 1, false, true);
+//
+//    ParameterList parameters = sgl_simple<ExperimentalLikelihood, MultinomialLikelihoodFunction > (X, Y, featureWeights, classWeights, delta, alpha, lambdaMin, d, do_refit);
+//
+//    //Copy to beta list
+//    for (u32 i = 0; i < parameters.getIndex(); i++) {
+//        mat b(betaList_ptrs[i], p + 1, max(Y) + 1, false, true);
+//        b = parameters.getParameterMatrixByIndex(i);
+//    }
+//}
+//
+//void c_sgl_experimental_cv(double * x_ptr, unsigned int * classes_ptr, double * featureWeights_ptr, double * classWeights_ptr, unsigned int * pedictedClasses_ptr, unsigned int n, unsigned int p, unsigned int d, double lambdaMin, double alpha, double delta, int do_refit, unsigned int fold, unsigned int numberOfThreads) {
+//
+//    const mat X(x_ptr, n, p, false, true);
+//    const uvec Y(classes_ptr, n, false, true);
+//    const vec featureWeights(featureWeights_ptr, p, false, true);
+//    const vec classWeights(classWeights_ptr, max(Y) + 1, false, true);
+//
+//    umat predictedClasses = sgl_simple_cv<ExperimentalLikelihood, MultinomialLikelihoodFunction, MultinomialPredictor > (X, Y, featureWeights, classWeights, delta, alpha, lambdaMin, d, do_refit, fold, numberOfThreads);
+//
+//    //Copy
+//    umat b(pedictedClasses_ptr, n, d, false, true);
+//    b = predictedClasses;
+//
+//}
 
 void c_sgl_simple(double * x_ptr, unsigned int * classes_ptr, double * featureWeights_ptr, double * classWeights_ptr, double ** betaList_ptrs, unsigned int n, unsigned int p, unsigned int d, unsigned int k, double lambdaMin, double alpha, double delta, int do_refit) {
 

@@ -25,139 +25,157 @@
 #include "armadillo.hpp"
 using namespace arma;
 
+template<typename T>
+T square(T x) {
+	return x * x;
+}
+
 template<typename Data>
 class MultinomialLikelihoodFunction {
 private:
-    Data const& _data;
+	Data const& _data;
 
-    u32 _derFeatureIndex;
-    u32 _derClassIndex;
-    u32 _corFeatureIndex;
-    u32 _corClassIndex;
+	u32 _derFeatureIndex;
+	u32 _derClassIndex;
+	u32 _corFeatureIndex;
+	u32 _corClassIndex;
 
-    mat _partB;
-    mat _expeta;
-    mat _Z;
-    mat _beta;
+	mat _partB;
+	mat _expeta;
+	mat _Z;
+	mat _beta;
 
 public:
 
-    MultinomialLikelihoodFunction(Data const& data) :
-    _data(data), _derFeatureIndex(0), _derClassIndex(0), _corFeatureIndex(0), _corClassIndex(0),
-    _partB(mat(data.getP() + 1, data.getK())), _expeta(mat(data.getN(), data.getK())), _Z(vec(data.getN())), _beta(mat(data.getK(), data.getP() + 1)) {
+	MultinomialLikelihoodFunction(Data const& data) :
+		_data(data), _derFeatureIndex(0), _derClassIndex(0),
+				_corFeatureIndex(0), _corClassIndex(0),
+				_partB(mat(data.getP()+ 1, data.getK())),
+				_expeta(mat(data.getN(), data.getK())),
+				_Z(vec(data.getN())),
+				_beta(mat(data.getK(), data.getP() + 1)) {
 
-        // caluclate part B
+		// caluclate part B
 
-        mat const& X = _data.getDataMatrix();
-        uvec const& Y = _data.getGrouping();
+		mat const& X = _data.getDataMatrix();
+		uvec const& Y = _data.getGrouping();
 
-        _partB.zeros();
+		_partB.zeros();
 
-        for (u32 j = 0; j < _data.getP() + 1; j++) {
-            for (u32 i = 0; i < _data.getN(); i++) {
-                _partB(j, Y(i)) = _partB(j, Y(i)) + X(i, j);
-            }
+		for (u32 j = 0; j < _data.getP() + 1; j++) {
+			for (u32 i = 0; i < _data.getN(); i++) {
+				_partB(j, Y(i)) = _partB(j, Y(i)) + X(i, j);
+			}
 
-        }
+		}
 
-    };
+	}
+	;
 
-    /**
-     * Sets the partial derivative this function object should represent.
-     *
-     * @param classIndex
-     * @param featureIndex
-     * @return
-     */
-    MultinomialLikelihoodFunction& der(u32 classIndex, u32 featureIndex) {
+	/**
+	 * Sets the partial derivative this function object should represent.
+	 *
+	 * @param classIndex
+	 * @param featureIndex
+	 * @return
+	 */
+	MultinomialLikelihoodFunction& der(u32 classIndex, u32 featureIndex) {
 
-        _derFeatureIndex = featureIndex;
-        _derClassIndex = classIndex;
+		_derFeatureIndex = featureIndex;
+		_derClassIndex = classIndex;
 
-        return *this;
-    }
+		return *this;
+	}
 
-    MultinomialLikelihoodFunction& cor(u32 classIndex, u32 featureIndex) {
+	MultinomialLikelihoodFunction& cor(u32 classIndex, u32 featureIndex) {
 
-        _corClassIndex = classIndex;
-        _corFeatureIndex = featureIndex;
+		_corClassIndex = classIndex;
+		_corFeatureIndex = featureIndex;
 
-        return *this;
-    }
+		return *this;
+	}
 
-    MultinomialLikelihoodFunction& at(mat const& beta) {
+	MultinomialLikelihoodFunction& at(mat const& beta) {
 
-        mat const& X = _data.getDataMatrix();
+		mat const& X = _data.getDataMatrix();
 
-        _expeta = exp(X * trans(beta));
-        _Z = sum(_expeta, 1);
-        _beta = beta;
+		_expeta = exp(X * trans(beta));
+		_Z = sum(_expeta, 1);
+		_beta = beta;
 
-        return *this;
-    }
+		return *this;
+	}
 
-    MultinomialLikelihoodFunction& at(double point) {
+	MultinomialLikelihoodFunction& at(double point) {
 
-        mat const& X = _data.getDataMatrix();
+		mat const& X = _data.getDataMatrix();
 
-        _Z = _Z - _expeta.col(_corClassIndex);
-        _expeta.col(_corClassIndex) = _expeta.col(_corClassIndex) % exp(X.col(_corFeatureIndex)*(point - _beta(_corClassIndex, _corFeatureIndex)));
-        _Z = _Z + _expeta.col(_corClassIndex);
+		_Z = _Z - _expeta.col(_corClassIndex);
+		_expeta.col(_corClassIndex) = _expeta.col(_corClassIndex) % exp(X.col(
+				_corFeatureIndex) * (point - _beta(_corClassIndex,
+				_corFeatureIndex)));
+		_Z = _Z + _expeta.col(_corClassIndex);
 
-        _beta(_corClassIndex, _corFeatureIndex) = point;
+		//update beta
+		_beta(_corClassIndex, _corFeatureIndex) = point;
 
-        return *this;
-    }
 
-    MultinomialLikelihoodFunction& at(vec const& feature, u32 featureIndex) {
+		return *this;
+	}
 
-        mat const& X = _data.getDataMatrix();
+	MultinomialLikelihoodFunction& at(vec const& feature, u32 featureIndex) {
 
-        _expeta = _expeta % exp(X.col(featureIndex) * trans(feature - _beta.col(featureIndex)));
-        _Z = sum(_expeta, 1);
-        _beta.col(featureIndex) = feature;
+		mat const& X = _data.getDataMatrix();
 
-        return *this;
-    }
+		_expeta = _expeta % exp(X.col(featureIndex) * trans(feature
+				- _beta.col(featureIndex)));
+		_Z = sum(_expeta, 1);
+		_beta.col(featureIndex) = feature;
 
-    MultinomialLikelihoodFunction& at_zero_feature(u32 featureIndex) {
+		return *this;
+	}
 
-        mat const& X = _data.getDataMatrix();
+	MultinomialLikelihoodFunction& at_zero_feature(u32 featureIndex) {
 
-        _expeta = _expeta % exp(X.col(featureIndex) * trans(-_beta.col(featureIndex)));
-        _Z = sum(_expeta, 1);
-        _beta.col(featureIndex).zeros();
+		mat const& X = _data.getDataMatrix();
 
-        return *this;
-    }
+		_expeta = _expeta % exp(X.col(featureIndex) * trans(-_beta.col(
+				featureIndex)));
+		_Z = sum(_expeta, 1);
+		_beta.col(featureIndex).zeros();
 
-    MultinomialLikelihoodFunction& at_zero() {
+		return *this;
+	}
 
-        _expeta.ones();
-        _Z = sum(_expeta, 1);
-        _beta.zeros();
+	MultinomialLikelihoodFunction& at_zero() {
 
-        return *this;
-    }
+		_expeta.ones();
+		_Z = sum(_expeta, 1);
+		_beta.zeros();
 
-    double eval() const {
+		return *this;
+	}
 
-        mat const& X = _data.getDataMatrix();
+	double eval() const {
 
-        double a = as_scalar(sum(_expeta.col(_derClassIndex) % X.col(_derFeatureIndex) / _Z));
+		mat const& X = _data.getDataMatrix();
 
-        return 1 / (double) X.n_rows * (a - _partB(_derFeatureIndex, _derClassIndex));
+		double a = as_scalar(sum(_expeta.col(_derClassIndex) % X.col(
+				_derFeatureIndex) / _Z));
 
-    }
+		return 1 / (double) X.n_rows * (a - _partB(_derFeatureIndex,
+				_derClassIndex));
 
-    double operator()(double point) {
-        at(point);
-        return eval();
-    }
+	}
 
-    mat const& getBeta() {
-        return _beta;
-    }
+	double operator()(double point) {
+		at(point);
+		return eval();
+	}
+
+	mat const& getBeta() const {
+		return _beta;
+	}
 };
 
 #endif	/* MULTINOMIALLIKELIHOODFUNCTION_H */

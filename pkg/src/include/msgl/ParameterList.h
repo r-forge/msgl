@@ -23,16 +23,17 @@ private:
 
 public:
 
-    ParameterList(vec const& lambdaSeq, u32 numberOfClasses, u32 numberOfFeatures) :
-    Parameter(numberOfClasses, numberOfFeatures),
+    ParameterList(vec const& lambdaSeq, u32 numberOfClasses, u32 numberOfFeatures, double deltaClassLoop, double deltaFeatureLoop) :
+    Parameter(numberOfClasses, numberOfFeatures, deltaClassLoop, deltaFeatureLoop),
     _betalist(field<mat>(lambdaSeq.n_elem)), _lambdaSeq(lambdaSeq), _lambdaIndex(0), _hasNext(true) {
 
         _lambda = _lambdaSeq(0);
         _hasNext = _lambdaIndex < _lambdaSeq.n_elem;
     }
 
+	//TODO constructor should be removed, do not use ParameterList as place holder
     ParameterList(u32 numberOfModels, u32 numberOfClasses, u32 numberOfFeatures) :
-    Parameter(numberOfClasses, numberOfFeatures),
+    Parameter(numberOfClasses, numberOfFeatures, 0, 0),
     _betalist(field<mat>(numberOfModels)), _lambdaSeq(numberOfModels), _lambdaIndex(0), _hasNext(true) {
 
         _lambda = _lambdaSeq(0);
