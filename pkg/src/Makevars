@@ -1,4 +1,0 @@
-#-DARMA_NO_DEBUG
-
-PKG_CXXFLAGS = -Iinclude -Wall -O3 -fopenmp -pedantic -ansi -DARMA_NO_DEBUG
-PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) -fopenmp
