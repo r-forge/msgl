@@ -190,6 +190,7 @@ std::string create_error_msg(const char * msg, const char * file_name,
 
 
 //FIXME use bactrace_exception in sgl
+#ifdef DEBUG_BACKTRACE
 
 #include <stdio.h>
 #include <execinfo.h>
@@ -255,7 +256,6 @@ public:
 
 };
 
-#ifdef DEBUG_BACKTRACE
 //TODO rename
 template<typename E>
 class simple_backtrace_exception : public backtrace_exception, public E {

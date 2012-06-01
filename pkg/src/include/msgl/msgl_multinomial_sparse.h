@@ -163,14 +163,14 @@ R::SEXP r_msgl_sparse_basic(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_featureWei
 		return msgl_sparse_basic(r_x, r_classes, r_featureWeights, r_classWeights, r_alpha, r_lambda_seq, r_needed_solutions, r_do_refit, r_config);
 
 		//Catch unhandled exceptions
+#ifdef DEBUG_BACKTRACE
 
 	} catch (backtrace_exception & e) {
 
-#ifdef DEBUG_BACKTRACE
 		e.print_trace();
-#endif
 
 		SGL_ERROR(e.what());
+#endif
 
 	} catch (std::exception & e) {
 

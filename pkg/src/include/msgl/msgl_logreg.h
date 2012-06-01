@@ -155,14 +155,14 @@ R::SEXP r_logreg_sgl_basic(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_block_dim, 
 				r_do_refit, r_config);
 
 		//Catch unhandled exceptions
+#ifdef DEBUG_BACKTRACE
 
 	} catch (backtrace_exception & e) {
 
-#ifdef DEBUG_BACKTRACE
 		e.print_trace();
-#endif
 
 		SGL_ERROR(e.what());
+#endif
 
 	} catch (std::exception & e) {
 
@@ -324,14 +324,14 @@ R::SEXP r_logreg_predict(R::SEXP r_x, R::SEXP r_beta) {
 		return logreg_predict(r_x, r_beta);
 
 		//Catch unhandled exceptions
+#ifdef DEBUG_BACKTRACE
 
 	} catch (backtrace_exception & e) {
 
-	#ifdef DEBUG_BACKTRACE
 			e.print_trace();
-	#endif
 
 			SGL_ERROR(e.what());
+#endif
 
 		} catch (std::exception & e) {
 

@@ -159,13 +159,14 @@ R::SEXP r_msgl_basic(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_featureWeights, R
 
 		//Catch unhandled exceptions
 
+#ifdef DEBUG_BACKTRACE
+
 	} catch (backtrace_exception & e) {
 
-#ifdef DEBUG_BACKTRACE
 		e.print_trace();
-#endif
 
 		SGL_ERROR(e.what());
+#endif
 
 	} catch (std::exception & e) {
 
@@ -214,14 +215,14 @@ R::SEXP r_msgl_predict_classes(R::SEXP r_x, R::SEXP r_beta) {
 		return msgl_predict_classes(r_x, r_beta);
 
 		//Catch unhandled exceptions
+#ifdef DEBUG_BACKTRACE
 
 	} catch (backtrace_exception & e) {
 
-	#ifdef DEBUG_BACKTRACE
 			e.print_trace();
-	#endif
 
 			SGL_ERROR(e.what());
+#endif
 
 		} catch (std::exception & e) {
 
