@@ -7,12 +7,10 @@
 #define SGL_H_
 
 #include <omp.h>
-#include <stdlib.h>
-#include <string>
 #include <limits>
 #include <time.h>
 #include <stdexcept>
-#include <math.h>
+#include <cmath>
 
 #include "boost/smart_ptr/shared_ptr.hpp"
 
