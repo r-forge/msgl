@@ -205,7 +205,7 @@ bool inline is_finite(T const& x) {
 
 template<>
 bool inline is_finite(numeric const& x) {
-	return !isnan(x) || !isinf(x);
+	return !boost::math::isnan(x) || !boost::math::isinf(x);
 }
 
 template<>

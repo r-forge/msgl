@@ -233,7 +233,7 @@ inline boost::tuple<field<typename Predictor::response_type>, field<typename Pre
 	sgl::vector average_number_of_parameters(lambda_sequence.n_elem);
 
 	//Training indices
-	field < Indices > training_indices(cv_indices.n_elem);
+	field<Indices> training_indices(cv_indices.n_elem);
 	for (u32 i = 0; i < cv_indices.n_elem; ++i) {
 		training_indices(i) = indices_all - cv_indices(i);
 	}
@@ -253,7 +253,12 @@ inline boost::tuple<field<typename Predictor::response_type>, field<typename Pre
 #endif
 		for (int i = 0; i < n_indices; i++) {
 
+#ifdef SGL_USE_OPENMP
+
 			int th_id = omp_get_thread_num();
+#else
+			int th_id = 0;
+#endif
 
 			if (!exception_caught) {
 
@@ -389,7 +394,7 @@ inline boost::tuple<field<field<typename Predictor::response_type> >, field<fiel
 	sgl::natural_matrix number_of_parameters(subsamples.n_elem, lambda_sequence.n_elem);
 
 	//Training indices
-	field < Indices > training_indices(subsamples.n_elem);
+	field<Indices> training_indices(subsamples.n_elem);
 	for (u32 i = 0; i < subsamples.n_elem; ++i) {
 		training_indices(i) = indices_all - subsamples(i);
 	}
@@ -409,7 +414,12 @@ inline boost::tuple<field<field<typename Predictor::response_type> >, field<fiel
 #endif
 		for (int i = 0; i < n_indices; i++) {
 
+#ifdef SGL_USE_OPENMP
+
 			int th_id = omp_get_thread_num();
+#else
+			int th_id = 0;
+#endif
 
 			if (!exception_caught) {
 

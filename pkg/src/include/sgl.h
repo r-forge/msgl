@@ -10,10 +10,9 @@
 #include <limits>
 #include <time.h>
 #include <stdexcept>
-#include <cmath>
 
+#include "boost/math/special_functions.hpp"
 #include "boost/smart_ptr/shared_ptr.hpp"
-
 #include "boost/tuple/tuple.hpp"
 using boost::tuple;
 
