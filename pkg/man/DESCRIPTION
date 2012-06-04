@@ -6,7 +6,7 @@ Date: 2012-05-29
 Author: Martin Vincent
 Maintainer: Martin Vincent <vincent@math.ku.dk>
 Description: Algorithm for solving sparse group lasso optimization problems.
-License: What license is it under?
+License: GPL
 LazyLoad: yes
 Depends:
     R (>= 2.13.0),
@@ -14,3 +14,5 @@ Depends:
 Collate:
     'msgl_multinomial.R'
     'msgl_logreg.R'
+    'msgl_multinomial_EX.R'
+    
