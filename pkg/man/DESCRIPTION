@@ -1,8 +1,8 @@
 Package: msgl
 Type: Package
 Title: Multinomial and logistic sparse group lasso
-Version: 0.0.9
-Date: 2012-05-29
+Version: 0.1.27
+Date: 2012-06-06
 Author: Martin Vincent
 Maintainer: Martin Vincent <vincent@math.ku.dk>
 Description: Algorithm for solving sparse group lasso optimization problems.
@@ -14,4 +14,3 @@ Depends:
 Collate:
     'msgl_multinomial.R'
     'msgl_logreg.R'
-    
