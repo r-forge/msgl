@@ -20,7 +20,7 @@
 #define MSGL_R_INTERFACE_H_
 
 #include <sgl.h>
-#include <rtools.h>
+#include <rtools/rtools.h>
 #include "msgl.h"
 
 namespace msgl {

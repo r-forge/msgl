@@ -14,5 +14,4 @@ Depends:
 Collate:
     'msgl_multinomial.R'
     'msgl_logreg.R'
-    'msgl_multinomial_EX.R'
     

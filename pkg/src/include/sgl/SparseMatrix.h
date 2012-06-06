@@ -370,13 +370,13 @@ public:
 		return values(entry_index + offset);
 	}
 
-	friend T norm2(SparseVectorView<T> const& a) {
+	T norm() const {
 
-		if (a.n_non_zero == 0) {
+		if (n_non_zero == 0) {
 			return 0;
 		}
 
-		return norm(a.values.subvec(a.offset, a.offset + a.n_non_zero - 1), 2);
+		return arma::norm(values.subvec(offset, offset + n_non_zero - 1), 2);
 	}
 
 };

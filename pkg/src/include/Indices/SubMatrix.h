@@ -23,8 +23,6 @@
 #include "../armadillo.hpp"
 using namespace arma;
 
-#include "Exceptions.h"
-
 //TODO clean up
 
 

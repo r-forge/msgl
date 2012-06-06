@@ -103,7 +103,7 @@ numeric norm(T const& x) {
 
 template<>
 numeric norm(SparseVectorView<numeric> const& x) {
-	return norm2(x);
+	return x.norm();
 }
 
 // Pos function

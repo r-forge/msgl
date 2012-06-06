@@ -28,7 +28,7 @@ public:
 	typedef MatrixData<T> data_type;
 	typedef MultinomialResponse response_type;
 
-	inline const field<MultinomialPredictor::response_type> predict(const data_type & sample_data, Indices const& samples,
+	inline const field<typename MultinomialPredictor::response_type> predict(const data_type & sample_data, Indices const& samples,
 			const sgl::parameter & parameter) const {
 
 		TIMER_START
@@ -36,7 +36,7 @@ public:
 		return do_predict(row_subview(sample_data.data_matrix, samples.getElements()), parameter);
 	}
 
-	inline const field<MultinomialPredictor::response_type> predict(const data_type & sample_data, Indices const& samples,
+	inline const field<typename MultinomialPredictor::response_type> predict(const data_type & sample_data, Indices const& samples,
 			const sgl::block_vector_field & parameters) const {
 
 		TIMER_START
@@ -44,7 +44,7 @@ public:
 		return do_predict(row_subview(sample_data.data_matrix, samples.getElements()), parameters);
 	}
 
-	inline const field<MultinomialPredictor::response_type> predict(const data_type & sample_data,
+	inline const field<typename MultinomialPredictor::response_type> predict(const data_type & sample_data,
 			const sgl::block_vector_field & parameters) const {
 
 		TIMER_START
@@ -94,7 +94,7 @@ public:
 	typedef MatrixData<T> data_type;
 	typedef MultinomialResponse response_type;
 
-	inline const field<LogRegPredictor::response_type> predict(const data_type & sample_data, Indices const& samples,
+	inline const field<typename LogRegPredictor::response_type> predict(const data_type & sample_data, Indices const& samples,
 			const sgl::parameter & parameter) const {
 
 		TIMER_START
@@ -102,7 +102,7 @@ public:
 		return do_predict(row_subview(sample_data.data_matrix, samples.getElements()), parameter);
 	}
 
-	inline const field<LogRegPredictor::response_type> predict(const data_type & sample_data, Indices const& samples,
+	inline const field<typename LogRegPredictor::response_type> predict(const data_type & sample_data, Indices const& samples,
 			const sgl::block_vector_field & parameters) const {
 
 		TIMER_START
@@ -110,7 +110,7 @@ public:
 		return do_predict(row_subview(sample_data.data_matrix, samples.getElements()), parameters);
 	}
 
-	inline const field<LogRegPredictor::response_type> predict(const data_type & sample_data,
+	inline const field<typename LogRegPredictor::response_type> predict(const data_type & sample_data,
 			const sgl::block_vector_field & parameters) const {
 
 		TIMER_START

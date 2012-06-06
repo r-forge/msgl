@@ -43,9 +43,11 @@
 //#define SGL_TIMING
 
 //Should openmp be used
-#ifdef SGL_WINDOWS
-//Currently openmp is not supported on windows
+#ifndef _OPENMP
+//No openmp
+#warning openmp (multithreading) not supported on this system - compiling witout openmp support
 #else
+//Use openmp
 #define SGL_USE_OPENMP
 #endif
 

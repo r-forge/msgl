@@ -29,8 +29,6 @@ using namespace std;
 #include "../armadillo.hpp"
 using namespace arma;
 
-#include "Exceptions.h"
-
 template <typename E>
 class IntegerSetExpression {
 public:
