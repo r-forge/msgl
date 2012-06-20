@@ -604,7 +604,7 @@ msgl.subsampleing <- function(x, classes, featureWeights = .featureWeights(x, cl
 				res <- .Call(r_msgl_subsampleing, x, classes.numeric, featureWeights, classWeights, alpha, lambda, do.refit, d, fraction, subsamples, FALSE, max.threads, seed, algorithm.config)
 			} else {
 				subsamples <- lapply(subsamples, function(x) as.integer(x - 1))
-				res <- .Call(r_msgl_cv, x, classes.numeric, featureWeights, classWeights, alpha, lambda, do.refit, d, fraction, subsamples, TRUE, max.threads, seed, algorithm.config)
+				res <- .Call(r_msgl_subsampleing, x, classes.numeric, featureWeights, classWeights, alpha, lambda, do.refit, d, fraction, subsamples, TRUE, max.threads, seed, algorithm.config)
 			}
 		}
 	}
