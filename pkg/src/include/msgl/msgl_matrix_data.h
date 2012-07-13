@@ -100,6 +100,9 @@ public:
 		//TODO clean up intercept add
 	}
 
+	GroupedMatrixData(GroupedMatrixData<T> const& data) : MatrixData<T>(data), grouping(data.grouping){};
+
+
 	void set_grouping(sgl::natural_vector const& grouping) {
 		const_cast<sgl::natural_vector&> (this->grouping) = grouping;
 

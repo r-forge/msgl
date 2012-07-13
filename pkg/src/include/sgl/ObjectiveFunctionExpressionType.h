@@ -114,6 +114,9 @@ public:
 template< typename E, typename D>
 class ObjectiveFunctionType : public ObjectiveFunctionData<D>, public ObjectiveFunctionExpressionType<ObjectiveFunctionType<E, D > > {
 
+private:
+	ObjectiveFunctionType<E, D> const& operator=(ObjectiveFunctionType<E, D> const& s) {}
+
 public:
 
 	using ObjectiveFunctionExpressionType<ObjectiveFunctionType<E, D> >::data;
@@ -123,10 +126,13 @@ public:
 
 	ObjectiveFunctionType(data_type const& data) : ObjectiveFunctionData<D>(data), ObjectiveFunctionExpressionType<ObjectiveFunctionType<E, D> >(this->function_data) {}
 
+	ObjectiveFunctionType(ObjectiveFunctionType<E, D> const& s) : ObjectiveFunctionData<D>(s.function_data), ObjectiveFunctionExpressionType<ObjectiveFunctionType<E, D> >(this->function_data) {}
+
 	instance_type create_instance(sgl::DimConfig const& dim_config) const {
 		return instance_type(data, dim_config);
 	}
 
+	//TODO use constructor instead, this should save 2 constructor calls, hence 2 x data copy
 	ObjectiveFunctionType<E, D> operator()(Indices const& indices) const  {
 			return ObjectiveFunctionType<E, D>(data(indices));
 	}

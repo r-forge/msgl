@@ -45,7 +45,7 @@
 //Should openmp be used
 #ifndef _OPENMP
 //No openmp
-#warning openmp (multithreading) not supported on this system - compiling witout openmp support
+#warning openmp (multithreading) not supported on this system - compiling without openmp support
 #else
 //Use openmp
 #define SGL_USE_OPENMP

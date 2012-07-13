@@ -20,15 +20,15 @@
 #define MSGL_MULTINOMIAL_PREDICTOR_H_
 
 
-template<typename T>
-class MultinomialPredictor {
+template<typename T, typename R, typename S>
+class Predictor {
 
 public:
 
 	typedef MatrixData<T> data_type;
-	typedef MultinomialResponse response_type;
+	typedef S response_type;
 
-	inline const field<typename MultinomialPredictor::response_type> predict(const data_type & sample_data, Indices const& samples,
+	inline const field<typename Predictor::response_type> predict(const data_type & sample_data, Indices const& samples,
 			const sgl::parameter & parameter) const {
 
 		TIMER_START
@@ -36,7 +36,7 @@ public:
 		return do_predict(row_subview(sample_data.data_matrix, samples.getElements()), parameter);
 	}
 
-	inline const field<typename MultinomialPredictor::response_type> predict(const data_type & sample_data, Indices const& samples,
+	inline const field<typename Predictor::response_type> predict(const data_type & sample_data, Indices const& samples,
 			const sgl::block_vector_field & parameters) const {
 
 		TIMER_START
@@ -44,7 +44,7 @@ public:
 		return do_predict(row_subview(sample_data.data_matrix, samples.getElements()), parameters);
 	}
 
-	inline const field<typename MultinomialPredictor::response_type> predict(const data_type & sample_data,
+	inline const field<typename Predictor::response_type> predict(const data_type & sample_data,
 			const sgl::block_vector_field & parameters) const {
 
 		TIMER_START
@@ -76,7 +76,7 @@ private:
 		sgl::matrix lp = sample_data_matrix * parameter;
 
 		for (sgl::natural i = 0; i < sample_data_matrix.n_rows; ++i) {
-			response(i) = MultinomialResponse(trans(lp.row(i)));
+			response(i) = static_cast<R const&>(*this).createResponse(trans(lp.row(i)));
 		}
 
 		return response;
@@ -85,7 +85,20 @@ private:
 
 };
 
-//TODO move to separate file
+template<typename T>
+class MultinomialPredictor : public Predictor<T, MultinomialPredictor<T>, MultinomialResponse> {
+
+public:
+
+	typedef typename Predictor<T, MultinomialPredictor<T>, MultinomialResponse>::response_type response_type;
+
+	response_type createResponse(sgl::vector linear_predictors) const {
+		return MultinomialResponse(linear_predictors);
+	}
+
+};
+
+//TODO use/write_into generic Predictor class
 template<typename T>
 class LogRegPredictor {
 
@@ -155,8 +168,8 @@ private:
 
 };
 
-
-static boost::tuple<sgl::matrix_field, sgl::matrix_field, sgl::natural_matrix> convert(field<MultinomialResponse> const& field_obj) {
+template<typename R>
+static boost::tuple<sgl::matrix_field, sgl::matrix_field, sgl::natural_matrix> convert(field<R> const& field_obj) {
 
 	sgl::natural number_of_samples = field_obj.n_rows;
 	sgl::natural length_of_lambda = field_obj.n_cols;
@@ -168,7 +181,7 @@ static boost::tuple<sgl::matrix_field, sgl::matrix_field, sgl::natural_matrix> c
 
 	for (sgl::natural i = 0; i < length_of_lambda; ++i) {
 
-		link(i).set_size(number_of_groups, number_of_samples);
+		link(i).set_size(field_obj(0, i).linear_predictor().n_elem, number_of_samples);
 		response(i).set_size(number_of_groups, number_of_samples);
 
 		for (sgl::natural j = 0; j < number_of_samples; ++j) {

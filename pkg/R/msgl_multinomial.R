@@ -229,7 +229,6 @@ msgl.lambda.seq <- function(x, classes, featureWeights = .featureWeights(x, clas
 		}
 	}
 	
-	class(res) <- "msgl" 
 	return(res)
 }
 
