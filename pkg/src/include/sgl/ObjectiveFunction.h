@@ -1,20 +1,20 @@
 /*
-	Sgl template library for optimizing sparse group lasso penalized objectives.
-    Copyright (C) 2012 Martin Vincent
+ Sgl template library for optimizing sparse group lasso penalized objectives.
+ Copyright (C) 2012 Martin Vincent
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
 
 #ifndef OBJECTIVEFUNCTION_H_
 #define OBJECTIVEFUNCTION_H_
@@ -164,13 +164,20 @@ public:
 	sgl::numeric hessian_bound_level1(sgl::natural block_index) const {
 		return fun.hessian_bound_level1(block_index);
 	}
+
+	static sgl::natural compute_unit_size(data_type const& data) {
+		return E::compute_unit_size(data);
+	}
+
+	static sgl::natural compute_number_of_units(data_type const& data) {
+		return E::compute_number_of_units(data);
+	}
 };
 
 template<typename E>
 struct function_traits<ObjectiveFunction<E> > {
 	typedef typename E::data_type data_type;
 };
-
 
 template<typename E, typename Filter>
 class DataFilter: public ObjectiveFunctionExpression<DataFilter<E, Filter> > {
@@ -241,7 +248,6 @@ template<typename E, typename Filter>
 struct function_traits<DataFilter<E, Filter> > {
 	typedef typename E::data_type data_type;
 };
-
 
 template<typename E>
 class ObjectiveFunctionScalarMultiplication: public ObjectiveFunctionExpression<ObjectiveFunctionScalarMultiplication<E> > {

@@ -437,7 +437,7 @@ predict.msgl <- function(fit, x, sparse.data = FALSE) {
 		sparse.data <- is(x, "sparseMatrix")
 	}
 	
-	res <- .predict.msgl(fit$beta, x, sparse.data, is.list(fit$classes))	
+	res <- .predict.msgl(fit$beta, x, sparse.data, is.list(fit$classes), fit$classes.prior)	
 	
 	if("beta.refit" %in% names(fit)) {
 		res.refit <- .predict.msgl(fit$beta.refit, x)
@@ -451,14 +451,12 @@ predict.msgl <- function(fit, x, sparse.data = FALSE) {
 	return(res)
 }
 
-.predict.msgl <- function(beta, x, sparse.data = FALSE, tensor = FALSE) {
+.predict.msgl <- function(beta, x, sparse.data = FALSE, tensor = FALSE, classes) {
 	#Save dimnames
 	dim.names <-  list(rownames(beta[[1]]), rownames(x))
 	
 	beta <- lapply(X = beta, FUN = function(m) as(m, "TsparseMatrix"))
 	beta <- lapply(X = beta, FUN = function(m) list(dim(m), m@i, m@j, m@x))
-	
-	classes <- fit$classes.prior
 	
 	if(!tensor) {
 		

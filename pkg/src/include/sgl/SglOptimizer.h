@@ -435,7 +435,7 @@ sgl::numeric SglOptimizer<SGL>::optimize_unpenalized(T & objective, sgl::block_v
 	CONVERGENCE_CHECK(5e3); //TODO configable
 
 	sgl::natural_vector indices(find(active_parameters));
-	sgl::block_vector gradient(sgl.setup.n_blocks, sgl.setup.block_dim(0)); //FIXME flexible block size
+	sgl::block_vector gradient(sgl.setup.block_dim);
 
 	objective.at(x);
 	gradient = objective.gradient(indices);
@@ -473,7 +473,7 @@ sgl::numeric SglOptimizer<SGL>::optimize_unpenalized(T & objective, sgl::block_v
 		//TODO debuging
 		//cout << gradient.max() << " : "  << old_value - value << endl;
 
-	} while (gradient.max() > 5e-2 || (old_value - value) > 5e-3); //FIXME stopping conditions configable
+	} while (gradient.max() > 5e-2 || (old_value - value) > 5e-3); //TODO stopping conditions configable
 
 	return objective.evaluate();
 
@@ -549,11 +549,11 @@ template<typename T>
 inline void SglOptimizer<SGL>::optimize_quadratic(T & objective, sgl::parameter & x, sgl::vector const& gradient,
 		sgl::vector const& critical_bounds, sgl::numeric const alpha, sgl::numeric const lambda) const {
 
-	sgl::numeric dist = sgl.config.active_set_threshold_alpha + 1; //Ensure active set optimisation is not started right away
+	sgl::numeric dist = sgl.config.active_set_threshold_alpha + 1; //Ensure active set optimization is not started right away
 	sgl::numeric discrete_dist = 0;
 
-	//Initialise converges checker
-	CONVERGENCE_CHECK(1e3); //TODO configable convergens checker
+	//Initialize converges checker
+	CONVERGENCE_CHECK(1e3); //TODO configable converges checker
 
 	sgl::vector block_gradient;
 	sgl::parameter_block x_new;
@@ -826,11 +826,19 @@ void SglOptimizer<SGL>::optimize_inner(sgl::vector const& gradient_at_x0, sgl::m
 	sgl::numeric sumsq = as_scalar(sum(square(x)));
 	sgl::parameter_block x_old(dim);
 
+	//TODO remove
+	//cout << trans(diagvec(second_order_term)) << endl;
+	//cout << trans(eig_sym(second_order_term)) << endl;
+	//cout << second_order_term << endl;
+	//cout << gradient << endl;
+
 	do {
 		CONVERGENCE_CHECK_INCREASE;
 		SGL_INTERRUPT_CHECK;
 
 		x_old = x;
+
+		//cout << trans(x) << endl;
 
 		for (sgl::natural i = 0; i < dim; i++) {
 
@@ -851,6 +859,7 @@ void SglOptimizer<SGL>::optimize_inner(sgl::vector const& gradient_at_x0, sgl::m
 				x(i) = x_new;
 
 			}
+
 		}
 
 		//Check if we ended up near zero
