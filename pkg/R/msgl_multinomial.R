@@ -160,7 +160,8 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 
 #' Computes a lambda sequence for the regularization path
 #' 
-#' A lambda sequence of length \code{d} from a data determined maximal lambda \eqn{\lambda_\textrm{max}} to the user inputed \code{lambda.min}.
+#' Computes a decreasing lambda sequence of length \code{d}.
+#' The sequence ranges from a data determined maximal lambda \eqn{\lambda_\textrm{max}} to the user inputed \code{lambda.min}.
 #'
 #' @param x Design matrix, matrix of size \eqn{N \times p}.
 #' @param classes Classes, factor of length \eqn{N}.
@@ -176,7 +177,7 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 #' @param alpha Alpha value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
 #' @param d length of lambda sequence
 #' @param standardize If TRUE the covariates are standardize before fitting the model. The model parameters are returned in the original scale. 
-#' @param lambda.min 
+#' @param lambda.min the smallest lambda value in the computed sequence. 
 #' @param sparse.data If TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
 #' @param algorithm.config The algorithm configuration to be used. 
 #' @return a vector of length \code{d} containing the compute lambda sequence.
@@ -671,11 +672,13 @@ sgl.standard.config <- sgl.algorithm.config();
 #' @param object an object of class msgl, produced with \code{msgl}.
 #' @param x a data matrix of size \eqn{N_\textrm{new} \times p}.
 #' @param sparse.data If TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
+#' @param ... ignored.
 #' @return 
 #' \item{link}{The linear predictors - a list of length \code{length(fit$beta)} one item for each model, with each item a matrix of size \eqn{K \times N_\textrm{new}} containing the linear predictors}
 #' \item{response}{The estimated probabilities - a list of length \code{length(fit$beta)} one item for each model, with each item a matrix of size \eqn{K \times N_\textrm{new}} containing the probabilities}
 #' \item{classes}{The estimated classes - a matrix of size \eqn{N_\textrm{new} \times d} with \eqn{d=}\code{length(fit$beta)}}
 #' @author Martin Vincent
+#' @S3method predict msgl
 #' @export
 #' @useDynLib msgl r_msgl_predict r_msgl_sparse_predict
 predict.msgl <- function(object, x, sparse.data = FALSE, ...) {

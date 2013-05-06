@@ -2,7 +2,7 @@
 \alias{predict.msgl}
 \title{Predict}
 \usage{
-  predict.msgl(object, x, sparse.data = FALSE, ...)
+\method{predict}{msgl}(object, x, sparse.data = FALSE, ...)
 }
 \arguments{
   \item{object}{an object of class msgl, produced with
@@ -14,6 +14,8 @@
   \item{sparse.data}{If TRUE \code{x} will be treated as
   sparse, if \code{x} is a sparse matrix it will be treated
   as sparse by default.}
+
+  \item{...}{ignored.}
 }
 \value{
   \item{link}{The linear predictors - a list of length

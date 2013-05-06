@@ -42,7 +42,8 @@
   before fitting the model. The model parameters are
   returned in the original scale.}
 
-  \item{lambda.min}{}
+  \item{lambda.min}{the smallest lambda value in the
+  computed sequence.}
 
   \item{sparse.data}{If TRUE \code{x} will be treated as
   sparse, if \code{x} is a sparse matrix it will be treated
@@ -56,9 +57,10 @@
   sequence.
 }
 \description{
-  A lambda sequence of length \code{d} from a data
-  determined maximal lambda \eqn{\lambda_\textrm{max}} to
-  the user inputed \code{lambda.min}.
+  Computes a decreasing lambda sequence of length \code{d}.
+  The sequence ranges from a data determined maximal lambda
+  \eqn{\lambda_\textrm{max}} to the user inputed
+  \code{lambda.min}.
 }
 \examples{
 data(SimData)
