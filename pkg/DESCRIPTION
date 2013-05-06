@@ -1,0 +1,16 @@
+Package: msgl
+Type: Package
+Title: Multinomial sparse group lasso
+Version: 0.99.0
+Date: 2012-06-06
+Author: Martin Vincent
+Maintainer: Martin Vincent <vincent@math.ku.dk>
+Description: Algorithm for solving the multinomial sparse group lasso
+    optimization problem. Suitable for high dimensional problems.
+License: GPL
+LazyLoad: yes
+Depends:
+    R (>= 2.13.0),
+    Matrix
+Collate:
+    'msgl_multinomial.R'
