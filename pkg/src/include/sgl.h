@@ -31,7 +31,9 @@ using boost::tuple;
 
 #include <boost/dynamic_bitset.hpp>
 
+#ifdef DEBUG_BACKTRACE
 #include "sgl/Backtrace.h"
+#endif
 
 #include "armadillo.hpp"
 #include "sgl/arma_additions.h"

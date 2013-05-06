@@ -201,7 +201,7 @@ public:
 
 		if (this != &other) {
 
-			set_matrix(other.data_matrix);
+			this->set_matrix(other.data_matrix);
 			const_cast<sgl::vector&>(this->weights) = other.weights;
 			const_cast<sgl::natural_vector&>(this->grouping) = other.grouping;
 
