@@ -686,8 +686,8 @@ predict.msgl <- function(object, x, sparse.data = FALSE, ...) {
 	
 	res <- list()
 	
-	if("beta" %in% names(fit)) {
-		res <- .predict.msgl(fit$beta, x, sparse.data)	
+	if("beta" %in% names(object)) {
+		res <- .predict.msgl(object$beta, x, sparse.data)	
 	} else  {
 		stop("No models found - missing beta")
 	}
