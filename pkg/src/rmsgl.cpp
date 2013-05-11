@@ -80,7 +80,8 @@ void show_warning(const char * msg) {
 
 void show_msg(const char * msg) {
 	//cout << msg << endl; 
-	R::Rprintf(msg); 
+	R::Rprintf(msg);
+	R::Rprintf("\n");
 }
 
 void report_error(const char *msg) {

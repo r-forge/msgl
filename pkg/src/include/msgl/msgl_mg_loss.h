@@ -438,7 +438,7 @@ inline sgl::matrix const GenralizedLinearLoss<MultinomialSampleLoss, sgl::sparse
 
 				sgl::natural row1 = tmp.row_indices[i1];
 
-				sgl::natural vi2 = 0;
+				sgl::numeric vi2 = 0;
 
 				for (sgl::natural i2 = tmp.col_ptrs[k]; i2 < tmp.col_ptrs[k + 1]; ++i2) {
 
@@ -457,7 +457,7 @@ inline sgl::matrix const GenralizedLinearLoss<MultinomialSampleLoss, sgl::sparse
 			}
 		}
 	}
-
+	
 	hessian_diag_mat(block_index) = symmatu(hessian_diag_mat(block_index));
 
 	hessian_diag_mat_computed(block_index) = 1;
