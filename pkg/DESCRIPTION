@@ -1,7 +1,7 @@
 Package: msgl
 Type: Package
 Title: Multinomial sparse group lasso
-Version: 0.99.0
+Version: 0.1.0
 Date: 2013-20-05
 Author: Martin Vincent
 Maintainer: Martin Vincent <vincent@math.ku.dk>
