@@ -3,35 +3,36 @@
 # Author: martin
 ###############################################################################
 
-#TODO roxygen and import of Matrix
-
 #' Fit a multinomial sparse group lasso regularization path. 
 #'
 #' For a classification problem with  \eqn{K} classes and \eqn{p} covariates dived into \eqn{m} groups.
 #' A sequence of minimizers (one for each lambda given in the \code{lambda} argument) of 
 #' \deqn{\hat R(\beta) + \lambda \left( (1-\alpha) \sum_{J=1}^m \gamma_J \|\beta^{(J)}\|_2 + \alpha \sum_{i=1}^{n} \xi_i |\beta_i| \right)}
-#' where \eqn{\hat R} is the weighted empirical log-likelihood risk of the multinomial regression model and \eqn{\beta^{(J)}} denotes the parameters associated with the \eqn{J}'th group of covariates (default is one covariate per group, hence the default dimension of \eqn{\beta^{(J)}} is \eqn{K}). 
-#' And for the specified group weights \eqn{\gamma \in [0,\infty)^m} and parameter weights \eqn{\xi = (\xi^{(1)},\dots, \xi^{(m)}) \in [0,\infty)^n} where \eqn{\xi^{(1)}\in [0,\infty)^{n_1},\dots, \xi^{(m)} \in [0,\infty)^{n_m}}.
+#' where \eqn{\hat R} is the weighted empirical log-likelihood risk of the multinomial regression model.
+#' The vector \eqn{\beta^{(J)}} denotes the parameters associated with the \eqn{J}'th group of covariates
+#' (default is one covariate per group, hence the default dimension of \eqn{\beta^{(J)}} is \eqn{K}). 
+#' The group weights \eqn{\gamma \in [0,\infty)^m} and the parameter weights \eqn{\xi = (\xi^{(1)},\dots, \xi^{(m)}) \in [0,\infty)^n} 
+#' with \eqn{\xi^{(1)}\in [0,\infty)^{n_1},\dots, \xi^{(m)} \in [0,\infty)^{n_m}}.
 #'
-#' @param x Design matrix, matrix of size \eqn{N \times p}.
-#' @param classes Classes, factor of length \eqn{N}.
-#' @param sampleWeights Sample weights, a vector of length \eqn{N}.
-#' @param grouping Grouping of covariates, a vector of length \eqn{p}. Each element of the vector specifying the group of the covariate. 
-#' @param groupWeights The group weights, a vector of length \eqn{m+1} (the number of groups). 
+#' @param x design matrix, matrix of size \eqn{N \times p}.
+#' @param classes classes, factor of length \eqn{N}.
+#' @param sampleWeights sample weights, a vector of length \eqn{N}.
+#' @param grouping grouping of covariates, a vector of length \eqn{p}. Each element of the vector specifying the group of the covariate. 
+#' @param groupWeights the group weights, a vector of length \eqn{m+1} (the number of groups). 
 #' The first element of the vector is the intercept weight. 
 #' If \code{groupWeights = NULL} default weights will be used.
-#' Default weights are 0 for the intercept and \eqn{\sqrt{K\cdot\textrm{number of covariates in the group}}} for all other weights.
-#' @param parameterWeights A matrix of size \eqn{K \times (p+1)}. 
+#' Default weights are 0 for the intercept and \deqn{\sqrt{K\cdot\textrm{number of covariates in the group}}} for all other weights.
+#' @param parameterWeights a matrix of size \eqn{K \times (p+1)}. 
 #' The first column of the matrix is the intercept weights.
 #' Default weights are is 0 for the intercept weights and 1 for all other weights.
-#' @param alpha Alpha value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
-#' @param standardize If TRUE the covariates are standardize before fitting the model. The model parameters are returned in the original scale. 
-#' @param lambda The lambda sequence for the regularization path.
-#' @param return The indices of lambda values for which to return a the fitted parameters.
-#' @param sparse.data If TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
-#' @param algorithm.config The algorithm configuration to be used. 
+#' @param alpha the \eqn{\alpha} value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
+#' @param standardize if TRUE the covariates are standardize before fitting the model. The model parameters are returned in the original scale. 
+#' @param lambda the lambda sequence for the regularization path.
+#' @param return the indices of lambda values for which to return a the fitted parameters.
+#' @param sparse.data if TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
+#' @param algorithm.config the algorithm configuration to be used. 
 #' @return 
-#' \item{beta}{the fitted parameters - a list of length \code{length(lambda)} with each entry a matrix of size \eqn{K\times (p+1)} holding the fitted parameters}
+#' \item{beta}{the fitted parameters -- a list of length \code{length(lambda)} with each entry a matrix of size \eqn{K\times (p+1)} holding the fitted parameters}
 #' \item{loss}{the values of the loss function}
 #' \item{objective}{the values of the objective function (i.e. loss + penalty)}
 #' \item{lambda}{the lambda values used}
@@ -163,23 +164,23 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 #' Computes a decreasing lambda sequence of length \code{d}.
 #' The sequence ranges from a data determined maximal lambda \eqn{\lambda_\textrm{max}} to the user inputed \code{lambda.min}.
 #'
-#' @param x Design matrix, matrix of size \eqn{N \times p}.
-#' @param classes Classes, factor of length \eqn{N}.
-#' @param sampleWeights Sample weights, a vector of length \eqn{N}.
-#' @param grouping Grouping of covariates, a vector of length \eqn{p}. Each element of the vector specifying the group of the covariate. 
-#' @param groupWeights The group weights, a vector of length \eqn{m+1} (the number of groups). 
+#' @param x design matrix, matrix of size \eqn{N \times p}.
+#' @param classes classes, factor of length \eqn{N}.
+#' @param sampleWeights sample weights, a vector of length \eqn{N}.
+#' @param grouping grouping of covariates, a vector of length \eqn{p}. Each element of the vector specifying the group of the covariate. 
+#' @param groupWeights the group weights, a vector of length \eqn{m+1} (the number of groups). 
 #' The first element of the vector is the intercept weight. 
 #' If \code{groupWeights = NULL} default weights will be used.
-#' Default weights are 0 for the intercept and \eqn{\sqrt{K\cdot\textrm{number of covariates in the group}}} for all other weights.
-#' @param parameterWeights A matrix of size \eqn{K \times (p+1)}. 
+#' Default weights are 0 for the intercept and \deqn{\sqrt{K\cdot\textrm{number of covariates in the group}}} for all other weights.
+#' @param parameterWeights a matrix of size \eqn{K \times (p+1)}. 
 #' The first column of the matrix is the intercept weights.
 #' Default weights are is 0 for the intercept weights and 1 for all other weights.
-#' @param alpha Alpha value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
-#' @param d length of lambda sequence
-#' @param standardize If TRUE the covariates are standardize before fitting the model. The model parameters are returned in the original scale. 
+#' @param alpha the \eqn{\alpha} value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
+#' @param d the length of lambda sequence
+#' @param standardize if TRUE the covariates are standardize before fitting the model. The model parameters are returned in the original scale. 
 #' @param lambda.min the smallest lambda value in the computed sequence. 
-#' @param sparse.data If TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
-#' @param algorithm.config The algorithm configuration to be used. 
+#' @param sparse.data if TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
+#' @param algorithm.config the algorithm configuration to be used. 
 #' @return a vector of length \code{d} containing the compute lambda sequence.
 #' @examples 
 #' data(SimData)
@@ -264,35 +265,35 @@ msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), l
 
 #' Multinomial sparse group lasso cross validation using multiple possessors 
 #' 
-#' @param x Design matrix, matrix of size \eqn{N \times p}.
-#' @param classes Classes, factor of length \eqn{N}.
-#' @param sampleWeights Sample weights, a vector of length \eqn{N}.
-#' @param grouping Grouping of covariates, a vector of length \eqn{p}. Each element of the vector specifying the group of the covariate. 
-#' @param groupWeights The group weights, a vector of length \eqn{m+1} (the number of groups). 
+#' @param x design matrix, matrix of size \eqn{N \times p}.
+#' @param classes classes, factor of length \eqn{N}.
+#' @param sampleWeights sample weights, a vector of length \eqn{N}.
+#' @param grouping grouping of covariates, a vector of length \eqn{p}. Each element of the vector specifying the group of the covariate. 
+#' @param groupWeights the group weights, a vector of length \eqn{m+1} (the number of groups). 
 #' The first element of the vector is the intercept weight. 
 #' If \code{groupWeights = NULL} default weights will be used.
-#' Default weights are 0 for the intercept and \eqn{\sqrt{K\cdot\textrm{number of covariates in the group}}} for all other weights.
-#' @param parameterWeights A matrix of size \eqn{K \times (p+1)}. 
+#' Default weights are 0 for the intercept and \deqn{\sqrt{K\cdot\textrm{number of covariates in the group}}} for all other weights.
+#' @param parameterWeights a matrix of size \eqn{K \times (p+1)}. 
 #' The first column of the matrix is the intercept weights.
 #' Default weights are is 0 for the intercept weights and 1 for all other weights.
-#' @param alpha Alpha value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
-#' @param standardize If TRUE the covariates are standardize before fitting the model. The model parameters are returned in the original scale. 
-#' @param lambda The lambda sequence for the regularization path.
+#' @param alpha the \eqn{\alpha} value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
+#' @param standardize if TRUE the covariates are standardize before fitting the model. The model parameters are returned in the original scale. 
+#' @param lambda the lambda sequence for the regularization path.
 #' @param fold the fold of the cross validation.
-#' The data will be split into fold disjoint subsets, keeping the ration of classes approximately equal.
+#' The data will be split into \code{fold} disjoint subsets, keeping the ration of classes approximately equal.
 #' @param cv.indices a list of indices of a cross validation splitting. 
 #' If \code{cv.indices = NULL} then a random splitting will be generated using the \code{fold} argument.
-#' @param sparse.data If TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
+#' @param sparse.data if TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
 #' @param max.threads the maximal number of threads to be used
 #' @param seed the seed used for generating the random cross validation splitting, only used if \code{cv.indices = NULL}. 
-#' @param algorithm.config The algorithm configuration to be used. 
+#' @param algorithm.config the algorithm configuration to be used. 
 #' @return 
-#' \item{link}{The linear predictors - a list of length \code{length(lambda)} one item for each lambda value, with each item a matrix of size \eqn{K \times N} containing the linear predictors}
-#' \item{response}{The estimated probabilities - a list of length \code{length(lambda)} one item for each lambda value, with each item a matrix of size \eqn{K \times N} containing the probabilities}
-#' \item{classes}{The estimated classes - a matrix of size \eqn{N \times d} with \eqn{d=}\code{length(lambda)}}
-#' \item{cv.indices}{The cross validation splitting used}
-#' \item{features}{Average number of features used in the models}
-#' \item{parameters}{Average number of parameters used in the models}
+#' \item{link}{the linear predictors -- a list of length \code{length(lambda)} one item for each lambda value, with each item a matrix of size \eqn{K \times N} containing the linear predictors.}
+#' \item{response}{the estimated probabilities - a list of length \code{length(lambda)} one item for each lambda value, with each item a matrix of size \eqn{K \times N} containing the probabilities.}
+#' \item{classes}{the estimated classes - a matrix of size \eqn{N \times d} with \eqn{d=}\code{length(lambda)}.}
+#' \item{cv.indices}{the cross validation splitting used.}
+#' \item{features}{average number of features used in the models.}
+#' \item{parameters}{average number of parameters used in the models.}
 #' @examples 
 #' data(SimData)
 #' x <- sim.data$x
@@ -425,34 +426,33 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 #'
 #' Support the use of multiple processors.
 #' 
-#' @param x Design matrix, matrix of size \eqn{N \times p}.
-#' @param classes Classes, factor of length \eqn{N}.
-#' @param sampleWeights Sample weights, a vector of length \eqn{N}.
-#' @param grouping Grouping of covariates, a vector of length \eqn{p}. Each element of the vector specifying the group of the covariate. 
-#' @param groupWeights The group weights, a vector of length \eqn{m+1} (the number of groups). 
+#' @param x design matrix, matrix of size \eqn{N \times p}.
+#' @param classes classes, factor of length \eqn{N}.
+#' @param sampleWeights sample weights, a vector of length \eqn{N}.
+#' @param grouping grouping of covariates, a vector of length \eqn{p}. Each element of the vector specifying the group of the covariate. 
+#' @param groupWeights the group weights, a vector of length \eqn{m+1} (the number of groups). 
 #' The first element of the vector is the intercept weight. 
 #' If \code{groupWeights = NULL} default weights will be used.
-#' Default weights are 0 for the intercept and \eqn{\sqrt{K\cdot\textrm{number of covariates in the group}}} for all other weights.
-#' @param parameterWeights A matrix of size \eqn{K \times (p+1)}. 
+#' Default weights are 0 for the intercept and \deqn{\sqrt{K\cdot\textrm{number of covariates in the group}}} for all other weights.
+#' @param parameterWeights a matrix of size \eqn{K \times (p+1)}. 
 #' The first column of the matrix is the intercept weights.
 #' Default weights are is 0 for the intercept weights and 1 for all other weights.
-#' @param alpha Alpha value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
-#' @param standardize If TRUE the covariates are standardize before fitting the model. The model parameters are returned in the original scale. 
-#' @param lambda The lambda sequence for the regularization path.
+#' @param alpha the \eqn{\alpha} value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
+#' @param standardize if TRUE the covariates are standardize before fitting the model. The model parameters are returned in the original scale. 
+#' @param lambda the lambda sequence for the regularization path.
 #' @param training a list of training samples, each item of the list corresponding to a subsample.
 #' Each item in the list must be a vector with the indices of the training samples for the corresponding subsample.
 #' The length of the list must equal the length of the \code{test} list.  
 #' @param test a list of test samples, each item of the list corresponding to a subsample.
 #' Each item in the list must be vector with the indices of the test samples for the corresponding subsample.
 #' The length of the list must equal the length of the \code{training} list.
-#' The data will be split into fold disjoint subsets, keeping the ration of classes approximately equal.
-#' @param sparse.data If TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
+#' @param sparse.data if TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
 #' @param max.threads the maximal number of threads to be used
-#' @param algorithm.config The algorithm configuration to be used. 
+#' @param algorithm.config the algorithm configuration to be used. 
 #' @return 
-#' \item{link}{the linear predictors - a list of length \code{length(test)} with each element of the list another list of length \code{length(lambda)} one item for each lambda value, with each item a matrix of size \eqn{K \times N} containing the linear predictors.}
-#' \item{response}{the estimated probabilities - a list of length \code{length(test)} with each element of the list another list of length \code{length(lambda)} one item for each lambda value, with each item a matrix of size \eqn{K \times N} containing the probabilities.}
-#' \item{classes}{the estimated classes - a list of length \code{length(test)} with each element of the list a matrix of size \eqn{N \times d} with \eqn{d=}\code{length(lambda)}.}
+#' \item{link}{the linear predictors -- a list of length \code{length(test)} with each element of the list another list of length \code{length(lambda)} one item for each lambda value, with each item a matrix of size \eqn{K \times N} containing the linear predictors.}
+#' \item{response}{the estimated probabilities -- a list of length \code{length(test)} with each element of the list another list of length \code{length(lambda)} one item for each lambda value, with each item a matrix of size \eqn{K \times N} containing the probabilities.}
+#' \item{classes}{the estimated classes -- a list of length \code{length(test)} with each element of the list a matrix of size \eqn{N \times d} with \eqn{d=}\code{length(lambda)}.}
 #' \item{features}{number of features used in the models.}
 #' \item{parameters}{number of parameters used in the models.}
 #' @examples 
@@ -464,7 +464,8 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 #' test <- replicate(5, sample(1:length(classes))[1:20], simplify = FALSE)
 #' train <- lapply(test, function(s) (1:length(classes))[-s])
 #' 
-#' fit.sub <- msgl.subsampling(x, classes, alpha = .5, lambda = lambda, training = train, test = test)
+#' fit.sub <- msgl.subsampling(x, classes, alpha = .5, lambda = lambda, 
+#'  training = train, test = test)
 #' 
 #' # Missclassification count of second subsample
 #' colSums(fit.sub$classes[[2]] != classes[test[[2]]])
@@ -576,18 +577,18 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 #'
 #' With the exception of \code{verbose} it is not recommended to change any of the default values.
 #' 
-#' @param tolerance_penalized_main_equation_loop 
-#' @param tolerance_penalized_inner_loop_alpha 
-#' @param tolerance_penalized_inner_loop_beta 
-#' @param tolerance_penalized_middel_loop_alpha 
-#' @param tolerance_penalized_outer_loop_alpha 
-#' @param tolerance_penalized_outer_loop_beta 
-#' @param tolerance_penalized_outer_loop_gamma 
-#' @param use_bound_optimization 
-#' @param use_stepsize_optimization_in_penalizeed_loop 
-#' @param stepsize_opt_penalized_initial_t 
-#' @param stepsize_opt_penalized_a 
-#' @param stepsize_opt_penalized_b 
+#' @param tolerance_penalized_main_equation_loop tolerance threshold.
+#' @param tolerance_penalized_inner_loop_alpha tolerance threshold.
+#' @param tolerance_penalized_inner_loop_beta tolerance threshold.
+#' @param tolerance_penalized_middel_loop_alpha tolerance threshold.
+#' @param tolerance_penalized_outer_loop_alpha tolerance threshold.
+#' @param tolerance_penalized_outer_loop_beta tolerance threshold.
+#' @param tolerance_penalized_outer_loop_gamma tolerance threshold.
+#' @param use_bound_optimization if \code{TRUE} hessian bound check will be used.
+#' @param use_stepsize_optimization_in_penalizeed_loop if \code{TRUE} step-size optimization will be used.
+#' @param stepsize_opt_penalized_initial_t initial step-size.
+#' @param stepsize_opt_penalized_a step-size optimization parameter.
+#' @param stepsize_opt_penalized_b step-size optimization parameter.
 #' @param verbose If \code{TRUE} some information, regarding the status of the algorithm, will be printed in the R terminal.
 #' @return A configuration.
 #' @examples
@@ -665,19 +666,20 @@ sgl.standard.config <- sgl.algorithm.config();
 	return(beta)
 }
 
-#'  Predict
+#' Predict
 #' 
 #' Computes the linear predictors, the estimated probabilities and the estimated classes for a new data set.
 #'
 #' @param object an object of class msgl, produced with \code{msgl}.
 #' @param x a data matrix of size \eqn{N_\textrm{new} \times p}.
-#' @param sparse.data If TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
+#' @param sparse.data if TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
 #' @param ... ignored.
 #' @return 
-#' \item{link}{The linear predictors - a list of length \code{length(fit$beta)} one item for each model, with each item a matrix of size \eqn{K \times N_\textrm{new}} containing the linear predictors}
-#' \item{response}{The estimated probabilities - a list of length \code{length(fit$beta)} one item for each model, with each item a matrix of size \eqn{K \times N_\textrm{new}} containing the probabilities}
-#' \item{classes}{The estimated classes - a matrix of size \eqn{N_\textrm{new} \times d} with \eqn{d=}\code{length(fit$beta)}}
+#' \item{link}{the linear predictors -- a list of length \code{length(fit$beta)} one item for each model, with each item a matrix of size \eqn{K \times N_\textrm{new}} containing the linear predictors.}
+#' \item{response}{the estimated probabilities -- a list of length \code{length(fit$beta)} one item for each model, with each item a matrix of size \eqn{K \times N_\textrm{new}} containing the probabilities.}
+#' \item{classes}{the estimated classes -- a matrix of size \eqn{N_\textrm{new} \times d} with \eqn{d=}\code{length(fit$beta)}.}
 #' @author Martin Vincent
+#' @method predict msgl
 #' @S3method predict msgl
 #' @export
 #' @useDynLib msgl r_msgl_predict r_msgl_sparse_predict
@@ -734,3 +736,15 @@ predict.msgl <- function(object, x, sparse.data = FALSE, ...) {
 	class(res) <- "msgl"
 	return(res)
 }
+
+#' Simulated data set
+#'
+#' The use of this data set is only intended for testing and examples.
+#' The data set contains 100 simulated samples grouped into 10 classes.
+#' For each sample 400 covariates have been simulated.
+#'
+#' @name sim.data
+#' @docType data
+#' @keywords data
+NULL
+

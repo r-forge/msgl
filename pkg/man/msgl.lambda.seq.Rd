@@ -10,46 +10,47 @@
     algorithm.config = sgl.standard.config)
 }
 \arguments{
-  \item{x}{Design matrix, matrix of size \eqn{N \times p}.}
+  \item{x}{design matrix, matrix of size \eqn{N \times p}.}
 
-  \item{classes}{Classes, factor of length \eqn{N}.}
+  \item{classes}{classes, factor of length \eqn{N}.}
 
-  \item{sampleWeights}{Sample weights, a vector of length
+  \item{sampleWeights}{sample weights, a vector of length
   \eqn{N}.}
 
-  \item{grouping}{Grouping of covariates, a vector of
+  \item{grouping}{grouping of covariates, a vector of
   length \eqn{p}. Each element of the vector specifying the
   group of the covariate.}
 
-  \item{groupWeights}{The group weights, a vector of length
+  \item{groupWeights}{the group weights, a vector of length
   \eqn{m+1} (the number of groups). The first element of
   the vector is the intercept weight. If \code{groupWeights
   = NULL} default weights will be used. Default weights are
-  0 for the intercept and \eqn{\sqrt{K\cdot\textrm{number
+  0 for the intercept and \deqn{\sqrt{K\cdot\textrm{number
   of covariates in the group}}} for all other weights.}
 
-  \item{parameterWeights}{A matrix of size \eqn{K \times
+  \item{parameterWeights}{a matrix of size \eqn{K \times
   (p+1)}. The first column of the matrix is the intercept
   weights. Default weights are is 0 for the intercept
   weights and 1 for all other weights.}
 
-  \item{alpha}{Alpha value 0 for group lasso, 1 for lasso,
-  between 0 and 1 gives a sparse group lasso penalty.}
+  \item{alpha}{the \eqn{\alpha} value 0 for group lasso, 1
+  for lasso, between 0 and 1 gives a sparse group lasso
+  penalty.}
 
-  \item{d}{length of lambda sequence}
+  \item{d}{the length of lambda sequence}
 
-  \item{standardize}{If TRUE the covariates are standardize
+  \item{standardize}{if TRUE the covariates are standardize
   before fitting the model. The model parameters are
   returned in the original scale.}
 
   \item{lambda.min}{the smallest lambda value in the
   computed sequence.}
 
-  \item{sparse.data}{If TRUE \code{x} will be treated as
+  \item{sparse.data}{if TRUE \code{x} will be treated as
   sparse, if \code{x} is a sparse matrix it will be treated
   as sparse by default.}
 
-  \item{algorithm.config}{The algorithm configuration to be
+  \item{algorithm.config}{the algorithm configuration to be
   used.}
 }
 \value{

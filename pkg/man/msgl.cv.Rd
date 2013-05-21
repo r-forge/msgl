@@ -11,49 +11,50 @@
     algorithm.config = sgl.standard.config)
 }
 \arguments{
-  \item{x}{Design matrix, matrix of size \eqn{N \times p}.}
+  \item{x}{design matrix, matrix of size \eqn{N \times p}.}
 
-  \item{classes}{Classes, factor of length \eqn{N}.}
+  \item{classes}{classes, factor of length \eqn{N}.}
 
-  \item{sampleWeights}{Sample weights, a vector of length
+  \item{sampleWeights}{sample weights, a vector of length
   \eqn{N}.}
 
-  \item{grouping}{Grouping of covariates, a vector of
+  \item{grouping}{grouping of covariates, a vector of
   length \eqn{p}. Each element of the vector specifying the
   group of the covariate.}
 
-  \item{groupWeights}{The group weights, a vector of length
+  \item{groupWeights}{the group weights, a vector of length
   \eqn{m+1} (the number of groups). The first element of
   the vector is the intercept weight. If \code{groupWeights
   = NULL} default weights will be used. Default weights are
-  0 for the intercept and \eqn{\sqrt{K\cdot\textrm{number
+  0 for the intercept and \deqn{\sqrt{K\cdot\textrm{number
   of covariates in the group}}} for all other weights.}
 
-  \item{parameterWeights}{A matrix of size \eqn{K \times
+  \item{parameterWeights}{a matrix of size \eqn{K \times
   (p+1)}. The first column of the matrix is the intercept
   weights. Default weights are is 0 for the intercept
   weights and 1 for all other weights.}
 
-  \item{alpha}{Alpha value 0 for group lasso, 1 for lasso,
-  between 0 and 1 gives a sparse group lasso penalty.}
+  \item{alpha}{the \eqn{\alpha} value 0 for group lasso, 1
+  for lasso, between 0 and 1 gives a sparse group lasso
+  penalty.}
 
-  \item{standardize}{If TRUE the covariates are standardize
+  \item{standardize}{if TRUE the covariates are standardize
   before fitting the model. The model parameters are
   returned in the original scale.}
 
-  \item{lambda}{The lambda sequence for the regularization
+  \item{lambda}{the lambda sequence for the regularization
   path.}
 
   \item{fold}{the fold of the cross validation. The data
-  will be split into fold disjoint subsets, keeping the
-  ration of classes approximately equal.}
+  will be split into \code{fold} disjoint subsets, keeping
+  the ration of classes approximately equal.}
 
   \item{cv.indices}{a list of indices of a cross validation
   splitting. If \code{cv.indices = NULL} then a random
   splitting will be generated using the \code{fold}
   argument.}
 
-  \item{sparse.data}{If TRUE \code{x} will be treated as
+  \item{sparse.data}{if TRUE \code{x} will be treated as
   sparse, if \code{x} is a sparse matrix it will be treated
   as sparse by default.}
 
@@ -64,24 +65,24 @@
   validation splitting, only used if \code{cv.indices =
   NULL}.}
 
-  \item{algorithm.config}{The algorithm configuration to be
+  \item{algorithm.config}{the algorithm configuration to be
   used.}
 }
 \value{
-  \item{link}{The linear predictors - a list of length
+  \item{link}{the linear predictors -- a list of length
   \code{length(lambda)} one item for each lambda value,
   with each item a matrix of size \eqn{K \times N}
-  containing the linear predictors} \item{response}{The
+  containing the linear predictors.} \item{response}{the
   estimated probabilities - a list of length
   \code{length(lambda)} one item for each lambda value,
   with each item a matrix of size \eqn{K \times N}
-  containing the probabilities} \item{classes}{The
+  containing the probabilities.} \item{classes}{the
   estimated classes - a matrix of size \eqn{N \times d}
-  with \eqn{d=}\code{length(lambda)}} \item{cv.indices}{The
-  cross validation splitting used} \item{features}{Average
-  number of features used in the models}
-  \item{parameters}{Average number of parameters used in
-  the models}
+  with \eqn{d=}\code{length(lambda)}.}
+  \item{cv.indices}{the cross validation splitting used.}
+  \item{features}{average number of features used in the
+  models.} \item{parameters}{average number of parameters
+  used in the models.}
 }
 \description{
   Multinomial sparse group lasso cross validation using
