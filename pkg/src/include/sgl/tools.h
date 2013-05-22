@@ -19,9 +19,6 @@
 #ifndef TOOLS_H_
 #define TOOLS_H_
 
-//TODO find out which methods we need and which are not used
-//TODO clean up
-
 //Return the index of the first element with maximal value
 arma::u32
 argmax(arma::vec x)

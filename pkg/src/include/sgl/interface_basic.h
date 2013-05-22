@@ -338,13 +338,11 @@ template<typename CONFIG, typename ObjectiveFunctionType>
 
                       if (sgl.config.verbose)
                         {
-                          std::ostringstream msg;
-                          msg << "Thread " << th_id << " at index "
+                          SGL_STD_OUT << "Thread " << th_id << " at index "
                               << lambda_index << " - lambda = " << lambda
                               << " - obj. fun. value = " << objective.evaluate()
                               << " - non zero blocks = " << x.n_nonzero_blocks
-                              << " - non zero parameters " << x.n_nonzero;
-                          SGL_MSG(msg.str().c_str());
+                              << " - non zero parameters " << x.n_nonzero << endl;
                         }
 
                       optimizer.optimize_single(x, x0, gradient, objective,
@@ -479,19 +477,6 @@ template<typename CONFIG, typename ObjectiveFunctionType>
           int th_id = 0;
 #endif
 
-//#ifdef SGL_USE_OPENMP
-//#pragma omp critical
-//#endif
-//                {
-//                  if (sgl.config.verbose)
-//                    {
-//                      std::ostringstream msg;
-//                      msg << "Thread " << th_id << " at subsample " << i + 1
-//                          << " of " << n_subsamples;
-//                      SGL_MSG(msg.str().c_str());
-//                    }
-//                }
-
           if (!exception_caught)
             {
 
@@ -538,14 +523,12 @@ template<typename CONFIG, typename ObjectiveFunctionType>
 
                       if (sgl.config.verbose)
                         {
-                          std::ostringstream msg;
-                          msg << "Thread " << th_id << " subsample " << i + 1
+                          SGL_STD_OUT << "Thread " << th_id << " subsample " << i + 1
                               << " at index " << lambda_index << " - lambda = "
                               << lambda << " - obj. fun. value = "
                               << objective.evaluate() << " - non zero blocks = "
                               << x.n_nonzero_blocks << " - non zero parameters "
-                              << x.n_nonzero;
-                          SGL_MSG(msg.str().c_str());
+                              << x.n_nonzero << endl;
                         }
 
                       optimizer.optimize_single(x, x0, gradient, objective,

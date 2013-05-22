@@ -55,34 +55,10 @@
 //#define SGL_EXTENSIONS
 //#define MSGL_EXTENSIONS
 
-// Map messages, errors and warnings
-void show_warning(const char * msg);
 void report_error(const char *msg);
-void show_msg(const char * msg);
-#define SGL_WARNING(msg) show_warning(msg);
-#define SGL_ERROR(msg) report_error(msg);
-#define SGL_MSG(msg) show_msg(msg);
-
-//TODO move heavy debug to sgl
-#ifdef SGL_SHOW_HEAVY_DEBUG_WARNING
-#define MSGL_R_START SGL_INTERRUPT_INIT SGL_WARNING("msgl was compiled with heavy debugging turned on - this will decrease run-time performance")
-#else
-#define MSGL_R_START SGL_INTERRUPT_INIT
-#endif
-
 
 #include "include/msgl_R_interface.h"
 #include <memory>
-
-void show_warning(const char * msg) {
-	R::Rf_warning(msg);
-}
-
-void show_msg(const char * msg) {
-	//cout << msg << endl; 
-	R::Rprintf(msg);
-	R::Rprintf("\n");
-}
 
 void report_error(const char *msg) {
 	R::Rf_error(msg);

@@ -17,5 +17,6 @@ namespace R {
 #include <rtools/get_value.h>
 #include <rtools/rObject.h>
 #include <rtools/rList.h>
+#include <rtools/rStream.h>
 
 #endif /* RTOOLS_H_ */

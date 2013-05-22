@@ -8,6 +8,8 @@
 #ifndef SIMPLE_TIMER_H_
 #define SIMPLE_TIMER_H_
 
+#ifdef SGL_TIMING
+
 class SimpleTimer {
 
 private:
@@ -25,7 +27,7 @@ public:
 	SimpleTimer(std::string func, std::string file, int line) : total(0), s(0), times(0), func(func), file(file), line(line) {}
 
 	~SimpleTimer() {
-		std::cout << func << " " << static_cast<double>(total) / CLOCKS_PER_SEC <<  " seconds - x"<< times << "." << " (in " << file << " at line "<< line << ") " << std::endl;
+		rout << func << " " << static_cast<double>(total) / CLOCKS_PER_SEC <<  " seconds - x"<< times << "." << " (in " << file << " at line "<< line << ") " << std::endl;
 	}
 
 	void start() {
@@ -53,7 +55,6 @@ public:
 	}
 };
 
-#ifdef SGL_TIMING
 #define TIMER_START static SimpleTimer timer(__func__, __FILE__, __LINE__); TimerScope timer_scope(timer);
 #else
 #define TIMER_START

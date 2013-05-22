@@ -31,7 +31,6 @@ R::SEXP msgl_wb_lambda_seq(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weig
 		R::SEXP r_parameterWeights, R::SEXP r_alpha, R::SEXP r_numberOfModels, R::SEXP r_lambdaMin, R::SEXP r_config) {
 
 	TIMER_START;
-	MSGL_R_START;
 
 	//Map data
 	const sgl::matrix X = get_value < sgl::matrix > (r_x);
@@ -90,8 +89,6 @@ R::SEXP msgl_wb_basic(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights, 
 	//Start scope timer, note will only be activated if SGL_TIMING is defined
 	TIMER_START;
 
-	MSGL_R_START;
-
 	//Load data
 	const sgl::matrix X = get_value < sgl::matrix > (r_x);
 	const sgl::natural_vector Y = get_value < sgl::natural_vector > (r_classes);
@@ -108,18 +105,14 @@ R::SEXP msgl_wb_basic(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights, 
 	const msgl::AlgorithmConfiguration config(rlist_config);
 
 	if (config.verbose) {
-		std::ostringstream msg;
-		msg << "Msgl basic - starting";
-		SGL_MSG(msg.str().c_str());
+		rout << "Msgl basic - starting" << endl;
 	}
 
 	sgl::DimConfig dim_config = sgl::createDimConfig(block_dim, blockWeights, parameterWeights);
 
 	if (config.verbose) {
-		std::ostringstream msg;
-		msg << "Number of blocks : " << dim_config.n_blocks << " - total dimension : " << dim_config.dim << " - L2 penalty for block 0 : "
-				<< dim_config.L2_penalty_weight(0) << "\n";
-		SGL_MSG(msg.str().c_str());
+		rout << "Number of blocks : " << dim_config.n_blocks << " - total dimension : " << dim_config.dim << " - L2 penalty for block 0 : "
+				<< dim_config.L2_penalty_weight(0) << endl;
 	}
 
 	msgl::WeightedGroupedMatrixData<sgl::matrix> data(X, Y, W, true);
@@ -183,8 +176,6 @@ R::SEXP r_msgl_wb_basic(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights
 R::SEXP msgl_wb_cv(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights, R::SEXP r_block_dim, R::SEXP r_blockWeights,
 		R::SEXP r_parameterWeights, R::SEXP r_alpha, R::SEXP r_lambda_seq, R::SEXP r_fold, R::SEXP r_cv_indices,
 		R::SEXP r_use_cv_indices, R::SEXP r_number_of_threads, R::SEXP r_seed, R::SEXP r_config) {
-
-	MSGL_R_START;
 
 	//Map data
 	const sgl::matrix X = get_value < sgl::matrix > (r_x);
@@ -277,8 +268,6 @@ R::SEXP msgl_wb_subsampling(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_wei
 		R::SEXP r_parameterWeights, R::SEXP r_alpha, R::SEXP r_lambda_seq, R::SEXP r_training_samples,
 		R::SEXP r_test_samples, R::SEXP r_number_of_threads, R::SEXP r_config) {
 
-	MSGL_R_START;
-
 	//Map data
 	const sgl::matrix X = get_value < sgl::matrix > (r_x);
 	const sgl::natural_vector Y = get_value < sgl::natural_vector > (r_classes);
@@ -359,8 +348,6 @@ R::SEXP r_msgl_wb_subsampling(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_w
  */
 
 R::SEXP msgl_predict(R::SEXP r_x, R::SEXP r_beta) {
-
-	MSGL_R_START;
 
 	//TODO domain checks
 

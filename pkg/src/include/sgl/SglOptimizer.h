@@ -194,7 +194,7 @@ sgl::parameter SglOptimizer<SGL>::optimize_single(sgl::parameter & x, sgl::param
 			}
 
 #ifdef SGL_DEBUG_INFO_STEPSIZE
-			std::cout << "stepsize = " << t << std::endl;
+			rout << "stepsize = " << t << std::endl;
 #endif
 
 			objective.at(x);
@@ -203,9 +203,9 @@ sgl::parameter SglOptimizer<SGL>::optimize_single(sgl::parameter & x, sgl::param
 		}
 
 #ifdef SGL_DEBUG_INFO_QUADRATIC
-		std::cout << " parameter distance = " << sgl.dist(x_old, x) << std::endl;
-		std::cout << " parameter discrete distance = " << sgl.discrete_dist(x_old, x) << std::endl;
-		std::cout << " function value = " << f << std::endl;
+		rout << " parameter distance = " << sgl.dist(x_old, x) << std::endl;
+		rout << " parameter discrete distance = " << sgl.discrete_dist(x_old, x) << std::endl;
+		rout << " function value = " << f << std::endl;
 #endif
 
 		if (!is_stopping_criteria_fulfilled(x, x_old, f, f_old)) {
@@ -259,11 +259,9 @@ void SglOptimizer<SGL>::optimize(sgl::parameter_field & x_field, sgl::natural_ve
 			sgl::numeric const lambda = lambda_sequence(lambda_index);
 
 			if (sgl.config.verbose) {
-				std::ostringstream msg;
-				msg << "At index " << lambda_index << " - lambda = " << lambda << " - obj. fun. value = " << objective.evaluate()
-						<< " - non zero blocks = " << x.n_nonzero_blocks << " - non zero parameters "
-						<< x.n_nonzero;
-				SGL_MSG(msg.str().c_str());
+				SGL_STD_OUT << "At index " << lambda_index << " - lambda = " << lambda << " - obj. fun. value = " << objective.evaluate()
+								<< " - non zero blocks = " << x.n_nonzero_blocks << " - non zero parameters "
+							<< x.n_nonzero << endl;
 			}
 
 			 optimize_single(x, x0, gradient, objective, lambda);
@@ -318,10 +316,7 @@ void SglOptimizer<SGL>::optimize(sgl::parameter_field & x_field, sgl::natural_ve
 		object_value.resize(x_field_index);
 		function_value.resize(x_field_index);
 
-		std::ostringstream msg;
-		msg << "Exception caught - returning results for the first " << lambda_index << " lambda values. Exception cause: " << e.what();
-
-		SGL_WARNING(msg.str().c_str());
+		SGL_STD_WARNING << "Exception caught - returning results for the first " << lambda_index << " lambda values. Exception cause: " << e.what();
 
 #endif
 
@@ -353,8 +348,6 @@ sgl::numeric SglOptimizer<SGL>::stepsize_optimize_penalized(T & objective, sgl::
 	sgl::numeric value;
 	while (objective.at((1 - t) * x0 + t * x1), value = objective.evaluate() + sgl.penalty((1 - t) * x0 + t * x1, alpha, lambda), value
 			> value_at_x0 + t * delta && t > 0) {
-	    //TODO remove
-	    //cout << objective.evaluate() + sgl.penalty((1 - t) * x0 + t * x1, alpha, lambda) - value_at_x0 + t * delta << " : " << delta << " : " << t - std::numeric_limits<sgl::numeric>::epsilon() << endl;
 
 		t *= sgl.config.stepsize_opt_penalized_b;
 
@@ -362,8 +355,6 @@ sgl::numeric SglOptimizer<SGL>::stepsize_optimize_penalized(T & objective, sgl::
 		    //TODO what should we do in this case
 		    return(0);
 		}
-
-		//ASSERT_IS_POSITIVE(t - std::numeric_limits<sgl::numeric>::epsilon()); //TODO Confiable
 	}
 
 	ASSERT_IS_POSITIVE(t);
@@ -486,9 +477,9 @@ inline void SglOptimizer<SGL>::optimize_quadratic(T & objective, sgl::parameter 
 			//Check if block is active
 			if (sgl.is_block_active(block_gradient, block_index, alpha, lambda)) {
 
-				cout << "block = " << block_index << " gab = " << sgl.compute_K(abs(block_gradient) - lambda * alpha * sgl.setup.L1_penalty_weight(block_index), 0) - sgl::square(lambda * (1 - alpha) * sgl.setup.L2_penalty_weight(block_index)) << endl;
+				rout << "block = " << block_index << " gab = " << sgl.compute_K(abs(block_gradient) - lambda * alpha * sgl.setup.L1_penalty_weight(block_index), 0) - sgl::square(lambda * (1 - alpha) * sgl.setup.L2_penalty_weight(block_index)) << endl;
 
-				cout << "critical bound = " << critical_bounds(block_index) << " hessian level 0 bound = " << objective.hessian_bound_level0()
+				rout << "critical bound = " << critical_bounds(block_index) << " hessian level 0 bound = " << objective.hessian_bound_level0()
 								<< " hessian level 1 bound = " << objective.hessian_bound_level1(block_index) << endl;
 
 				//throw std::runtime_error("error - hessian bound");
@@ -515,11 +506,11 @@ inline void SglOptimizer<SGL>::optimize_quadratic(T & objective, sgl::parameter 
 		}
 
 #ifdef SGL_DEBUG_INFO_GB_OPT
-		std::cout << "Computed block gradients " << computed_gbs << std::endl;
+		rout << "Computed block gradients " << computed_gbs << std::endl;
 #endif
 
 #ifdef SGL_DEBUG_QUADRATIC_STOPPING
-		std::cout << "Quadratic loop - dist = " << dist << std::endl;
+		rout << "Quadratic loop - dist = " << dist << std::endl;
 #endif
 
 	} while (dist > sgl.config.tolerance_penalized_middel_loop_alpha);

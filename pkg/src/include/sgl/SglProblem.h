@@ -352,9 +352,6 @@ sgl::numeric SglProblem<CONFIG>::compute_t(sgl::vector const& a, sgl::numeric b)
         ASSERT_IS_NUMBER(r);
         ASSERT_IS_NON_NEGATIVE(r);
 
-       // TODO remove ?
-        // ASSERT_IS_FINITE(r);
-
         //DEBUGING
         //TODO debug guards
 //      sgl::numeric upper = compute_K(a, r + r / 4);

@@ -19,6 +19,28 @@
 #ifndef MSGL_R_INTERFACE_H_
 #define MSGL_R_INTERFACE_H_
 
+#include <iostream>
+#include <cstdio>
+
+class rstream : public std::streambuf {
+public:
+protected:
+  virtual std::streamsize xsputn(const char *s, std::streamsize n);
+  virtual int overflow(int c = EOF);
+  virtual int sync();
+};
+
+class rostream : public std::ostream
+{
+protected:
+    rstream buf;
+
+public:
+    rostream() : std::ostream(&buf) {}
+};
+
+rostream rout;
+
 #include <sgl.h>
 #include <rtools.h>
 #include <msgl.h>

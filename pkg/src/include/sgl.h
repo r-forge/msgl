@@ -59,7 +59,6 @@ namespace sgl {
 #include "sgl/BlockVector.h"
 #include "sgl/SglProblem.h"
 #include "sgl/SglOptimizer.h"
-//#include "sgl/PredictorResponse.h"
 #include "sgl/ObjectiveFunction.h"
 #include "sgl/ObjectiveFunctionExpressionType.h"
 #include "sgl/interface_basic.h"

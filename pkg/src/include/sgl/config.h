@@ -35,16 +35,16 @@
 #define SGL_EXCEPTIONS_GENRAL dummy_exception_b
 #endif
 
-#ifndef SGL_WARNING
-#define SGL_WARNING(msg) std::cerr << msg << std::endl;
-#endif
-
 #ifndef SGL_ERROR
-#define SGL_ERROR(msg) std::cerr << msg << std::endl; exit(1);
+#define SGL_ERROR(msg) report_error(msg);
 #endif
 
-#ifndef SGL_MSG
-#define SGL_MSG(msg) std::cout << msg << std::endl;
+#ifndef SGL_STD_OUT
+#define SGL_STD_OUT rout
+#endif
+
+#ifndef SGL_STD_WARNING
+#define SGL_STD_WARNING rwarn
 #endif
 
 #ifndef SGL_INTERRUPT_INIT

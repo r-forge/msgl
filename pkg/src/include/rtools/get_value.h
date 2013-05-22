@@ -41,8 +41,7 @@ arma::Mat<double> get_value(R::SEXP exp) {
 	unsigned int n_rows = R::INTEGER(dim)[0];
 	unsigned int n_cols = R::INTEGER(dim)[1];
 
-	return conv_to < arma::Mat<double>
-			> ::from(arma::mat(ptr, n_rows, n_cols, false, true));
+	return arma::conv_to< arma::Mat<double> >::from(arma::mat(ptr, n_rows, n_cols, false, true));
 }
 
 template<>
@@ -50,8 +49,7 @@ arma::Col<double> get_value(R::SEXP exp) {
 
 	double *ptr = R::REAL(exp);
 
-	return conv_to < arma::Col<double>
-			> ::from(arma::vec(ptr, R::Rf_length(exp), false, true));
+	return arma::conv_to< arma::Col<double> >::from(arma::vec(ptr, R::Rf_length(exp), false, true));
 }
 
 template<>
@@ -59,8 +57,7 @@ arma::Col<arma::u32> get_value(R::SEXP exp) {
 
 	int *ptr = R::INTEGER(exp);
 
-	return conv_to < arma::Col<u32>
-			> ::from(arma::Col<int>(ptr, R::Rf_length(exp), false, true));
+	return arma::conv_to< arma::Col<arma::u32> >::from(arma::Col<int>(ptr, R::Rf_length(exp), false, true));
 }
 
 template<>
@@ -68,8 +65,7 @@ arma::Col<arma::s32> get_value(R::SEXP exp) {
 
 	int *ptr = R::INTEGER(exp);
 
-	return conv_to < arma::Col<s32>
-			> ::from(arma::Col<int>(ptr, R::Rf_length(exp), false, true));
+	return arma::conv_to< arma::Col<arma::s32> >::from(arma::Col<int>(ptr, R::Rf_length(exp), false, true));
 }
 
 template<>

@@ -106,9 +106,8 @@
 // #define ARMA_USE_BOOST
 // #define ARMA_USE_BOOST_DATE
 
-
 #if !defined(ARMA_DEFAULT_OSTREAM)
-  #define ARMA_DEFAULT_OSTREAM std::cout
+  #define ARMA_DEFAULT_OSTREAM rout
 #endif
 
 #define ARMA_PRINT_LOGIC_ERRORS
