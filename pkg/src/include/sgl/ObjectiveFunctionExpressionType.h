@@ -19,9 +19,10 @@
 #ifndef OBJECTIVEFUNCTIONEXPRESSIONTYPE_H_
 #define OBJECTIVEFUNCTIONEXPRESSIONTYPE_H_
 
-class NoData {};
-
-static NoData noData;
+//TODO REMOVE
+//class NoData {};
+//
+//static NoData noData;
 
 template <typename E>
 struct type_traits;

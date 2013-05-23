@@ -8,7 +8,8 @@
 #ifndef BLOCKVECTOR_H_
 #define BLOCKVECTOR_H_
 
-static int bv_count = 0;
+//FIXME REMOVE
+//static int bv_count = 0;
 
 template<typename MATRIX, typename VECTOR>
   class BlockVector

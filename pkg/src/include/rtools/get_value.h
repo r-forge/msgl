@@ -92,10 +92,10 @@ arma::sp_mat get_value(R::SEXP exp) {
 		return m;
 	}
 
-	uword* new_row_indices = memory::acquire_chunked < uword > (n_nonzero + 1);
-	double* new_values = memory::acquire_chunked<double>(n_nonzero + 1);
+	arma::uword* new_row_indices = arma::memory::acquire_chunked < uword > (n_nonzero + 1);
+	double* new_values = arma::memory::acquire_chunked<double>(n_nonzero + 1);
 
-	arrayops::copy(new_values, R::REAL(values), n_nonzero);
+	arma::arrayops::copy(new_values, R::REAL(values), n_nonzero);
 
 	int * row_ptr = R::INTEGER(row_idx);
 	for (unsigned int i = 0; i < n_nonzero; ++i) {
@@ -106,17 +106,17 @@ arma::sp_mat get_value(R::SEXP exp) {
 
 	int * col_ptr = R::INTEGER(col_ptrs);
 	for (unsigned int i = 0; i < n_cols + 2; ++i) {
-		access::rwp(m.col_ptrs)[i] = static_cast<arma::uword>(col_ptr[i]);
+		arma::access::rwp(m.col_ptrs)[i] = static_cast<arma::uword>(col_ptr[i]);
 	}
 
-	memory::release(m.values);
-	memory::release(m.row_indices);
+	arma::memory::release(m.values);
+	arma::memory::release(m.row_indices);
 
-	access::rw(m.values) = new_values;
-	access::rw(m.row_indices) = new_row_indices;
+	arma::access::rw(m.values) = new_values;
+	arma::access::rw(m.row_indices) = new_row_indices;
 
 	// Update counts and such.
-	access::rw(m.n_nonzero) = n_nonzero;
+	arma::access::rw(m.n_nonzero) = n_nonzero;
 
 	return m;
 }
