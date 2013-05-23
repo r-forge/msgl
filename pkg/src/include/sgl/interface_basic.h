@@ -281,20 +281,21 @@ template<typename CONFIG, typename ObjectiveFunctionType>
       bool exception_caught = false;
       string exception_msg;
 
+#ifdef SGL_USE_OPENMP
       omp_set_num_threads(number_of_threads);
 
-#ifdef SGL_USE_OPENMP
-#pragma omp parallel for schedule(dynamic)
+      #pragma omp parallel for schedule(dynamic)
 #endif
       for (int i = 0; i < n_indices; i++)
         {
 
-#ifdef SGL_USE_OPENMP
-
-          int th_id = omp_get_thread_num();
-#else
-          int th_id = 0;
-#endif
+    	  //TODO see TODO below
+//#ifdef SGL_USE_OPENMP
+//
+//          int th_id = omp_get_thread_num();
+//#else
+//          int th_id = 0;
+//#endif
 
           if (!exception_caught)
             {
@@ -309,8 +310,7 @@ template<typename CONFIG, typename ObjectiveFunctionType>
 #pragma omp critical
 #endif
                     {
-                      traning_objective.set_data(
-                          objective_type.data(training_indices(i)));
+                      traning_objective.set_data(objective_type.data(training_indices(i)));
                       test_data = objective_type.data(cv_indices(i));
                     }
 
@@ -335,15 +335,6 @@ template<typename CONFIG, typename ObjectiveFunctionType>
                     {
 
                       sgl::numeric const lambda = lambda_sequence(lambda_index);
-
-                      if (sgl.config.verbose)
-                        {
-                          SGL_STD_OUT << "Thread " << th_id << " at index "
-                              << lambda_index << " - lambda = " << lambda
-                              << " - obj. fun. value = " << objective.evaluate()
-                              << " - non zero blocks = " << x.n_nonzero_blocks
-                              << " - non zero parameters " << x.n_nonzero << endl;
-                        }
 
                       optimizer.optimize_single(x, x0, gradient, objective,
                           lambda);
@@ -392,11 +383,17 @@ template<typename CONFIG, typename ObjectiveFunctionType>
                       if (!exception_caught)
                         {
 
-                          //Mark exception caught
+                    	  //Mark exception caught
                           exception_caught = true;
 
-                          //Copy exception
-                          exception_msg = ex.what();
+                          //Copy msg
+                          if(ex.what() != NULL) {
+                        	  exception_msg = ex.what();
+                          }
+
+                          else {
+                        	  exception_msg = "Unknown error";
+                          }
 
                           //Interrupt all threads
                           SGL_INTERRUPT;
@@ -405,15 +402,30 @@ template<typename CONFIG, typename ObjectiveFunctionType>
                     }
                 }
             }
+
+          //TODO This does not seem to work with R -
+          // printing to the R terminal using Rprintf results in
+          // 'Error: C stack usage is too close to the limit'
+          // If std::cout is used everything works fine
+//#ifdef SGL_USE_OPENMP
+//#pragma omp critical
+//#endif
+//        {
+//
+//            if (sgl.config.verbose && !exception_caught) {
+//
+//        	SGL_STD_OUT << "Thread " << th_id << ": fold "
+//                  << i << " completed" << endl;
+//            }
+//        }
+
         }
 
       if (exception_caught)
         {
-
           SGL_INTERRUPT_RESET;
 
           //handle exception
-
           throw std::runtime_error(exception_msg.c_str());
         }
 
@@ -463,19 +475,20 @@ template<typename CONFIG, typename ObjectiveFunctionType>
       bool exception_caught = false;
       string exception_msg;
 
+#ifdef SGL_USE_OPENMP
       omp_set_num_threads(number_of_threads);
 
-#ifdef SGL_USE_OPENMP
-#pragma omp parallel for schedule(dynamic)
+      #pragma omp parallel for schedule(dynamic)
 #endif
       for (int i = 0; i < static_cast<int>(n_subsamples); i++)
         {
 
-#ifdef SGL_USE_OPENMP
-          int th_id = omp_get_thread_num();
-#else
-          int th_id = 0;
-#endif
+    	  //TODO see TODO below
+//#ifdef SGL_USE_OPENMP
+//          int th_id = omp_get_thread_num();
+//#else
+//          int th_id = 0;
+//#endif
 
           if (!exception_caught)
             {
@@ -520,16 +533,6 @@ template<typename CONFIG, typename ObjectiveFunctionType>
                     {
 
                       sgl::numeric const lambda = lambda_sequence(lambda_index);
-
-                      if (sgl.config.verbose)
-                        {
-                          SGL_STD_OUT << "Thread " << th_id << " subsample " << i + 1
-                              << " at index " << lambda_index << " - lambda = "
-                              << lambda << " - obj. fun. value = "
-                              << objective.evaluate() << " - non zero blocks = "
-                              << x.n_nonzero_blocks << " - non zero parameters "
-                              << x.n_nonzero << endl;
-                        }
 
                       optimizer.optimize_single(x, x0, gradient, objective,
                           lambda);
@@ -577,8 +580,14 @@ template<typename CONFIG, typename ObjectiveFunctionType>
                           //Mark exception caught
                           exception_caught = true;
 
-                          //Copy exception
-                          exception_msg = ex.what();
+                          //Copy msg
+                          if(ex.what() != NULL) {
+                        	  exception_msg = ex.what();
+                          }
+
+                          else {
+                        	  exception_msg = "Unknown error";
+                          }
 
                           //Interrupt all threads
                           SGL_INTERRUPT;
@@ -587,6 +596,23 @@ template<typename CONFIG, typename ObjectiveFunctionType>
                     }
                 }
             }
+
+          //TODO This does not seem to work with R -
+          // printing to the R terminal using Rprintf results in
+          // 'Error: C stack usage is too close to the limit'
+          // If std::cout is used everything works fine
+//#ifdef SGL_USE_OPENMP
+//#pragma omp critical
+//#endif
+//        {
+//
+//            if (sgl.config.verbose && !exception_caught) {
+//
+//        	SGL_STD_OUT << "Thread " << th_id << ": subsample "
+//                  << i << " completed" << endl;
+//            }
+//        }
+
         }
 
       if (exception_caught)

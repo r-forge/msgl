@@ -41,7 +41,7 @@ create_error_msg(const char * msg, const char * file_name, int line_number)
 {
   std::ostringstream error_msg;
 
-  error_msg << msg << " ( in " << file_name << " at line " << line_number
+  error_msg << msg << " (Assert failed in " << file_name << " at line " << line_number
       << " )";
   return error_msg.str();
 }

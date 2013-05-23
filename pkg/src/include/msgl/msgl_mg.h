@@ -69,10 +69,15 @@ R::SEXP r_msgl_wb_lambda_seq(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_we
 
 	} catch (std::exception & e) {
 
-		SGL_ERROR(e.what());
+		if(e.what() != NULL) {
+			SGL_ERROR(e.what());
+		}
+
+		else {
+			SGL_ERROR("Unknown error");
+		}
 
 	} catch (...) {
-
 		SGL_ERROR("Unknown error");
 	}
 
@@ -104,15 +109,12 @@ R::SEXP msgl_wb_basic(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights, 
 	rList rlist_config(r_config);
 	const msgl::AlgorithmConfiguration config(rlist_config);
 
-	if (config.verbose) {
-		rout << "Msgl basic - starting" << endl;
-	}
-
 	sgl::DimConfig dim_config = sgl::createDimConfig(block_dim, blockWeights, parameterWeights);
 
 	if (config.verbose) {
+		rout << "Msgl" << endl;
 		rout << "Number of blocks : " << dim_config.n_blocks << " - total dimension : " << dim_config.dim << " - L2 penalty for block 0 : "
-				<< dim_config.L2_penalty_weight(0) << endl;
+				<< dim_config.L2_penalty_weight(0) << endl << endl;
 	}
 
 	msgl::WeightedGroupedMatrixData<sgl::matrix> data(X, Y, W, true);
@@ -159,10 +161,15 @@ R::SEXP r_msgl_wb_basic(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights
 
 	} catch (std::exception & e) {
 
-		SGL_ERROR(e.what());
+		if(e.what() != NULL) {
+			SGL_ERROR(e.what());
+		}
+
+		else {
+			SGL_ERROR("Unknown error");
+		}
 
 	} catch (...) {
-
 		SGL_ERROR("Unknown error");
 	}
 
@@ -194,8 +201,14 @@ R::SEXP msgl_wb_cv(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights, R::
 	//Configuration
 	rList rlist_config(r_config);
 	const msgl::AlgorithmConfiguration config(rlist_config);
-
 	sgl::DimConfig dim_config = sgl::createDimConfig(block_dim, blockWeights, parameterWeights);
+
+	if (config.verbose) {
+		rout << "Msgl, cross validation" << endl;
+		rout << "Number of blocks : " << dim_config.n_blocks << " - total dimension : " << dim_config.dim << " - L2 penalty for block 0 : "
+				<< dim_config.L2_penalty_weight(0) << endl;
+	}
+
 	msgl::WeightedGroupedMatrixData<sgl::matrix> data(X, Y, W, true);
 	msgl::gl_weighted_multinomial obj_type(data);
 
@@ -224,13 +237,11 @@ R::SEXP msgl_wb_cv(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights, R::
 	boost::tuple<field<msgl::MultinomialResponse>, sgl::vector, sgl::vector> response_field =
 			sgl_optimizer.regular_cv(predictor, lambda_seq, cvgroups, indices, number_of_threads);
 
-	boost::shared_ptr<rList> res_ptr;
 
 	//Build result R list
-	res_ptr = boost::shared_ptr<rList>(new rList(6));
-	boost::tuple<sgl::matrix_field, sgl::matrix_field, sgl::natural_matrix> result = convert(response_field.get<0>());
+	rList res(6);
 
-	rList & res = *res_ptr.get();
+	boost::tuple<sgl::matrix_field, sgl::matrix_field, sgl::natural_matrix> result = convert(response_field.get<0>());
 
 	res.attach(rObject(result.get<0>()), "link");
 	res.attach(rObject(result.get<1>()), "response");
@@ -256,7 +267,16 @@ R::SEXP r_msgl_wb_cv(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights, R
 		//Catch unhandled exceptions
 
 	} catch (std::exception & e) {
-		SGL_ERROR(e.what());
+
+		if(e.what() != NULL) {
+
+			SGL_ERROR(e.what());
+		}
+
+		else {
+			SGL_ERROR("Unknown error");
+		}
+
 	} catch (...) {
 		SGL_ERROR("Unknown error");
 	}
@@ -290,6 +310,12 @@ R::SEXP msgl_wb_subsampling(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_wei
 	sgl::DimConfig dim_config = sgl::createDimConfig(block_dim, blockWeights, parameterWeights);
 	msgl::WeightedGroupedMatrixData<sgl::matrix> data(X, Y, W, true);
 	msgl::gl_weighted_multinomial obj_type(data);
+
+	if (config.verbose) {
+		rout << "Msgl, subsampling" << endl;
+		rout << "Number of blocks : " << dim_config.n_blocks << " - total dimension : " << dim_config.dim << " - L2 penalty for block 0 : "
+				<< dim_config.L2_penalty_weight(0) << endl;
+	}
 
 	sgl::Interface < msgl::AlgorithmConfiguration, msgl::gl_weighted_multinomial
 			> sgl_optimizer(obj_type, dim_config, alpha, config);
@@ -335,11 +361,18 @@ R::SEXP r_msgl_wb_subsampling(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_w
 		//Catch unhandled exceptions
 
 	} catch (std::exception & e) {
-		SGL_ERROR(e.what());
+
+		if(e.what() != NULL) {
+			SGL_ERROR(e.what());
+		}
+
+		else {
+			SGL_ERROR("Unknown error");
+		}
+
 	} catch (...) {
 		SGL_ERROR("Unknown error");
 	}
-
 	return R::R_NilValue; //Avoid compiler warnings
 }
 
@@ -379,13 +412,17 @@ R::SEXP r_msgl_predict(R::SEXP r_x, R::SEXP r_beta) {
 
 		} catch (std::exception & e) {
 
-			SGL_ERROR(e.what());
+			if(e.what() != NULL) {
+				SGL_ERROR(e.what());
+			}
+
+			else {
+				SGL_ERROR("Unknown error");
+			}
 
 		} catch (...) {
-
 			SGL_ERROR("Unknown error");
 		}
-
 
 	return R::R_NilValue; //Avoid compiler warnings
 }

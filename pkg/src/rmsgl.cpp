@@ -37,7 +37,6 @@
 
 //Exception handling
 #define SGL_CATCH_EXCEPTIONS
-#define SGL_EXCEPTION_AS_ERROR
 
 //Should the timers be activated (only needed for profiling the code)
 //#define SGL_TIMING

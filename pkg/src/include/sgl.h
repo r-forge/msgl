@@ -19,7 +19,10 @@
 #ifndef SGL_H_
 #define SGL_H_
 
+#ifdef SGL_USE_OPENMP
 #include <omp.h>
+#endif
+
 #include <limits>
 #include <time.h>
 #include <stdexcept>

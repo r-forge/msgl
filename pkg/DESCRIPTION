@@ -1,11 +1,13 @@
 Package: msgl
 Type: Package
 Title: Multinomial sparse group lasso
-Version: 0.1.0
+Version: 0.1.1
 Date: 2013-20-05
 Author: Martin Vincent
 Maintainer: Martin Vincent <vincent@math.ku.dk>
-Description: Sparse group lasso multiclass classification, suitable for high dimensional problems with many classes. Fast algorithm for solving the multinomial sparse group lasso optimization problem. 
+Description: Sparse group lasso multiclass classification, suitable for high
+    dimensional problems with many classes. Fast algorithm for solving the
+    multinomial sparse group lasso optimization problem.
 License: GPL
 LazyLoad: yes
 Depends:

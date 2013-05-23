@@ -300,25 +300,7 @@ void SglOptimizer<SGL>::optimize(sgl::parameter_field & x_field, sgl::natural_ve
 		//Reset intrrupt flag
 		SGL_INTERRUPT_RESET;
 
-#ifdef SGL_EXCEPTION_AS_ERROR
 		throw;
-#else
-
-		if (!handle_exceptions) {
-			throw;
-		}
-
-		if (lambda_index == 0) {
-			throw;
-		}
-
-		x_field = x_field.rows(0, x_field_index - 1); //TODO avoid copying - smarter way to reduce the size
-		object_value.resize(x_field_index);
-		function_value.resize(x_field_index);
-
-		SGL_STD_WARNING << "Exception caught - returning results for the first " << lambda_index << " lambda values. Exception cause: " << e.what();
-
-#endif
 
 	} catch (SGL_EXCEPTIONS_GENRAL) {
 

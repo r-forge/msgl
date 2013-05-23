@@ -70,10 +70,15 @@ R::SEXP r_msgl_wb_sp_lambda_seq(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample
 
 	} catch (std::exception & e) {
 
-		SGL_ERROR(e.what());
+		if(e.what() != NULL) {
+			SGL_ERROR(e.what());
+		}
+
+		else {
+			SGL_ERROR("Unknown error");
+		}
 
 	} catch (...) {
-
 		SGL_ERROR("Unknown error");
 	}
 
@@ -104,14 +109,10 @@ R::SEXP msgl_wb_sp_basic(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weight
 	// Create optimiser
 	rList rlist_config(r_config);
 	const msgl::AlgorithmConfiguration config(rlist_config);
-
-	if (config.verbose) {
-		rout << "Msgl, sparse" << endl;
-	}
-
 	sgl::DimConfig dim_config = sgl::createDimConfig(block_dim, blockWeights, parameterWeights);
 
 	if (config.verbose) {
+		rout << "Msgl, sparse" << endl;
 		rout << "Number of blocks : " << dim_config.n_blocks << " - total dimension : " << dim_config.dim << " - L2 penalty for block 0 : "
 				<< dim_config.L2_penalty_weight(0) << endl;
 	}
@@ -159,10 +160,15 @@ R::SEXP r_msgl_wb_sp_basic(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weig
 		//Catch unhandled exceptions
 	} catch (std::exception & e) {
 
-		SGL_ERROR(e.what());
+		if(e.what() != NULL) {
+			SGL_ERROR(e.what());
+		}
+
+		else {
+			SGL_ERROR("Unknown error");
+		}
 
 	} catch (...) {
-
 		SGL_ERROR("Unknown error");
 	}
 
@@ -195,13 +201,10 @@ R::SEXP msgl_wb_sp_cv(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights, 
 	rList rlist_config(r_config);
 	const msgl::AlgorithmConfiguration config(rlist_config);
 
-	if (config.verbose) {
-		rout << "Msgl, cross validation, sparse" << endl;
-	}
-
 	sgl::DimConfig dim_config = sgl::createDimConfig(block_dim, blockWeights, parameterWeights);
 
 	if (config.verbose) {
+		rout << "Msgl, cross validation, sparse" << endl;
 		rout << "Number of blocks : " << dim_config.n_blocks << " - total dimension : " << dim_config.dim << " - L2 penalty for block 0 : "
 				<< dim_config.L2_penalty_weight(0) << endl;
 	}
@@ -234,14 +237,10 @@ R::SEXP msgl_wb_sp_cv(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights, 
 	boost::tuple < field<msgl::MultinomialResponse>, sgl::vector, sgl::vector > response_field = sgl_optimizer.regular_cv(predictor,
 			lambda_seq, cvgroups, indices, number_of_threads);
 
-	boost::shared_ptr < rList > res_ptr;
-
 	//Build R list
-	res_ptr = boost::shared_ptr < rList > (new rList(6));
-
 	boost::tuple < sgl::matrix_field, sgl::matrix_field, sgl::natural_matrix > result = convert(response_field.get<0>());
 
-	rList & res = *res_ptr.get();
+	rList res(6);
 
 	res.attach(rObject(result.get<0>()), "link");
 	res.attach(rObject(result.get<1>()), "response");
@@ -267,7 +266,15 @@ R::SEXP r_msgl_wb_sp_cv(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sample_weights
 		//Catch unhandled exceptions
 
 	} catch (std::exception & e) {
-		SGL_ERROR(e.what());
+
+		if(e.what() != NULL) {
+			SGL_ERROR(e.what());
+		}
+
+		else {
+			SGL_ERROR("Unknown error");
+		}
+
 	} catch (...) {
 		SGL_ERROR("Unknown error");
 	}
@@ -285,6 +292,7 @@ boost::tuple<field<field<msgl::MultinomialResponse> >, sgl::natural_matrix, sgl:
 	msgl::sp_gl_weighted_multinomial obj_type(data);
 
 	if (config.verbose) {
+		rout << "Msgl, subsampling, sparse" << endl;
 		rout << "Number of blocks : " << dim_config.n_blocks << " - total dimension : " << dim_config.dim << " - L2 penalty for block 0 : "
 				<< dim_config.L2_penalty_weight(0) << endl;
 	}
@@ -359,7 +367,15 @@ R::SEXP r_msgl_wb_sp_subsampling(R::SEXP r_x, R::SEXP r_classes, R::SEXP r_sampl
 		//Catch unhandled exceptions
 
 	} catch (std::exception & e) {
-		SGL_ERROR(e.what());
+
+		if(e.what() != NULL) {
+			SGL_ERROR(e.what());
+		}
+
+		else {
+			SGL_ERROR("Unknown error");
+		}
+
 	} catch (...) {
 		SGL_ERROR("Unknown error");
 	}
@@ -401,10 +417,15 @@ R::SEXP r_msgl_sparse_predict(R::SEXP r_x, R::SEXP r_beta) {
 		//Catch unhandled exceptions
 	} catch (std::exception & e) {
 
-		SGL_ERROR(e.what());
+		if(e.what() != NULL) {
+			SGL_ERROR(e.what());
+		}
+
+		else {
+			SGL_ERROR("Unknown error");
+		}
 
 	} catch (...) {
-
 		SGL_ERROR("Unknown error");
 	}
 

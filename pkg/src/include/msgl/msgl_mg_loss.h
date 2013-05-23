@@ -30,7 +30,7 @@ public:
 
 
 	MultinomialSampleLoss() :
-			n_samples(0), n_classes(0), Y(static_cast<u32>(0)), W(0), prob(n_samples, n_classes), hessian_matrices(static_cast<u32>(0)), hessians_computed(false) {
+			n_samples(0), n_classes(0), Y(static_cast<u32>(0)), W(static_cast<u32>(0)), prob(n_samples, n_classes), hessian_matrices(static_cast<u32>(0)), hessians_computed(false) {
 	}
 
 	template<typename E>

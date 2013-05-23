@@ -211,7 +211,8 @@ public:
     }
 
     template <typename RandomNumberGenerator > field<GroupedIndices> groupedDisjointSubsets(u32 fold, RandomNumberGenerator & gen) const {
-        ASSERT(fold <= size(), "Fold > size of indices set.")
+        ASSERT(fold <= size(), "fold > size of indices set.")
+		ASSERT(fold <= max(groupSizes()), "fold > max group size")
 
         vec fractions(fold);
         fractions.fill(1 / (double) fold);
@@ -221,6 +222,15 @@ public:
 
     u32 numberOfGroups() const {
         return _groupIndices.n_elem;
+    }
+
+    uvec groupSizes() const {
+    	uvec sizes(numberOfGroups());
+    	for(u32 i = 0; i < numberOfGroups(); ++i) {
+    		sizes(i) = _groupIndices(i).size();
+    	}
+
+    	return sizes;
     }
 
     uvec grouping() const {
@@ -240,8 +250,6 @@ public:
 
         return grouping;
     }
-
-    //TODO uvec const & groupCounts() const {};
 
 };
 

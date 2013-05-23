@@ -45,9 +45,14 @@
   \item{lambda}{the lambda sequence for the regularization
   path.}
 
-  \item{fold}{the fold of the cross validation. The data
-  will be split into \code{fold} disjoint subsets, keeping
-  the ration of classes approximately equal.}
+  \item{fold}{the fold of the cross validation, an integer
+  larger than \eqn{1} and less than \eqn{N+1}. Ignored if
+  \code{cv.indices != NULL}. If
+  \code{fold}\eqn{\le}\code{max(table(classes))} then the
+  data will be split into \code{fold} disjoint subsets
+  keeping the ration of classes approximately equal.
+  Otherwise the data will be split into \code{fold}
+  disjoint subsets without keeping the ration fixed.}
 
   \item{cv.indices}{a list of indices of a cross validation
   splitting. If \code{cv.indices = NULL} then a random
@@ -62,8 +67,8 @@
   used}
 
   \item{seed}{the seed used for generating the random cross
-  validation splitting, only used if \code{cv.indices =
-  NULL}.}
+  validation splitting, only used if
+  \code{fold}\eqn{\le}\code{max(table(classes))}.}
 
   \item{algorithm.config}{the algorithm configuration to be
   used.}

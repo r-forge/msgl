@@ -279,13 +279,14 @@ msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), l
 #' @param alpha the \eqn{\alpha} value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
 #' @param standardize if TRUE the covariates are standardize before fitting the model. The model parameters are returned in the original scale. 
 #' @param lambda the lambda sequence for the regularization path.
-#' @param fold the fold of the cross validation.
-#' The data will be split into \code{fold} disjoint subsets, keeping the ration of classes approximately equal.
+#' @param fold the fold of the cross validation, an integer larger than \eqn{1} and less than \eqn{N+1}. Ignored if \code{cv.indices != NULL}.
+#' If \code{fold}\eqn{\le}\code{max(table(classes))} then the data will be split into \code{fold} disjoint subsets keeping the ration of classes approximately equal.
+#' Otherwise the data will be split into \code{fold} disjoint subsets without keeping the ration fixed.
 #' @param cv.indices a list of indices of a cross validation splitting. 
 #' If \code{cv.indices = NULL} then a random splitting will be generated using the \code{fold} argument.
 #' @param sparse.data if TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
 #' @param max.threads the maximal number of threads to be used
-#' @param seed the seed used for generating the random cross validation splitting, only used if \code{cv.indices = NULL}. 
+#' @param seed the seed used for generating the random cross validation splitting, only used if \code{fold}\eqn{\le}\code{max(table(classes))}. 
 #' @param algorithm.config the algorithm configuration to be used. 
 #' @return 
 #' \item{link}{the linear predictors -- a list of length \code{length(lambda)} one item for each lambda value, with each item a matrix of size \eqn{K \times N} containing the linear predictors.}
@@ -370,7 +371,6 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 	}
 	
 	#TODO domain check
-	
 	if(sum(is.na(x)) > 0) {
 		warning("Replacing NA values in x with 0")
 		x[is.na(x)] <- 0
@@ -378,18 +378,27 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 	
 	
 	#Dimnames
-	
-	if(is.list(classes)) {
-		class.names <- unlist(lapply(classes, function(x) levels(factor(x))))
-	} else {
-		class.names <- levels(factor(classes))
-	}
-	
+	class.names <- levels(factor(classes))
 	dim.names <-  list(class.names, rownames(x))
 	
 	if(length(cv.indices) == 0) {
 		
 		use.cv.indices <- FALSE
+		
+		# Check fold
+		if(fold < 2) {
+			stop("fold must be equal to or larger than 2")
+		}
+		
+		if(fold > length(classes)) {
+			stop("fold must be equal to or less than the number of samples")
+		}
+		
+		if(fold > max(table(classes))) {
+			# use random sample indices
+			use.cv.indices <- TRUE
+			cv.indices <- split(sample(0:(length(classes))-1L), 1:fold)
+		}
 		
 	} else {
 		

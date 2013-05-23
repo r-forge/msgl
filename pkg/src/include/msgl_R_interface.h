@@ -22,6 +22,9 @@
 #include <iostream>
 #include <cstdio>
 
+//TODO fix openmp problem with rstream
+//TODO until fixed use write_msg in openmp loops
+
 class rstream : public std::streambuf {
 public:
 protected:
@@ -40,6 +43,7 @@ public:
 };
 
 rostream rout;
+void write_msg(std::string const& msg);
 
 #include <sgl.h>
 #include <rtools.h>
