@@ -6,7 +6,7 @@ Date: 2013-20-05
 Author: Martin Vincent
 Maintainer: Martin Vincent <vincent@math.ku.dk>
 Description: Sparse group lasso multiclass classification, suitable for high dimensional problems with many classes. Fast algorithm for solving the multinomial sparse group lasso optimization problem. Use of multiple processors for cross validation and subsampling is supported through OpenMP. The Armadillo C++ template library (by Conrad Sanderson) is used as the primary linear algebra engine.
-License: GPL
+License: GPL (>= 2)
 LazyLoad: yes
 Depends:
     R (>= 2.13.0),

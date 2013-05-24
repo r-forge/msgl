@@ -92,7 +92,7 @@
 data(SimData)
 x <- sim.data$x
 classes <- sim.data$classes
-lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.01)
+lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.03)
 
 test <- replicate(5, sample(1:length(classes))[1:20], simplify = FALSE)
 train <- lapply(test, function(s) (1:length(classes))[-s])
