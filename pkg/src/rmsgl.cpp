@@ -44,7 +44,8 @@
 //Should openmp be used
 #ifndef _OPENMP
 //No openmp
-#warning openmp (multithreading) not supported on this system - compiling without openmp support
+//TODO a warning should be displayed when the package is loaded in R
+//openmp (multithreading) not supported on this system - compiling without openmp support
 #else
 //Use openmp
 #define SGL_USE_OPENMP
