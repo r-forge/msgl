@@ -43,7 +43,6 @@ public:
 };
 
 rostream rout;
-void write_msg(std::string const& msg);
 
 #include <sgl.h>
 #include <rtools.h>

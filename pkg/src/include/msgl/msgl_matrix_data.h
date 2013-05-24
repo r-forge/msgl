@@ -1,4 +1,4 @@
-/* Routines for multinomial and logistic sparse group lasso regression.
+/* Routines for multinomial sparse group lasso regression.
  Intended for use with R.
  Copyright (C) 2012 Martin Vincent
 
@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
+
 #ifndef MSGL_MATRIX_DATA_H_
 #define MSGL_MATRIX_DATA_H_
 

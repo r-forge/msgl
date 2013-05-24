@@ -1,5 +1,5 @@
 /*
-	Sgl template library for optimizing sparse group lasso penalized objectives.
+	Indices tools.
     Copyright (C) 2012 Martin Vincent
 
     This program is free software: you can redistribute it and/or modify
