@@ -25,6 +25,26 @@
 #include <RcppCommon.h>
 #include <Rconfig.h>
 #include <RcppArmadilloConfig.h>
+
+// Debugging
+#ifdef SGL_DEBUG
+// Do debugging
+#ifdef ARMA_NO_DEBUG
+#undef ARMA_NO_DEBUG
+#endif
+#ifdef NDEBUG
+#undef NDEBUG
+#endif
+//#define SGL_DEBUG_SIMPLE
+//#define SGL_DEBUG_COMPLEX
+//#define SGL_DEBUG_INFO_ALL
+//#define SGL_DEBUG_INFO_STEPSIZE
+#else
+// Do no debugging
+#define ARMA_NO_DEBUG
+#define NDEBUG
+#endif
+
 #include <armadillo>
 #include <Rcpp.h>
 

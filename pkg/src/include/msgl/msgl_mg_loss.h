@@ -386,7 +386,7 @@ void GenralizedLinearLoss<T, E>::hessian_update(sgl::natural block_index, sgl::p
 	tmp2.reshape(n_classes, dim_config.block_dim(block_index) / n_classes);
 
 	for (sgl::natural i = 0; i < n_samples; ++i) {
-		partial_hessian.col(i) += T::hessians(i) * tmp2 * trans(tmp1.row(i));
+		partial_hessian.col(i) += T::hessians(i) * (tmp2 * trans(tmp1.row(i)));
 	}
 
 	this->compute_hessian_norm();

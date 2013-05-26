@@ -27,16 +27,8 @@
 #include <time.h>
 #include <stdexcept>
 
-//#include <boost/math/special_functions.hpp>
-//#include <boost/smart_ptr/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 using boost::tuple;
-
-//#include <boost/dynamic_bitset.hpp>
-
-#ifdef DEBUG_BACKTRACE
-#include "sgl/Backtrace.h"
-#endif
 
 #include <armadillo>
 #include "sgl/arma_additions.h"
