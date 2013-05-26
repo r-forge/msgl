@@ -25,9 +25,7 @@
 //#define SGL_DEBUG_COMPLEX
 //#define SGL_DEBUG_INFO_ALL
 //#define DEBUG_BACKTRACE
-
 //#define SGL_DEBUG_INFO_STEPSIZE
-//#define SGL_DEBUG_INFO_QUADRATIC
 
 //Runtime checking for numerical problems
 #define SGL_RUNTIME_CHECKS
@@ -61,5 +59,5 @@ void report_error(const char *msg);
 #include <memory>
 
 void report_error(const char *msg) {
-	R::Rf_error(msg);
+	Rf_error(msg);
 }

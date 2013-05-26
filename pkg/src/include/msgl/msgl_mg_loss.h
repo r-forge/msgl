@@ -206,6 +206,8 @@ GenralizedLinearLossBase<T, E>::GenralizedLinearLossBase(data_type const& data, 
 	}
 
 	x_norm_max = x_norm.max();
+
+	at_zero();
 }
 
 template<typename T, typename E>
@@ -243,6 +245,7 @@ sgl::vector const GenralizedLinearLossBase<T, E>::gradient() const {
 	return reshape(T::gradients() * X, n_features * n_classes, 1);
 }
 
+//TODO remove
 template<typename T, typename E>
 sgl::block_vector const GenralizedLinearLossBase<T, E>::gradient(sgl::natural_vector const& indices) const {
 
@@ -388,9 +391,8 @@ void GenralizedLinearLoss<T, E>::hessian_update(sgl::natural block_index, sgl::p
 
 	this->compute_hessian_norm();
 
-	//Update cureent x
+	//Update current x
 	current_parameters.set_block(block_index, z);
-
 }
 
 // Sparse matrix specializations

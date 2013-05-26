@@ -53,6 +53,11 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 	classes <- factor(classes)
 	nclasses <- length(levels(classes))
 	
+	if(alpha == 1) {
+		#Lasso -> ignor grouping
+		grouping <- NULL
+	}
+	
 	if(!is.null(grouping)) {
 		
 		grouping <- factor(grouping)
@@ -195,6 +200,11 @@ msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), l
 	classes <- factor(classes)
 	nclasses <- length(levels(classes))
 	
+	if(alpha == 1) {
+		#Lasso -> ignor grouping
+		grouping <- NULL
+	}
+	
 	if(!is.null(grouping)) {
 		
 		grouping <- factor(grouping)
@@ -320,6 +330,11 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 			n_train <- sapply(cv.indices, function(x) length(classes)-length(x))
 			sampleWeights <- rep(1/mean(n_train), length(classes))
 		}
+	}
+	
+	if(alpha == 1) {
+		#Lasso -> ignor grouping
+		grouping <- NULL
 	}
 	
 	if(!is.null(grouping)) {
@@ -486,6 +501,11 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 	
 	classes <- factor(classes)
 	nclasses <- length(levels(classes))
+	
+	if(alpha == 1) {
+		#Lasso -> ignor grouping
+		grouping <- NULL
+	}
 	
 	if(!is.null(grouping)) {
 		
