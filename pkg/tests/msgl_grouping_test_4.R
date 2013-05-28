@@ -12,13 +12,13 @@ grouping[1:5] <- 1
 grouping[6:10] <- 2 
 
 ## Lambda sequence
-lambda <- msgl.lambda.seq(x, classes, grouping = grouping, alpha = .9, d = 100L, lambda.min = 0.1, standardize = FALSE)
+lambda <- msgl.lambda.seq(x, classes, grouping = grouping, alpha = 1, d = 25L, lambda.min = 0.1, standardize = TRUE)
 
-## Sparse Group Lasso 2
+## Lasso
 
-# Dense x
-fit1a <- msgl(x, classes, grouping = grouping, alpha = .9, lambda = lambda, standardize = FALSE)
+# Test that grouping is ignored
+fit1a <- msgl(x, classes, grouping = grouping, alpha = 1, lambda = lambda, standardize = TRUE)
 # (Forced) Sparse x
-fit1b <- msgl(x, classes, grouping = grouping, alpha = .9, lambda = lambda, sparse.data = TRUE, standardize = FALSE)
+fit1b <- msgl(x, classes, alpha = 1, lambda = lambda, standardize = TRUE)
 
-if( sum(predict(fit1b, x)$classes != predict(fit1a, x)$classes) > 30 ) stop()
+if( sum(predict(fit1b, x)$classes != predict(fit1a, x)$classes) > 0 ) stop()
