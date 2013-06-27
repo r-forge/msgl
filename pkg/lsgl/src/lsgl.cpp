@@ -111,7 +111,7 @@ static const R_CallMethodDef sglCallMethods[] = {
 		SGL_PREDICT(lsgl_dense), SGL_PREDICT(lsgl_sparse),
 		SGL_CV(lsgl_dense), SGL_CV(lsgl_sparse),
 //TODO subsampling, 11
-		NULL };
+		NULL};
 
 extern "C" {
 	void R_init_lsgl(DllInfo *info);
