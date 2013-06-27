@@ -45,7 +45,9 @@ void attach_to_RList(rList & list, field<LinearResponse> const& responses)
 	{
 		sgl::natural number_of_samples = responses.n_rows;
 		sgl::natural length_of_lambda = responses.n_cols;
-		sgl::natural number_of_groups = responses(0, 0).n_groups;
+
+		//TODO remove
+		//sgl::natural number_of_groups = responses(0, 0).n_groups;
 
 		sgl::matrix_field link(length_of_lambda);
 
