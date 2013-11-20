@@ -19,7 +19,7 @@ Description: Sparse group lasso multiclass classification, suitable for high
     in particular the Tuple library by Jaakko Jarvi and the Random library by
     Jens Maurer. The Boost libraries are licensed under the Boost Software
     License.
-URL: http://arxiv.org/abs/1205.1245 http://arma.sourceforge.net/,
+URL: http://dx.doi.org/10.1016/j.csda.2013.06.004 http://arma.sourceforge.net/,
     http://www.boost.org/
 License: GPL (>= 2)
 LazyLoad: yes
