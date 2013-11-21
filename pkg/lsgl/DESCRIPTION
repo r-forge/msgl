@@ -12,11 +12,8 @@ License: GPL (>= 2)
 LazyLoad: yes
 Depends:
     R (>= 3.0.0),
-    SglOptimizer,
-    Matrix,
-    RcppProgress,
-    RcppArmadillo,
-    BH
-LinkingTo: SglOptimizer, Rcpp, RcppProgress, RcppArmadillo, BH
+    sglOptim,
+    Matrix
+LinkingTo: sglOptim, Rcpp, RcppProgress, RcppArmadillo, BH
 Collate:
     'lsgl.R'

@@ -4,6 +4,14 @@
 ###############################################################################
 
 #' Fit a sparse group lasso regularization path. 
+#' 
+#' #' A sequence of minimizers (one for each lambda given in the \code{lambda} argument) of 
+#' \deqn{\mathrm{loss}(\beta) + \lambda \left( (1-\alpha) \sum_{J=1}^m \gamma_J \|\beta^{(J)}\|_2 + \alpha \sum_{i=1}^{n} \xi_i |\beta_i| \right)}
+#' where \eqn{\mathrm{loss}} is the loss/objective function specified by \code{module_name}.
+#' The vector \eqn{\beta^{(J)}} denotes the parameters associated with the \eqn{J}'th group of covariates
+#' (default is one covariate per group, hence the default dimension of \eqn{\beta^{(J)}} is \eqn{K}). 
+#' The group weights \eqn{\gamma \in [0,\infty)^m} and the parameter weights \eqn{\xi = (\xi^{(1)},\dots, \xi^{(m)}) \in [0,\infty)^n} 
+#' with \eqn{\xi^{(1)}\in [0,\infty)^{n_1},\dots, \xi^{(m)} \in [0,\infty)^{n_m}}.
 #'
 #' @param call_sym reference to objective specific C++ routines
 #' @param data

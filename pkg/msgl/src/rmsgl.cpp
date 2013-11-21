@@ -17,9 +17,10 @@
 */
 
 //Configuration
-
 //Debugging
-//#define SGL_DEBUG
+#ifndef NDEBUG
+#define SGL_DEBUG
+#endif
 
 //Runtime checking for numerical problems
 #define SGL_RUNTIME_CHECKS
@@ -39,22 +40,101 @@
 //Should openmp be used
 #ifndef _OPENMP
 //No openmp
-//TODO a warning should be displayed when the package is loaded in R
 //openmp (multithreading) not supported on this system - compiling without openmp support
 #else
 //Use openmp
 #define SGL_USE_OPENMP
 #endif
 
-//Compile with extensions if present
-//#define SGL_EXTENSIONS
-//#define MSGL_EXTENSIONS
+//Sgl optimizer
+#include <sgl.h>
 
-void report_error(const char *msg);
+/**********************************
+ *
+ *  msgl dense module
+ *
+ *********************************/
 
-#include "include/msgl_R_interface.h"
-#include <memory>
+// Module name
+#define MODULE_NAME msgl_dense
 
-void report_error(const char *msg) {
-	Rf_error(msg);
+//Objective
+#include "multinomial_loss.hpp"
+
+#define OBJECTIVE multinomial
+#define DATA sgl::WeightedResponseGroupedMatrixData < sgl::matrix , sgl::vector >
+
+#include <sgl/RInterface/sgl_lambda_seq.h>
+#include <sgl/RInterface/sgl_fit.h>
+
+#include "multinomial_response.hpp"
+//#include "multinomial_predictor.hpp" //FIXME remove file
+#define PREDICTOR sgl::LinearPredictor < sgl::matrix , MultinomialResponse >
+
+#include <sgl/RInterface/sgl_predict.h>
+#include <sgl/RInterface/sgl_cv.h>
+//#include <sgl/RInterface/sgl_subsampling.h> //TODO
+
+/*********************************
+ *
+ *  msgl sparse module
+ *
+ *********************************/
+
+// Module name
+#define MODULE_NAME msgl_sparse
+
+//Objective
+#include "multinomial_loss.hpp"
+#define OBJECTIVE multinomial_spx
+#define DATA sgl::WeightedResponseGroupedMatrixData < sgl::sparse_matrix , sgl::vector >
+
+#include <sgl/RInterface/sgl_lambda_seq.h>
+#include <sgl/RInterface/sgl_fit.h>
+
+#include "multinomial_response.hpp"
+#define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , MultinomialResponse >
+
+#include <sgl/RInterface/sgl_predict.h>
+#include <sgl/RInterface/sgl_cv.h>
+//#include <sgl/RInterface/sgl_subsampling.h> //TODO
+
+/* **********************************
+ *
+ *  Registration of methods
+ *
+ ***********************************/
+
+#include <R_ext/Rdynload.h>
+
+static const R_CallMethodDef sglCallMethods[] = {
+		SGL_LAMBDA(msgl_dense), NULL};
+
+//static const R_CallMethodDef sglCallMethods[] = {
+//		SGL_LAMBDA(msgl_dense), SGL_LAMBDA(msgl_sparse),
+//		SGL_FIT(msgl_dense), SGL_FIT(msgl_sparse),
+//		SGL_PREDICT(msgl_dense), SGL_PREDICT(msgl_sparse),
+//		SGL_CV(msgl_dense), SGL_CV(msgl_sparse),
+////TODO subsampling, 11
+//		NULL};
+
+extern "C" {
+	void R_init_lsgl(DllInfo *info);
+}
+
+void R_init_lsgl(DllInfo *info)
+{
+	// Print warnings
+#ifndef SGL_USE_OPENMP
+	Rcout << "SglOptimizer warning: openmp (multithreading) not supported on this system" << endl;
+#endif
+
+#ifdef SGL_DEBUG
+	Rcout
+			<< "SglOptimizer warning: compiled with debugging on -- this may slow down the runtime of the sgl routines"
+			<< endl;
+#endif
+
+// Register the .Call routines.
+	R_registerRoutines(info, NULL, sglCallMethods, NULL, NULL);
 }
