@@ -65,6 +65,7 @@ void attach_to_RList(rList & list, field<MultinomialResponse> const& responses)
 		for (sgl::natural i = 0; i < length_of_lambda; ++i) {
 
 			link(i).set_size(responses(0, i).linear_predictors.n_elem, number_of_samples);
+			probabilities(i).set_size(responses(0, i).linear_predictors.n_elem, number_of_samples);
 
 			for (sgl::natural j = 0; j < number_of_samples; ++j) {
 

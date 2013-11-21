@@ -37,7 +37,7 @@ private:
 
 public:
 
-	typedef sgl::WeightedResponseGroupedMatrixData < T , sgl::vector > data_type;
+	typedef sgl::WeightedGroupedMatrixData < T > data_type;
 
 	mutable sgl::matrix_field hessian_matrices;
 	mutable bool hessians_computed;

@@ -52,8 +52,12 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 	data$n.groups <- length(levels(sampleGrouping))
 	
 	# names
+	data$sample.names <- rownames(x)
 	data$covariate.names <- colnames(x)
 	data$group.names <- levels(sampleGrouping)
+	
+	# Is X sparse
+	data$sparseX <- is(data$X, "sparseMatrix")
 	
 	class(data) <- "sgldata"
 	return(data)

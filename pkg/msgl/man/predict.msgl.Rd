@@ -35,6 +35,17 @@
   probabilities and the estimated classes for a new data
   set.
 }
+\examples{
+data(SimData)
+x <- sim.data$x
+classes <- sim.data$classes
+lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.01)
+fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+
+# Training error
+res <- predict(fit, x)
+colSums(fit.cv$classes != classes)
+}
 \author{
   Martin Vincent
 }

@@ -1,7 +1,23 @@
-# TODO: Add comment
+#
+#     Description of this R script:
+#     R interface for multinomial sparse group lasso rutines.
+#
+#     Intended for use with R.
+#     Copyright (C) 2013 Martin Vincent
 # 
-# Author: martin
-###############################################################################
+#     This program is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+# 
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+# 
+#     You should have received a copy of the GNU General Public License
+#     along with this program.  If not, see <http://www.gnu.org/licenses/>
+#
 
 #' Fit a multinomial sparse group lasso regularization path. 
 #'
@@ -45,120 +61,58 @@
 #' fit$beta[[10]] #model with lambda = lambda[10] 
 #' @author Martin Vincent
 #' @export
-#' @useDynLib msgl r_msgl_wb_basic r_msgl_wb_sp_basic
+#' @useDynLib msgl .registration=TRUE
 #' @import Matrix
 msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, standardize = TRUE, 
 		lambda, return = 1:length(lambda), sparse.data = FALSE, algorithm.config = sgl.standard.config) {
+
+	# Default values
+	if(is.null(grouping)) {
+		covariateGrouping <- factor(1:ncol(x))
+	} else {
+		# ensure factor
+		covariateGrouping <- factor(grouping)		
+	}
 	
+	# cast
 	classes <- factor(classes)
-	nclasses <- length(levels(classes))
+	return <- as.integer(return)
 	
-	if(alpha == 1) {
-		#Lasso -> ignor grouping
-		grouping <- NULL
+	if(is.null(groupWeights)) {
+		groupWeights <- c(sqrt(length(levels(classes))*table(covariateGrouping)))
 	}
 	
-	if(!is.null(grouping)) {
-		
-		grouping <- factor(grouping)
-		group.order <- order(grouping)
-		
-		#Reorder 
-		x <- x[,group.order]
-		
-		if(is.null(groupWeights)) {
-			groupWeights <- c(0, sqrt(nclasses*table(grouping))) #FIXME intercept weight
-		}
-		
-		if(is.null(parameterWeights)) {
-			parameterWeights <- matrix(1, nrow = nclasses, ncol = ncol(x) + 1)
-			parameterWeights[,1] <- 0
-		}
-		
-		#Compute block dim
-		block.dim <- nclasses*c(1L, as.integer(table(grouping)))
-		
-	} else {	
-		
-		if(is.null(groupWeights)) {
-			groupWeights = c(0,rep(sqrt(nclasses), ncol(x)))
-		}
-		
-		if(is.null(parameterWeights)) {
-			parameterWeights = matrix(1, nrow = nclasses, ncol = ncol(x)+1)
-			parameterWeights[,1] <- 0
-		}
-		
-		#Compute block dim
-		block.dim <- rep(nclasses, ncol(x)+1)
+	if(is.null(parameterWeights)) {
+		parameterWeights <-  matrix(1, nrow = length(levels(classes)), ncol = ncol(x))
 	}
 	
-	#TODO check that return is valid
-	return <- as.integer(sort(unique(return))) - 1L
-	
-	if(!sparse.data) {
-		sparse.data <- is(x, "sparseMatrix")
-	}
-	
-	classes.numeric <- as.integer(factor(classes))-1L
-	
+	# Standardize
 	if(standardize) {
-		
 		x <- scale(x, if(sparse.data) FALSE else TRUE, TRUE)
 		x.scale <- attr(x, "scaled:scale")
 		x.center <- if(sparse.data) rep(0, length(x.scale)) else attr(x, "scaled:center")
 	}
 	
-	#TODO domain check
+	# add intercept
+	x <- cBind(Intercept = rep(1, nrow(x)), x)
+	groupWeights <- c(0, groupWeights)
+	parameterWeights <- cbind(rep(0, length(levels(classes))), parameterWeights)
+	covariateGrouping <- factor(c("Intercept", as.character(covariateGrouping)), levels = c("Intercept", levels(covariateGrouping)))
 	
-	if(sum(is.na(x)) > 0) {
-		warning("Replacing NA values in x with 0")
-		x[is.na(x)] <- 0
-	}
+	# create data
+	data <- create.sgldata(x, y = NULL, sampleWeights, classes)
 	
-	# Run msgl algorithm
-	
-	if(sparse.data) {
-		
-		m <- as(x, "CsparseMatrix")
-		m <- list(dim(m), m@p, m@i, m@x)
-		
-		res <- .Call(r_msgl_wb_sp_basic, m, classes.numeric, sampleWeights, block.dim, groupWeights, parameterWeights, alpha, lambda, return, algorithm.config)
+	# call SglOptimizer function
+	if(data$sparseX) {
+		res <- sgl_fit("msgl_sparse", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
 	} else {
-		res <- .Call(r_msgl_wb_basic, x, classes.numeric, sampleWeights, block.dim, groupWeights, parameterWeights, alpha, lambda, return, algorithm.config)
+		res <- sgl_fit("msgl_dense", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
 	}
-	
-	# Dim names
-	feature.names <- if(!is.null(colnames(x))) colnames(x) else 1:dim(x)[2]
-	
-	if(is.list(classes)) {
-		
-		class.names <- unlist(lapply(classes, function(x) levels(factor(x))))
-		
-	} else {
-		
-		class.names <- levels(factor(classes))
-		
-	}
-	
-	# Create R sparse matrix
-	res$beta <- lapply(1:length(res$beta), function(i) sparseMatrix(p = res$beta[[i]][[2]], i = res$beta[[i]][[3]], x = res$beta[[i]][[4]], dims = res$beta[[i]][[1]], dimnames = list(class.names, c("Intercept", feature.names)), index1 = FALSE))
 	
 	# Convert beta back to the org scale
 	if(standardize) {
-		
 		res$beta <- .to_org_scale(beta = res$beta, x.scale = x.scale, x.center = x.center)
-		
 	}
-	
-	if(!is.null(grouping)) {
-		
-		# Restore org order
-		res$beta <- lapply(res$beta, function(beta.matrix) beta.matrix[, c(1,1+order(group.order))])
-	}
-	
-	#TODO name
-	res$classes.prior <- classes
 	
 	class(res) <- "msgl"
 	return(res)
@@ -194,83 +148,53 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 #' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.01)
 #' @author Martin Vincent
 #' @export
-#' @useDynLib msgl r_msgl_wb_sp_lambda_seq r_msgl_wb_lambda_seq
+#' @useDynLib msgl .registration=TRUE
 msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, d = 100L, standardize = TRUE, lambda.min, sparse.data = FALSE, algorithm.config = sgl.standard.config) {
-	
+
+	# cast
 	classes <- factor(classes)
-	nclasses <- length(levels(classes))
+	d <- as.integer(d)
 	
-	if(alpha == 1) {
-		#Lasso -> ignor grouping
-		grouping <- NULL
+	# Default values
+	if(is.null(grouping)) {
+		covariateGrouping <- factor(1:ncol(x))
+	} else {
+		# ensure factor
+		covariateGrouping <- factor(grouping)		
+	}
+		
+	if(is.null(groupWeights)) {
+		groupWeights <- c(sqrt(length(levels(classes))*table(covariateGrouping)))
 	}
 	
-	if(!is.null(grouping)) {
-		
-		grouping <- factor(grouping)
-		group.order <- order(grouping)
-		
-		#Reorder 
-		x <- x[,group.order]
-		
-		if(is.null(groupWeights)) {
-			groupWeights <- c(0, sqrt(nclasses*table(grouping))) #FIXME intercept weight
-		}
-		
-		if(is.null(parameterWeights)) {
-			parameterWeights <- matrix(1, nrow = nclasses, ncol = ncol(x) + 1)
-			parameterWeights[,1] <- 0
-		}
-		
-		#Compute block dim
-		block.dim <- nclasses*c(1L, as.integer(table(grouping)))
-		
-	} else {	
-		
-		if(is.null(groupWeights)) {
-			groupWeights = c(0,rep(sqrt(nclasses), ncol(x)))
-		}
-		
-		if(is.null(parameterWeights)) {
-			parameterWeights = matrix(1, nrow = nclasses, ncol = ncol(x)+1)
-			parameterWeights[,1] <- 0
-		}
-		
-		#Compute block dim
-		block.dim <- rep(nclasses, ncol(x)+1)
+	if(is.null(parameterWeights)) {
+		parameterWeights <-  matrix(1, nrow = length(levels(classes)), ncol = ncol(x))
 	}
-	
-	if(!sparse.data) {
-		sparse.data <- is(x, "sparseMatrix")
-	}
-	
-	classes.numeric <- as.integer(factor(classes))-1L
-	
+
+	# Standardize
 	if(standardize) {
-		
 		x <- scale(x, if(sparse.data) FALSE else TRUE, TRUE)
 		x.scale <- attr(x, "scaled:scale")
-		x.center <- attr(x, "scaled:center")
+		x.center <- if(sparse.data) rep(0, length(x.scale)) else attr(x, "scaled:center")
 	}
 	
-	#TODO domain check
+	# add intercept
+	x <- cBind(Intercept = rep(1, nrow(x)), x)
+	groupWeights <- c(0, groupWeights)
+	parameterWeights <- cbind(rep(0, length(levels(classes))), parameterWeights)
+	covariateGrouping <- factor(c("Intercept", as.character(covariateGrouping)), levels = c("Intercept", levels(covariateGrouping)))
 	
-	if(sum(is.na(x)) > 0) {
-		warning("Replacing NA values in x with 0")
-		x[is.na(x)] <- 0
-	}
+	# create data
+	data <- create.sgldata(x, y = NULL, sampleWeights, classes)
 	
-	if(sparse.data) {
-		
-		m <- as(x, "CsparseMatrix")
-		m <- list(dim(m), m@p, m@i, m@x)
-		
-		res <- .Call(r_msgl_wb_sp_lambda_seq, m, classes.numeric, sampleWeights, block.dim, groupWeights, parameterWeights, alpha, d, lambda.min, algorithm.config)
+	# call SglOptimizer function
+	if(data$sparseX) {
+		lambda <- sgl_lambda_sequence("msgl_sparse", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha = alpha, d = d, lambda.min, algorithm.config)
 	} else {
-		res <- .Call(r_msgl_wb_lambda_seq, x, classes.numeric, sampleWeights, block.dim, groupWeights, parameterWeights, alpha, d, lambda.min, algorithm.config)
+		lambda <- sgl_lambda_sequence("msgl_dense", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha = alpha, d = d, lambda.min, algorithm.config)
 	}
 	
-	return(res)
+	return(lambda)
 }
 
 #' Multinomial sparse group lasso cross validation using multiple possessors 
@@ -316,12 +240,17 @@ msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), l
 #' colSums(fit.cv$classes != classes)
 #' @author Martin Vincent
 #' @export
-#' @useDynLib msgl r_msgl_wb_cv r_msgl_wb_sp_cv
+#' @useDynLib msgl .registration=TRUE
 msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, standardize = TRUE, 
 		lambda, fold = 10L, cv.indices = list(), sparse.data = FALSE, max.threads = 2L, seed = 331L, algorithm.config = sgl.standard.config) {
 	
-	classes <- factor(classes)
-	nclasses <- length(levels(classes))
+	# Default values
+	if(is.null(grouping)) {
+		covariateGrouping <- factor(1:ncol(x))
+	} else {
+		# ensure factor
+		covariateGrouping <- factor(grouping)		
+	}
 	
 	if(is.null(sampleWeights)) {
 		if(length(cv.indices) == 0) {
@@ -332,115 +261,60 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 		}
 	}
 	
-	if(alpha == 1) {
-		#Lasso -> ignor grouping
-		grouping <- NULL
+	# cast
+	classes <- factor(classes)
+	fold <- as.integer(fold)
+	max.threads <- as.integer(max.threads)
+	seed <- as.integer(seed)
+		
+	if(is.null(groupWeights)) {
+		groupWeights <- c(sqrt(length(levels(classes))*table(covariateGrouping)))
 	}
 	
-	if(!is.null(grouping)) {
-		
-		grouping <- factor(grouping)
-		group.order <- order(grouping)
-		
-		#Reorder 
-		x <- x[,group.order]
-		
-		if(is.null(groupWeights)) {
-			groupWeights <- c(0, sqrt(nclasses*table(grouping))) #FIXME intercept weight
-		}
-		
-		if(is.null(parameterWeights)) {
-			parameterWeights <- matrix(1, nrow = nclasses, ncol = ncol(x) + 1)
-			parameterWeights[,1] <- 0
-		}
-		
-		#Compute block dim
-		block.dim <- nclasses*c(1L, as.integer(table(grouping)))
-		
-	} else {	
-		
-		if(is.null(groupWeights)) {
-			groupWeights = c(0,rep(sqrt(nclasses), ncol(x)))
-		}
-		
-		if(is.null(parameterWeights)) {
-			parameterWeights = matrix(1, nrow = nclasses, ncol = ncol(x)+1)
-			parameterWeights[,1] <- 0
-		}
-		
-		#Compute block dim
-		block.dim <- rep(nclasses, ncol(x)+1)
+	if(is.null(parameterWeights)) {
+		parameterWeights <-  matrix(1, nrow = length(levels(classes)), ncol = ncol(x))
 	}
 	
-	if(!sparse.data) {
-		sparse.data <- is(x, "sparseMatrix")
-	}
-	
-	classes.numeric <- as.integer(factor(classes))-1L
-	
+	# Standardize
 	if(standardize) {
-		
 		x <- scale(x, if(sparse.data) FALSE else TRUE, TRUE)
 		x.scale <- attr(x, "scaled:scale")
-		x.center <- attr(x, "scaled:center")
+		x.center <- if(sparse.data) rep(0, length(x.scale)) else attr(x, "scaled:center")
 	}
 	
-	#TODO domain check
-	if(sum(is.na(x)) > 0) {
-		warning("Replacing NA values in x with 0")
-		x[is.na(x)] <- 0
-	}
+	# add intercept
+	x <- cBind(Intercept = rep(1, nrow(x)), x)
+	groupWeights <- c(0, groupWeights)
+	parameterWeights <- cbind(rep(0, length(levels(classes))), parameterWeights)
+	covariateGrouping <- factor(c("Intercept", as.character(covariateGrouping)), levels = c("Intercept", levels(covariateGrouping)))
 	
-	
-	#Dimnames
-	class.names <- levels(factor(classes))
-	dim.names <-  list(class.names, rownames(x))
-	
-	if(length(cv.indices) == 0) {
+	# create data
+	data <- create.sgldata(x, y = NULL, sampleWeights, classes)
 		
-		use.cv.indices <- FALSE
+	# call sglOptim function
+	if(data$sparseX) {
 		
-		# Check fold
-		if(fold < 2) {
-			stop("fold must be equal to or larger than 2")
-		}
-		
-		if(fold > length(classes)) {
-			stop("fold must be equal to or less than the number of samples")
-		}
-		
-		if(fold > max(table(classes))) {
-			# use random sample indices
-			use.cv.indices <- TRUE
-			cv.indices <- split(sample(0:(length(classes))-1L), 1:fold)
-		}
+		res <- sgl_cv("msgl_sparse", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, fold, cv.indices, max.threads, seed, algorithm.config)
 		
 	} else {
 		
-		cv.indices <- lapply(cv.indices, function(x) as.integer(x-1))
-		use.cv.indices <- TRUE
+		res <- sgl_cv("msgl_dense", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, fold, cv.indices, max.threads, seed, algorithm.config)
+		
 	}
 	
-	if(sparse.data) {
-		
-		m <- as(x, "CsparseMatrix")
-		m <- list(dim(m), m@p, m@i, m@x)	
-		
-		res <- .Call(r_msgl_wb_sp_cv, m, classes.numeric, sampleWeights, block.dim, groupWeights, parameterWeights, alpha, lambda, fold, cv.indices, use.cv.indices, max.threads, seed, algorithm.config)				
-	} else {
-		res <- .Call(r_msgl_wb_cv, x, classes.numeric, sampleWeights, block.dim, groupWeights, parameterWeights, alpha, lambda, fold, cv.indices, use.cv.indices, max.threads, seed, algorithm.config)				
-	}
+	### Set correct dim names
+	dim.names <- list(data$group.names, data$sample.names)
 	
-	#Set class names
+	# classes
 	rownames(res$classes) <- dim.names[[2]]
 	
 	if(!is.null(dim.names[[1]])) {
 		res$classes <- apply(X = res$classes, MARGIN = c(1,2), FUN = function(x) dim.names[[1]][x+1])
 	}
-	
-	res$link <- lapply(X = res$link, FUN = function(m) {dimnames(m) <-dim.names; m})
-	res$response <- lapply(X = res$response, FUN = function(m) {dimnames(m) <-dim.names; m})
-	
+		
+	# Set dim names for link and response
+	res$link <- lapply(X = res$link, FUN = function(m) {dimnames(m) <- dim.names; m})
+	res$response <- lapply(X = res$response, FUN = function(m) {dimnames(m) <- dim.names; m})
 	
 	class(res) <- "msgl"
 	return(res)
@@ -495,7 +369,7 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 #' colSums(fit.sub$classes[[2]] != classes[test[[2]]])
 #' @author Martin Vincent
 #' @export
-#' @useDynLib msgl r_msgl_wb_subsampling r_msgl_wb_sp_subsampling
+#' @useDynLib msgl .registration=TRUE
 msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, standardize = TRUE, 
 		lambda, training, test, sparse.data = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
 	
@@ -601,76 +475,7 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 	return(res)
 }
 
-
-#' Create a new algorithm configuration
-#'
-#' With the exception of \code{verbose} it is not recommended to change any of the default values.
-#' 
-#' @param tolerance_penalized_main_equation_loop tolerance threshold.
-#' @param tolerance_penalized_inner_loop_alpha tolerance threshold.
-#' @param tolerance_penalized_inner_loop_beta tolerance threshold.
-#' @param tolerance_penalized_middel_loop_alpha tolerance threshold.
-#' @param tolerance_penalized_outer_loop_alpha tolerance threshold.
-#' @param tolerance_penalized_outer_loop_beta tolerance threshold.
-#' @param tolerance_penalized_outer_loop_gamma tolerance threshold.
-#' @param use_bound_optimization if \code{TRUE} hessian bound check will be used.
-#' @param use_stepsize_optimization_in_penalizeed_loop if \code{TRUE} step-size optimization will be used.
-#' @param stepsize_opt_penalized_initial_t initial step-size.
-#' @param stepsize_opt_penalized_a step-size optimization parameter.
-#' @param stepsize_opt_penalized_b step-size optimization parameter.
-#' @param verbose If \code{TRUE} some information, regarding the status of the algorithm, will be printed in the R terminal.
-#' @return A configuration.
-#' @examples
-#' config.verbose <- sgl.algorithm.config(verbose = TRUE)
-#' @author Martin Vincent
-#' @export
-sgl.algorithm.config <- function(tolerance_penalized_main_equation_loop = 1e-10, 
-		tolerance_penalized_inner_loop_alpha = 1e-4, 
-		tolerance_penalized_inner_loop_beta = 1, 
-		tolerance_penalized_middel_loop_alpha = 0.01, 
-		tolerance_penalized_outer_loop_alpha = 0.01, 
-		tolerance_penalized_outer_loop_beta = 0, 
-		tolerance_penalized_outer_loop_gamma = 1e-5, 
-		use_bound_optimization = TRUE, 
-		use_stepsize_optimization_in_penalizeed_loop = TRUE, 
-		stepsize_opt_penalized_initial_t = 1,
-		stepsize_opt_penalized_a = 0.1, 
-		stepsize_opt_penalized_b = 0.1, 
-		verbose = FALSE) {
-	
-	config <- list()
-	
-	config$tolerance_penalized_main_equation_loop <- tolerance_penalized_main_equation_loop
-	
-	config$tolerance_penalized_inner_loop_alpha <- tolerance_penalized_inner_loop_alpha
-	config$tolerance_penalized_inner_loop_beta <- tolerance_penalized_inner_loop_beta
-	
-	config$tolerance_penalized_middel_loop_alpha <- tolerance_penalized_middel_loop_alpha
-	
-	config$tolerance_penalized_outer_loop_alpha <- tolerance_penalized_outer_loop_alpha
-	config$tolerance_penalized_outer_loop_beta <- tolerance_penalized_outer_loop_beta	
-	config$tolerance_penalized_outer_loop_gamma <- tolerance_penalized_outer_loop_gamma	
-	
-	config$use_bound_optimization <- use_bound_optimization
-	
-	config$use_stepsize_optimization_in_penalizeed_loop <- use_stepsize_optimization_in_penalizeed_loop
-	config$stepsize_opt_penalized_initial_t <- stepsize_opt_penalized_initial_t
-	config$stepsize_opt_penalized_a <- stepsize_opt_penalized_a
-	config$stepsize_opt_penalized_b <- stepsize_opt_penalized_b
-	
-	config$verbose <- verbose
-	
-	return(config)
-}
-
-#' Standard algorithm configuration
-#'
-#' \code{sgl.standard.config <- sgl.algorithm.config()}
-#' 
-#' @author Martin Vicnet
-#' @export
-sgl.standard.config <- sgl.algorithm.config();
-
+#TODO do we need this ??
 .to_org_scale <- function(beta, x.scale, x.center) {
 	for(l in 1:length(beta)) {
 		
@@ -707,60 +512,57 @@ sgl.standard.config <- sgl.algorithm.config();
 #' \item{link}{the linear predictors -- a list of length \code{length(fit$beta)} one item for each model, with each item a matrix of size \eqn{K \times N_\textrm{new}} containing the linear predictors.}
 #' \item{response}{the estimated probabilities -- a list of length \code{length(fit$beta)} one item for each model, with each item a matrix of size \eqn{K \times N_\textrm{new}} containing the probabilities.}
 #' \item{classes}{the estimated classes -- a matrix of size \eqn{N_\textrm{new} \times d} with \eqn{d=}\code{length(fit$beta)}.}
+#' @examples 
+#' data(SimData)
+#' x <- sim.data$x
+#' classes <- sim.data$classes
+#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.01)
+#' fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+#' 
+#' # Training error
+#' res <- predict(fit, x)
+#' colSums(fit.cv$classes != classes)
 #' @author Martin Vincent
 #' @method predict msgl
 #' @S3method predict msgl
 #' @export
-#' @useDynLib msgl r_msgl_predict r_msgl_sparse_predict
+#' @useDynLib msgl .registration=TRUE
 predict.msgl <- function(object, x, sparse.data = FALSE, ...) {
 	
-	if(!sparse.data) {
-		sparse.data <- is(x, "sparseMatrix")
-	}
+	x <- cBind(Intercept = rep(1, nrow(x)), x)
 	
-	res <- list()
+	data <- list()
 	
-	if("beta" %in% names(object)) {
-		res <- .predict.msgl(object$beta, x, sparse.data)	
-	} else  {
-		stop("No models found - missing beta")
-	}
-	
-	class(res) <- "msgl"
-	return(res)
-}
-
-.predict.msgl <- function(beta, x, sparse.data = FALSE) {
-	#Save dimnames
-	dim.names <-  list(rownames(beta[[1]]), rownames(x))
-	
-	beta <- lapply(X = beta, FUN = function(m) as(m, "CsparseMatrix"))
-	beta <- lapply(X = beta, FUN = function(m) list(dim(m), m@p, m@i, m@x))
-	
-	if(sparse.data) {
+	if(is(x, "sparseMatrix")) {
 		
-		m <- as(x, "CsparseMatrix")
-		m <- list(dim(m), m@p, m@i, m@x)
+		x <- as(x, "CsparseMatrix")
+		data$X <- list(dim(x), x@p, x@i, x@x)
 		
-		res <- .Call(r_msgl_sparse_predict, m, beta)
+		res <- sgl_predict("msgl_sparse", "msgl", object, data)
 		
 	} else {
 		
-		res <- .Call(r_msgl_predict, x, beta)
+		data$X <- as.matrix(x)
+		
+		res <- sgl_predict("msgl_dense", "msgl", object, data)
+		
 	}
 	
-	#Set class names
+	browser()
+	
+	### Set correct dim names
+	dim.names <-  list(rownames(object$beta[[1]]), rownames(x))
+	
+	# classes
 	rownames(res$classes) <- dim.names[[2]]
 	
 	if(!is.null(dim.names[[1]])) {
 		res$classes <- apply(X = res$classes, MARGIN = c(1,2), FUN = function(x) dim.names[[1]][x+1])
 	}
 	
-	#Set dimnames ect
-	
-	res$link <- lapply(X = res$link, FUN = function(m) {dimnames(m) <-dim.names; m})
-	res$response <- lapply(X = res$response, FUN = function(m) {dimnames(m) <-dim.names; m})
-	
+	# Set dim names for link and response
+	res$link <- lapply(X = res$link, FUN = function(m) {dimnames(m) <- dim.names; m})
+	res$response <- lapply(X = res$response, FUN = function(m) {dimnames(m) <- dim.names; m})
 	
 	class(res) <- "msgl"
 	return(res)

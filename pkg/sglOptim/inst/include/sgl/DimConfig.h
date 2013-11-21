@@ -68,10 +68,10 @@ public:
 			throw std::domain_error("L2 weights are negative");
 		}
 		if (sum(block_dim) != L1_penalty_weights.n_elem) {
-			throw std::logic_error("DimConfig : Dimension mismatch");
+			throw std::logic_error("L1 weights dimension mismatch");
 		}
 		if (block_dim.n_elem != L2_penalty_weights.n_elem) {
-			throw std::logic_error("DimConfig : Dimension mismatch");
+			throw std::logic_error("L2 weights dimension mismatch");
 		}
 
 		//Initialise index
@@ -114,11 +114,11 @@ DimConfig createDimConfig(sgl::natural_vector const& block_dim, sgl::vector cons
 	sgl::vector penalty_weight_L1 = reshape(parameter_weights, parameter_weights.n_elem, 1);
 
 	if(block_dim.n_elem != blocks_weights.n_elem) {
-		throw std::logic_error("createDimConfig : Dimension mismatch");
+		throw std::logic_error("L2 weights dimension mismatch");
 	}
 
 	if(sum(block_dim) != penalty_weight_L1.n_elem) {
-		throw std::logic_error("createDimConfig : Dimension mismatch");
+		throw std::logic_error("L1 weights dimension mismatch");
 	}
 
 	return DimConfig(block_dim, parameter_weights.n_rows, penalty_weight_L1, blocks_weights);

@@ -8,20 +8,25 @@
     seed = 331L, algorithm.config = sgl.standard.config)
 }
 \arguments{
-  \item{call_sym}{reference to objective specific C++
+  \item{module_name}{reference to objective specific C++
   routines}
 
-  \item{data}{}
+  \item{PACKAGE}{name of the package}
 
-  \item{covariateGrouping}{grouping of covariates, a vector
+  \item{data}{a list of data objects -- will be parsed to
+  the specified module}
+
+  \item{parameterGrouping}{grouping of parameters, a vector
   of length \eqn{p}. Each element of the vector specifying
-  the group of the covariate.}
+  the group of the parameters in the corresponding column
+  of \eqn{\beta}.}
 
   \item{groupWeights}{the group weights, a vector of length
-  \eqn{m+1} (the number of groups).}
+  \code{length(unique(parameterGrouping))} (the number of
+  groups).}
 
-  \item{parameterWeights}{a matrix of size \eqn{K \times
-  (p+1)}.}
+  \item{parameterWeights}{a matrix of size \eqn{q \times
+  p}.}
 
   \item{alpha}{the \eqn{\alpha} value 0 for group lasso, 1
   for lasso, between 0 and 1 gives a sparse group lasso
@@ -53,6 +58,9 @@
 
   \item{algorithm.config}{the algorithm configuration to be
   used.}
+}
+\value{
+  sgl object content will depend on the C++ response class
 }
 \description{
   Sparse group lasso cross validation using multiple
