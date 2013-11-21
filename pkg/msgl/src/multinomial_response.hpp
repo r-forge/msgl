@@ -80,11 +80,5 @@ void attach_to_RList(rList & list, field<MultinomialResponse> const& responses)
 		list.attach(rObject(classes), "classes");
 	}
 
-rList & operator << (rList & list, field<MultinomialResponse> const& responses)
-{
-	attach_to_RList(list, responses);
-	return list;
-}
-
 
 #endif /* MSGL_MULTINOMIAL_RESPONSE_H_ */

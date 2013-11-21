@@ -64,11 +64,12 @@ void attach_to_RList(rList & list, field<LinearResponse> const& responses)
 		list.attach(rObject(link), "link");
 	}
 
-rList & operator << (rList & list, field<LinearResponse> const& responses)
-{
-	attach_to_RList(list, responses);
-	return list;
-}
+//TODO remove
+//rList & operator << (rList & list, field<LinearResponse> const& responses)
+//{
+//	attach_to_RList(list, responses);
+//	return list;
+//}
 
 
 #endif /* LINEAR_RESPONSE_H_ */

@@ -26,3 +26,4 @@ Collate:
     'sgl_config.R'
     'sgl_predict.R'
     'sgl_cv.R'
+    'sgl_subsampling.R'

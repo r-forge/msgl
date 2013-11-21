@@ -373,91 +373,69 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, standardize = TRUE, 
 		lambda, training, test, sparse.data = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
 	
+	# Default values
+	if(is.null(grouping)) {
+		covariateGrouping <- factor(1:ncol(x))
+	} else {
+		# ensure factor
+		covariateGrouping <- factor(grouping)		
+	}
+	
+	if(is.null(sampleWeights)) {
+		if(length(cv.indices) == 0) {
+			sampleWeights <- rep(fold/(length(classes)*(fold-1)), length(classes))
+		} else {
+			n_train <- sapply(cv.indices, function(x) length(classes)-length(x))
+			sampleWeights <- rep(1/mean(n_train), length(classes))
+		}
+	}
+	
+	# cast
 	classes <- factor(classes)
-	nclasses <- length(levels(classes))
+	max.threads <- as.integer(max.threads)
 	
-	if(alpha == 1) {
-		#Lasso -> ignor grouping
-		grouping <- NULL
+	if(is.null(groupWeights)) {
+		groupWeights <- c(sqrt(length(levels(classes))*table(covariateGrouping)))
 	}
 	
-	if(!is.null(grouping)) {
-		
-		grouping <- factor(grouping)
-		group.order <- order(grouping)
-		
-		#Reorder 
-		x <- x[,group.order]
-		
-		if(is.null(groupWeights)) {
-			groupWeights <- c(0, sqrt(nclasses*table(grouping))) #FIXME intercept weight
-		}
-		
-		if(is.null(parameterWeights)) {
-			parameterWeights <- matrix(1, nrow = nclasses, ncol = ncol(x) + 1)
-			parameterWeights[,1] <- 0
-		}
-		
-		#Compute block dim
-		block.dim <- nclasses*c(1L, as.integer(table(grouping)))
-		
-	} else {	
-		
-		if(is.null(groupWeights)) {
-			groupWeights = c(0,rep(sqrt(nclasses), ncol(x)))
-		}
-		
-		if(is.null(parameterWeights)) {
-			parameterWeights = matrix(1, nrow = nclasses, ncol = ncol(x)+1)
-			parameterWeights[,1] <- 0
-		}
-		
-		#Compute block dim
-		block.dim <- rep(nclasses, ncol(x)+1)
+	if(is.null(parameterWeights)) {
+		parameterWeights <-  matrix(1, nrow = length(levels(classes)), ncol = ncol(x))
 	}
 	
-	if(!sparse.data) {
-		sparse.data <- is(x, "sparseMatrix")
-	}
-	
-	classes.numeric <- as.integer(factor(classes))-1L
-	
+	# Standardize
 	if(standardize) {
-		
 		x <- scale(x, if(sparse.data) FALSE else TRUE, TRUE)
 		x.scale <- attr(x, "scaled:scale")
-		x.center <- attr(x, "scaled:center")
+		x.center <- if(sparse.data) rep(0, length(x.scale)) else attr(x, "scaled:center")
 	}
 	
-	#TODO domain check
+	# add intercept
+	x <- cBind(Intercept = rep(1, nrow(x)), x)
+	groupWeights <- c(0, groupWeights)
+	parameterWeights <- cbind(rep(0, length(levels(classes))), parameterWeights)
+	covariateGrouping <- factor(c("Intercept", as.character(covariateGrouping)), levels = c("Intercept", levels(covariateGrouping)))
 	
-	if(sum(is.na(x)) > 0) {
-		warning("Replacing NA values in x with 0")
-		x[is.na(x)] <- 0
-	}
+	# create data
+	data <- create.sgldata(x, y = NULL, sampleWeights, classes)
 	
-	#Dimnames
-	
-	class.names <- levels(factor(classes))
-	dim.names <-  list(class.names, rownames(x))
-	
-	trainingSamples.0 <- lapply(training, function(x) as.integer(x - 1))
-	testSamples.0 <- lapply(test, function(x) as.integer(x - 1))
-	
-	if(sparse.data) {
+	# call sglOptim function
+	if(data$sparseX) {
 		
-		m <- as(x, "CsparseMatrix")
-		m <- list(dim(m), m@p, m@i, m@x)
+		res <- sgl_subsampling("msgl_sparse", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
 		
-		res <- .Call(r_msgl_wb_sp_subsampling, m, classes.numeric, sampleWeights, block.dim, groupWeights, parameterWeights, alpha, lambda, trainingSamples.0, testSamples.0, max.threads, algorithm.config)	
 	} else {
-		res <- .Call(r_msgl_wb_subsampling, x, classes.numeric, sampleWeights, block.dim, groupWeights, parameterWeights, alpha, lambda, trainingSamples.0, testSamples.0, max.threads, algorithm.config)	
+		
+		res <- sgl_subsampling("msgl_dense", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
+		
 	}
-
+	
+	### Set correct dim names
+	dim.names <- list(data$group.names, data$sample.names)
+	
 	for(i in 1:length(test)) {
 		res$classes[[i]] <- res$classes[[i]]+1
 	}
-		
+	
 	for(i in 1:length(test)) {
 		
 		#Set class names
@@ -466,7 +444,7 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 		if(!is.null(dim.names[[1]])) {
 			res$classes[[i]] <- apply(X = res$classes[[i]], MARGIN = c(1,2), FUN = function(x) dim.names[[1]][x])
 		}
-
+		
 		res$link[[i]] <- lapply(X = res$link[[i]], FUN = function(m) {dimnames(m) <- list(dim.names[[1]], dim.names[[2]][test[[i]]]); m})
 		res$response[[i]] <- lapply(X = res$response[[i]], FUN = function(m) {dimnames(m) <- list(dim.names[[1]], dim.names[[2]][test[[i]]]); m})
 	}
@@ -476,17 +454,17 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 }
 
 #TODO do we need this ??
-.to_org_scale <- function(beta, x.scale, x.center) {
-	for(l in 1:length(beta)) {
-		
-		beta.org <- t(t(beta[[l]])*c(1,1/x.scale))
-		beta.org[,1] <- beta.org[,1] - rowSums(t(t(beta[[l]][,-1])*(x.center/x.scale)))
-		
-		beta[[l]] <- beta.org
-	}
-	
-	return(beta)
-}
+#.to_org_scale <- function(beta, x.scale, x.center) {
+#	for(l in 1:length(beta)) {
+#		
+#		beta.org <- t(t(beta[[l]])*c(1,1/x.scale))
+#		beta.org[,1] <- beta.org[,1] - rowSums(t(t(beta[[l]][,-1])*(x.center/x.scale)))
+#		
+#		beta[[l]] <- beta.org
+#	}
+#	
+#	return(beta)
+#}
 
 .to_std_scale <- function(beta, x.scale, x.center) {
 	
@@ -516,12 +494,12 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 #' data(SimData)
 #' x <- sim.data$x
 #' classes <- sim.data$classes
-#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.01)
+#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 20L, lambda.min = 0.01)
 #' fit <- msgl(x, classes, alpha = .5, lambda = lambda)
 #' 
 #' # Training error
 #' res <- predict(fit, x)
-#' colSums(fit.cv$classes != classes)
+#' colSums(res$classes != classes)
 #' @author Martin Vincent
 #' @method predict msgl
 #' @S3method predict msgl
@@ -547,8 +525,6 @@ predict.msgl <- function(object, x, sparse.data = FALSE, ...) {
 		res <- sgl_predict("msgl_dense", "msgl", object, data)
 		
 	}
-	
-	browser()
 	
 	### Set correct dim names
 	dim.names <-  list(rownames(object$beta[[1]]), rownames(x))

@@ -19,6 +19,20 @@
 #ifndef TOOLS_H_
 #define TOOLS_H_
 
+template<typename T>
+rList & operator << (rList & list, field<T> const& responses)
+{
+	attach_to_RList(list, responses);
+	return list;
+}
+
+template<typename T>
+rList & operator << (rList & list, field<field<T> > const& responses)
+{
+	attach_to_RList(list, responses);
+	return list;
+}
+
 //Return the index of the first element with maximal value
 arma::u32
 argmax(arma::vec x)

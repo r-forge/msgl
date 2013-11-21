@@ -19,7 +19,7 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-#' Sparse group lasso cross validation using multiple possessors 
+#' Generic sparse group lasso cross validation using multiple possessors 
 #' 
 #' 
 #' @param module_name reference to objective specific C++ routines
