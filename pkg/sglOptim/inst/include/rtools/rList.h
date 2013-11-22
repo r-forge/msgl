@@ -25,46 +25,55 @@ class rList {
 
 private:
 
-	vector < SEXP > SEXPs;
+	vector < rObject > objects;
 	vector < string > names;
-
-	unsigned int number_of_elements;
 
 public:
 
 	rList()
-			: SEXPs(), names(), number_of_elements(0)
+			: objects(), names()
 	{
 	}
 
 	rList(SEXP list)
-			: SEXPs(), names(), number_of_elements(Rf_length(list))
+			: objects(), names()
 	{
 
 		SEXP SEXP_names = Rf_getAttrib(list, R_NamesSymbol);
 
-		for (unsigned int i = 0; i < number_of_elements; ++i)
+		for (unsigned int i = 0; i < Rf_length(list); ++i)
 		{
 			attach(VECTOR_ELT(list, i), CHAR(STRING_ELT(SEXP_names, i)));
 		}
 
 	}
 
+	template<typename T>
+	rList(arma::field<T> const& field) {
+		for (unsigned int i = 0; i < field.n_elem; i++) {
+				// attaching
+
+			std::stringstream ss;
+			ss << i;
+
+			attach(field(i), ss.str());
+		}
+	}
+
 	~rList()
 	{
 	}
 
-	void attach(SEXP element, string const& name)
+	void attach(rObject const& object, string const& name)
 	{
-
-		SEXPs.push_back(element);
+		objects.push_back(object);
 		names.push_back(name);
 
 	}
 
-	SEXP get(unsigned int index) const
+	rObject get(unsigned int index) const
 	{
-		return SEXPs[index];
+		return objects[index];
 	}
 
 	string getName(unsigned int index) const
@@ -74,13 +83,13 @@ public:
 
 	unsigned int length() const
 	{
-		return SEXPs.size();
+		return objects.size();
 	}
 
 	int getIndex(string const& name) const
 	{
 
-		for (u32 index = 0; index < number_of_elements; ++index)
+		for (u32 index = 0; index < objects.size(); ++index)
 		{
 			if (name.compare(names[index]) == 0)
 			{

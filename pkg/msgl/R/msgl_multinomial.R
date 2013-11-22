@@ -65,7 +65,7 @@
 #' @import Matrix
 msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, standardize = TRUE, 
 		lambda, return = 1:length(lambda), sparse.data = FALSE, algorithm.config = sgl.standard.config) {
-
+	
 	# Default values
 	if(is.null(grouping)) {
 		covariateGrouping <- factor(1:ncol(x))
@@ -73,7 +73,7 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 		# ensure factor
 		covariateGrouping <- factor(grouping)		
 	}
-	
+
 	# cast
 	classes <- factor(classes)
 	return <- as.integer(return)
@@ -379,15 +379,6 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 	} else {
 		# ensure factor
 		covariateGrouping <- factor(grouping)		
-	}
-	
-	if(is.null(sampleWeights)) {
-		if(length(cv.indices) == 0) {
-			sampleWeights <- rep(fold/(length(classes)*(fold-1)), length(classes))
-		} else {
-			n_train <- sapply(cv.indices, function(x) length(classes)-length(x))
-			sampleWeights <- rep(1/mean(n_train), length(classes))
-		}
 	}
 	
 	# cast

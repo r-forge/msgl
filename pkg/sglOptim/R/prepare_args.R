@@ -74,9 +74,10 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 #' @export
 prepare.args <- function(data, covariateGrouping, groupWeights, parameterWeights, alpha) {
 	
+	#If Lasso then ignore grouping
 	if(alpha == 1) {
-		#Lasso -> ignor grouping
-		covariteGrouping <- factor(1:ncol(x))
+		covariateGrouping <- factor(1:data$n.covariate)
+		groupWeights <- rep(1, data$n.covariate)
 	}
 	
 	ncov <- data$n.covarites

@@ -41,8 +41,10 @@ public:
 };
 
 
-void attach_to_RList(rList & list, field<LinearResponse> const& responses)
+rList create_rList(field<LinearResponse> const& responses)
 	{
+		rList list;
+
 		sgl::natural number_of_samples = responses.n_rows;
 		sgl::natural length_of_lambda = responses.n_cols;
 
@@ -62,13 +64,23 @@ void attach_to_RList(rList & list, field<LinearResponse> const& responses)
 		}
 
 		list.attach(rObject(link), "link");
+
+		return list;
 	}
 
-rList & operator << (rList & list, field<LinearResponse> const& responses)
-{
-	attach_to_RList(list, responses);
+rList create_rList(field< field<LinearResponse> > const& responses) {
+
+	rList list;
+
+	for(u32 i = 0; i < responses.n_elem; ++i) {
+
+		std::stringstream ss;
+		ss << "subsample " << i;
+
+		list.attach(rObject(create_rList(responses(i))), ss.str());
+	}
+
 	return list;
 }
-
 
 #endif /* LINEAR_RESPONSE_H_ */

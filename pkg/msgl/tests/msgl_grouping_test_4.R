@@ -18,7 +18,6 @@ lambda <- msgl.lambda.seq(x, classes, grouping = grouping, alpha = 1, d = 25L, l
 
 # Test that grouping is ignored
 fit1a <- msgl(x, classes, grouping = grouping, alpha = 1, lambda = lambda, standardize = TRUE)
-# (Forced) Sparse x
 fit1b <- msgl(x, classes, alpha = 1, lambda = lambda, standardize = TRUE)
 
 if( sum(predict(fit1b, x)$classes != predict(fit1a, x)$classes) > 0 ) stop()

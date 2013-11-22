@@ -124,26 +124,4 @@ DimConfig createDimConfig(sgl::natural_vector const& block_dim, sgl::vector cons
 	return DimConfig(block_dim, parameter_weights.n_rows, penalty_weight_L1, blocks_weights);
 }
 
-
-//TODO remove
-//DimConfig createDimConfig(sgl::natural number_of_features, sgl::natural number_of_classes, bool block_zero_no_penalty = true) {
-//
-//	//Create block_dim
-//	sgl::natural_vector block_dim(number_of_features);
-//	block_dim.fill(number_of_classes);
-//
-//	//Create L1 weights
-//	sgl::vector penalty_weight_L1(ones(number_of_features * number_of_classes));
-//
-//	//Create L2 weights
-//	sgl::vector penalty_weight_L2(ones(number_of_features));
-//
-//	if (block_zero_no_penalty) {
-//		penalty_weight_L1.subvec(0, number_of_classes - 1).zeros();
-//		penalty_weight_L2(0) = 0;
-//	}
-//
-//	return DimConfig(block_dim, number_of_classes, penalty_weight_L1, penalty_weight_L2);
-//}
-
 #endif /* DIMCONFIG_H_ */

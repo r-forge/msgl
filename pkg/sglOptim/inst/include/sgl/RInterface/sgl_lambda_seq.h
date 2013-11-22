@@ -40,7 +40,7 @@ SEXP FUN_NAME(sgl_lambda, MODULE_NAME) (SEXP r_data, SEXP r_block_dim, SEXP r_bl
 	sgl::vector result = sgl_optimizer.lambda_sequence(sgl_optimizer.lambda_max(), get_value < sgl::numeric > (r_lambdaMin),
 			get_value < sgl::natural > (r_numberOfModels));
 
-	return (rObject(result));
+	return rObject(result);
 }
 
 SEXP R_FUN_NAME(sgl_lambda, MODULE_NAME) (SEXP r_data, SEXP r_block_dim, SEXP r_blockWeights,

@@ -22,6 +22,11 @@
 #define SGL_DEBUG
 #endif
 
+//TODO remove
+//#undef NDEBUG
+//#define SGL_DEBUG
+//#define PRINT_BACKTRACE
+
 //Runtime checking for numerical problems
 #define SGL_RUNTIME_CHECKS
 
@@ -59,7 +64,7 @@
 #define MODULE_NAME msgl_dense
 
 //Objective
-#include "multinomial_loss.hpp"
+#include "multinomial_loss.h"
 
 #define OBJECTIVE multinomial
 #define DATA sgl::WeightedGroupedMatrixData < sgl::matrix >
@@ -67,7 +72,7 @@
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>
 
-#include "multinomial_response.hpp"
+#include "multinomial_response.h"
 #define PREDICTOR sgl::LinearPredictor < sgl::matrix , MultinomialResponse >
 
 #include <sgl/RInterface/sgl_predict.h>
@@ -89,14 +94,14 @@
 #define MODULE_NAME msgl_sparse
 
 //Objective
-#include "multinomial_loss.hpp"
+#include "multinomial_loss.h"
 #define OBJECTIVE multinomial_spx
 #define DATA sgl::WeightedGroupedMatrixData < sgl::sparse_matrix >
 
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>
 
-#include "multinomial_response.hpp"
+#include "multinomial_response.h"
 #define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , MultinomialResponse >
 
 #include <sgl/RInterface/sgl_predict.h>
@@ -127,12 +132,12 @@ void R_init_msgl(DllInfo *info)
 {
 	// Print warnings
 #ifndef SGL_USE_OPENMP
-	Rcout << "SglOptimizer warning: openmp (multithreading) not supported on this system" << endl;
+	Rcout << "warning: openmp (multithreading) not supported on this system" << endl;
 #endif
 
 #ifdef SGL_DEBUG
 	Rcout
-			<< "SglOptimizer warning: compiled with debugging on -- this may slow down the runtime of the sgl routines"
+			<< "warning: msgl compiled with debugging on -- this may slow down the runtime of the msgl routines"
 			<< endl;
 #endif
 
