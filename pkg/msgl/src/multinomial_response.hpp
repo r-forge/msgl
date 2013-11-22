@@ -51,10 +51,24 @@ public:
 		return *this;
 	}
 
+//	operator rList() const {
+//
+//		rList list;
+//
+//		list.attach(rObject(linear_predictors), "link");
+//		list.attach(rObject(probabilities), "response");
+//		list.attach(rObject(predicted_class), "class");
+//
+//		return list;
+//
+//	}
+
 };
 
-void attach_to_RList(rList & list, field<MultinomialResponse> const& responses)
+rList create_rList(field<MultinomialResponse> const& responses)
 	{
+		rList list;
+
 		sgl::natural number_of_samples = responses.n_rows;
 		sgl::natural length_of_lambda = responses.n_cols;
 
@@ -78,7 +92,25 @@ void attach_to_RList(rList & list, field<MultinomialResponse> const& responses)
 		list.attach(rObject(link), "link");
 		list.attach(rObject(probabilities), "response");
 		list.attach(rObject(classes), "classes");
+
+		return list;
 	}
+
+rList create_rList(field< field<MultinomialResponse> > const& responses) {
+
+	rList list;
+
+	for(u32 i = 0; i < responses.n_elem; ++i) {
+
+		std::stringstream ss;
+		ss << "subsample " << i;
+
+		list.attach(rObject(create_rList(responses(i))), ss.str());
+	}
+
+	return list;
+}
+
 
 
 #endif /* MSGL_MULTINOMIAL_RESPONSE_H_ */

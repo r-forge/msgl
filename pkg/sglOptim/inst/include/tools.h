@@ -19,19 +19,18 @@
 #ifndef TOOLS_H_
 #define TOOLS_H_
 
-template<typename T>
-rList & operator << (rList & list, field<T> const& responses)
-{
-	attach_to_RList(list, responses);
-	return list;
-}
-
-template<typename T>
-rList & operator << (rList & list, field<field<T> > const& responses)
-{
-	attach_to_RList(list, responses);
-	return list;
-}
+//template<typename T>
+//rList & operator << (rList & list, field<field<T> > const& responses)
+//{
+//
+//	for(arma::u32 i = 0; i < responses.n_elem; ++i) {
+//
+//		rList sub_list;
+//		attach_to_RList(sub_list, responses);
+//		list.attach(sub_list)
+//	}
+//	return list;
+//}
 
 //Return the index of the first element with maximal value
 arma::u32

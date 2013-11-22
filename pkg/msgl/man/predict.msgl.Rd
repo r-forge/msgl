@@ -39,12 +39,12 @@
 data(SimData)
 x <- sim.data$x
 classes <- sim.data$classes
-lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.01)
+lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 20L, lambda.min = 0.01)
 fit <- msgl(x, classes, alpha = .5, lambda = lambda)
 
 # Training error
 res <- predict(fit, x)
-colSums(fit.cv$classes != classes)
+colSums(res$classes != classes)
 }
 \author{
   Martin Vincent

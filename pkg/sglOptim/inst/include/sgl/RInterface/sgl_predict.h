@@ -25,10 +25,7 @@ SEXP FUN_NAME(sgl_predict, MODULE_NAME) (SEXP r_data, SEXP r_beta) {
 	PREDICTOR predictor;
 	field<PREDICTOR::response_type> responses = predictor.predict(data, beta);
 
-	rList res;
-	res << responses;
-
-	return rObject(res);
+	return rObject(rObject(create_rList(responses)));
 }
 
 SEXP R_FUN_NAME(sgl_predict, MODULE_NAME) (SEXP r_data, SEXP r_beta) {

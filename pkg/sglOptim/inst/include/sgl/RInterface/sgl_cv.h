@@ -78,10 +78,7 @@ SEXP FUN_NAME(sgl_cv, MODULE_NAME) (SEXP r_data, SEXP r_block_dim, SEXP r_blockW
 
 
 	//Build result R list
-	rList res;
-
-	res << response_field.get<0>();
-
+	rList res = create_rList(response_field.get<0>());
 	res.attach(rObject(cvgroups), "cv.indices");
 	res.attach(rObject(response_field.get<1>()), "features");
 	res.attach(rObject(response_field.get<2>()), "parameters");

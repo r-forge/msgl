@@ -111,10 +111,6 @@
 
 #include <R_ext/Rdynload.h>
 
-//TODO remove
-//static const R_CallMethodDef sglCallMethods[] = {
-//		SGL_LAMBDA(msgl_dense), NULL};
-
 static const R_CallMethodDef sglCallMethods[] = {
 		SGL_LAMBDA(msgl_dense), SGL_LAMBDA(msgl_sparse),
 		SGL_FIT(msgl_dense), SGL_FIT(msgl_sparse),

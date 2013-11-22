@@ -429,12 +429,19 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 		
 	}
 	
+	### Reorganize
+
+	res_reorg <- list()
+	res_reorg$classes <- lapply(res$responses, function(x) x$classes + 1)
+	res_reorg$response <- lapply(res$responses, function(x) x$response)
+	res_reorg$link <- lapply(res$responses, function(x) x$link)
+	res_reorg$features <- res$features
+	res_reorg$parameters <- res$parameters
+	
+	res <- res_reorg
+			
 	### Set correct dim names
 	dim.names <- list(data$group.names, data$sample.names)
-	
-	for(i in 1:length(test)) {
-		res$classes[[i]] <- res$classes[[i]]+1
-	}
 	
 	for(i in 1:length(test)) {
 		
@@ -453,30 +460,30 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 	return(res)
 }
 
-#TODO do we need this ??
-#.to_org_scale <- function(beta, x.scale, x.center) {
-#	for(l in 1:length(beta)) {
-#		
-#		beta.org <- t(t(beta[[l]])*c(1,1/x.scale))
-#		beta.org[,1] <- beta.org[,1] - rowSums(t(t(beta[[l]][,-1])*(x.center/x.scale)))
-#		
-#		beta[[l]] <- beta.org
-#	}
-#	
-#	return(beta)
-#}
-
-.to_std_scale <- function(beta, x.scale, x.center) {
-	
+.to_org_scale <- function(beta, x.scale, x.center) {
 	for(l in 1:length(beta)) {
-		beta.std <- t(t(beta[[l]])*c(1, x.scale))
-		beta.std[,1] <- beta.std[,1] + rowSums(t(t(beta[[l]][,-1])*(x.center)))
 		
-		beta[[l]] <- beta.std
+		beta.org <- t(t(beta[[l]])*c(1,1/x.scale))
+		beta.org[,1] <- beta.org[,1] - rowSums(t(t(beta[[l]][,-1])*(x.center/x.scale)))
+		
+		beta[[l]] <- beta.org
 	}
 	
 	return(beta)
 }
+
+#TODO do we need this ??
+#.to_std_scale <- function(beta, x.scale, x.center) {
+#	
+#	for(l in 1:length(beta)) {
+#		beta.std <- t(t(beta[[l]])*c(1, x.scale))
+#		beta.std[,1] <- beta.std[,1] + rowSums(t(t(beta[[l]][,-1])*(x.center)))
+#		
+#		beta[[l]] <- beta.std
+#	}
+#	
+#	return(beta)
+#}
 
 #' Predict
 #' 

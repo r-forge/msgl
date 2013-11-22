@@ -5,12 +5,9 @@
  *      Author: martin
  */
 
-#ifndef SGL_SUBSAMPLING_H_
-#define SGL_SUBSAMPLING_H_
-
 // Registration macro
 #ifndef SGL_SUBSAMPLING
-#define SGL_SUBSAMPLING(MODULE) CALL_METHOD(sgl_subsampling, MODULE, 12)
+#define SGL_SUBSAMPLING(MODULE) CALL_METHOD(sgl_subsampling, MODULE, 10)
 #endif
 
 extern "C" {
@@ -66,22 +63,22 @@ SEXP FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP 
 	//Build result R list
 	rList res;
 
-	res << response_field.get<0>();
+	//res << response_field.get<0>();
 
-	res.attach(rObject(cvgroups), "cv.indices");
+	res.attach(rObject(create_rList(response_field.get<0>())),"responses");
 	res.attach(rObject(response_field.get<1>()), "features");
 	res.attach(rObject(response_field.get<2>()), "parameters");
 
-	return res;
+	return rObject(res);
 }
 
-SEXP R_FUN_NAME(sgl_cv, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP r_blockWeights,
+SEXP R_FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP r_blockWeights,
 		SEXP r_parameterWeights, SEXP r_alpha, SEXP r_lambda_seq, SEXP r_training_samples,
 		SEXP r_test_samples, SEXP r_number_of_threads, SEXP r_config) {
 
 	try {
 
-		return FUN_NAME(sgl_cv, MODULE_NAME)(r_data, r_block_dim, r_blockWeights, r_parameterWeights, r_alpha,
+		return FUN_NAME(sgl_subsampling, MODULE_NAME)(r_data, r_block_dim, r_blockWeights, r_parameterWeights, r_alpha,
 				r_lambda_seq, r_training_samples, r_test_samples, r_number_of_threads, r_config);
 
 		//Catch unhandled exceptions
@@ -101,5 +98,3 @@ SEXP R_FUN_NAME(sgl_cv, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP r_block
 	}
 	return R_NilValue; //Avoid compiler warnings
 }
-
-#endif /* SGL_SUBSAMPLING_H_ */
