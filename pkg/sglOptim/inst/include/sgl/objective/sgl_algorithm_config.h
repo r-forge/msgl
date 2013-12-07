@@ -1,4 +1,5 @@
-/* Routines for multinomial sparse group lasso regression.
+/*
+ Routines for sparse group lasso regression.
  Intended for use with R.
  Copyright (C) 2012 Martin Vincent
 

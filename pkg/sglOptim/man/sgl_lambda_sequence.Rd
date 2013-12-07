@@ -3,7 +3,7 @@
 \title{Generic routine for computing a lambda sequence for the regularization path}
 \usage{
   sgl_lambda_sequence(module_name, PACKAGE, data,
-    covariateGrouping, groupWeights, parameterWeights,
+    parameterGrouping, groupWeights, parameterWeights,
     alpha = 0.5, d = 100L, lambda.min,
     algorithm.config = sgl.standard.config)
 }
@@ -11,7 +11,7 @@
   \item{module_name}{reference to objective specific C++
   routines}
 
-  \item{PACKAGE}{name of the package}
+  \item{PACKAGE}{name of the calling package}
 
   \item{data}{a list of data objects -- will be parsed to
   the specified module}

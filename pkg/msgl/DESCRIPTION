@@ -2,8 +2,8 @@ Package: msgl
 Type: Package
 Title: High dimensional multiclass classification using sparse group
     lasso
-Version: 0.1.10
-Date: 2013-20-11
+Version: 0.2.0
+Date: 2013-07-12
 Author: Martin Vincent
 Maintainer: Martin Vincent <vincent@math.ku.dk>
 Description: Sparse group lasso multiclass classification, suitable for
@@ -15,15 +15,8 @@ Description: Sparse group lasso multiclass classification, suitable for
     (e.g. for the GCC compiler use -O3). Use of multiple processors
     for cross validation and subsampling is supported through
     OpenMP. The Armadillo C++ library is used as the primary linear
-    algebra engine. Armadillo is licensed under the MPL 2.0. The
-    Armadillo C++ library is primarily developed at NICTA
-    (Australia) by Conrad Sanderson, with contributions from around
-    the world. Furthermore the package utilize various Boost
-    libraries, in particular the Tuple library by Jaakko Jarvi and
-    the Random library by Jens Maurer. The Boost libraries are
-    licensed under the Boost Software License.
-URL: http://arxiv.org/abs/1205.1245 http://arma.sourceforge.net/,
-    http://www.boost.org/
+    algebra engine.
+URL: http://dx.doi.org/10.1016/j.csda.2013.06.004
 License: GPL (>= 2)
 LazyLoad: yes
 Depends:

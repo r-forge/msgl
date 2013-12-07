@@ -1,16 +1,21 @@
 \name{rearrange.sgldata}
 \alias{rearrange.sgldata}
-\title{Rearrange sgl.data}
+\title{Rearrange sgldata}
 \usage{
   rearrange.sgldata(data, covariate.order, ...)
 }
 \arguments{
-  \item{data}{}
+  \item{data}{sgldata object}
 
-  \item{covarite.order}{}
+  \item{covariate.order}{the new order of the covarites}
+
+  \item{...}{not used}
+}
+\value{
+  a sgl data object with the covariates reordered
 }
 \description{
-  Rearrange sgl.data
+  Rearrange sgldata
 }
 \author{
   Martin Vincent

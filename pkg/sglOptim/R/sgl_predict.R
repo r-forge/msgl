@@ -5,11 +5,12 @@
 
 #' Sgl predict
 #' 
-#' @param module_name reference to objective specific C++ routines
-#' @param PACKAGE name of the package
-#' @param data a list of data objects -- will be parsed to the specified module
-#' @param ... 
-#' @return sgl object content will depend on the C++ response class
+#' @param module_name reference to objective specific C++ routines.
+#' @param PACKAGE name of the calling package.
+#' @param object a sgl object containing a list of estimated models.
+#' @param data a list of data objects -- will be parsed to the specified module.
+#' @param ... not used.
+#' @return sgl object content will depend on the C++ response class.
 #' @author Martin Vincent
 #' @export
 sgl_predict <- function(module_name, PACKAGE, object, data, ...) {

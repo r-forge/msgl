@@ -23,9 +23,9 @@
 #'
 #' Support the use of multiple processors.
 #' 
-#' @param module_name reference to objective specific C++ routines
-#' @param PACKAGE name of the package
-#' @param data a list of data objects -- will be parsed to the specified module
+#' @param module_name reference to objective specific C++ routines.
+#' @param PACKAGE name of the calling package.
+#' @param data a list of data objects -- will be parsed to the specified module.
 #' @param parameterGrouping grouping of parameters, a vector of length \eqn{p}. Each element of the vector specifying the group of the parameters in the corresponding column of \eqn{\beta}. 
 #' @param groupWeights the group weights, a vector of length \code{length(unique(parameterGrouping))} (the number of groups). 
 #' @param parameterWeights a matrix of size \eqn{q \times p}. 
@@ -37,15 +37,14 @@
 #' @param test a list of test samples, each item of the list corresponding to a subsample.
 #' Each item in the list must be vector with the indices of the test samples for the corresponding subsample.
 #' The length of the list must equal the length of the \code{training} list.
-#' @param max.threads the maximal number of threads to be used
-#' @param seed the seed used for generating the random cross validation splitting, only used if \code{fold}\eqn{\le}\code{max(table(classes))}. 
+#' @param max.threads the maximal number of threads to be used.
 #' @param algorithm.config the algorithm configuration to be used. 
 #' @return sgl object content will depend on the C++ response class
 #' @author Martin Vincent
 #' @export
-sgl_subsampling <- function(module_name, PACKAGE, data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads = 2L, algorithm.config = sgl.standard.config) {
+sgl_subsampling <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads = 2L, algorithm.config = sgl.standard.config) {
 		
-		args <- prepare.args(data, covariateGrouping, groupWeights, parameterWeights, alpha)
+		args <- prepare.args(data, parameterGrouping, groupWeights, parameterWeights, alpha)
 				
 		training.0 <- lapply(training, function(x) as.integer(x - 1))
 		test.0 <- lapply(test, function(x) as.integer(x - 1))

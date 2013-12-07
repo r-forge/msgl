@@ -16,16 +16,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>
 */
 
+//Uncomment to turn on debuging
+//#undef NDEBUG
+
+//Should the timers be activated (only needed for profiling the code)
+//#define SGL_TIMING
+
+//TODO remove
+//#define PRINT_BACKTRACE
+
 //Configuration
 //Debugging
 #ifndef NDEBUG
 #define SGL_DEBUG
 #endif
-
-//TODO remove
-//#undef NDEBUG
-//#define SGL_DEBUG
-//#define PRINT_BACKTRACE
 
 //Runtime checking for numerical problems
 #define SGL_RUNTIME_CHECKS
@@ -38,9 +42,6 @@
 
 //Exception handling
 #define SGL_CATCH_EXCEPTIONS
-
-//Should the timers be activated (only needed for profiling the code)
-//#define SGL_TIMING
 
 //Should openmp be used
 #ifndef _OPENMP

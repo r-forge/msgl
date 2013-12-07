@@ -11,7 +11,7 @@
   \item{module_name}{reference to objective specific C++
   routines}
 
-  \item{PACKAGE}{name of the package}
+  \item{PACKAGE}{name of the calling package}
 
   \item{data}{a list of data objects -- will be parsed to
   the specified module}

@@ -27,11 +27,23 @@ type get_value(SEXP exp) {
 	&error_type_not_defined = 0;
 }
 
+/**
+ * Get double value from SEXP
+ *
+ * @param exp
+ * @return double
+ */
 template<>
 double get_value(SEXP exp) {
 	return static_cast<double>(*REAL(exp));
 }
 
+/**
+ * Get unsigned integere value from SEXP
+ *
+ * @param exp
+ * @return unsigned int
+ */
 template<>
 arma::u32 get_value(SEXP exp) {
 	return static_cast<arma::u32>(*INTEGER(exp));

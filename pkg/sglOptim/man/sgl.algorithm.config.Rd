@@ -13,7 +13,7 @@
     use_stepsize_optimization_in_penalizeed_loop = TRUE,
     stepsize_opt_penalized_initial_t = 1,
     stepsize_opt_penalized_a = 0.1,
-    stepsize_opt_penalized_b = 0.1, verbose = FALSE)
+    stepsize_opt_penalized_b = 0.1, verbose = TRUE)
 }
 \arguments{
   \item{tolerance_penalized_main_equation_loop}{tolerance

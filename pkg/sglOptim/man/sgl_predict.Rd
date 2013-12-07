@@ -8,12 +8,15 @@
   \item{module_name}{reference to objective specific C++
   routines}
 
-  \item{PACKAGE}{name of the package}
+  \item{PACKAGE}{name of the calling package}
+
+  \item{object}{a sgl object containing a list of estimated
+  models}
 
   \item{data}{a list of data objects -- will be parsed to
   the specified module}
 
-  \item{...}{}
+  \item{...}{not used}
 }
 \value{
   sgl object content will depend on the C++ response class

@@ -116,10 +116,10 @@ static const R_CallMethodDef sglCallMethods[] = {
 		NULL};
 
 extern "C" {
-	void R_init_lsgl(DllInfo *info);
+	void R_init_sglOptim(DllInfo *info);
 }
 
-void R_init_lsgl(DllInfo *info)
+void R_init_sglOptim(DllInfo *info)
 {
 	// Print warnings
 #ifndef SGL_USE_OPENMP

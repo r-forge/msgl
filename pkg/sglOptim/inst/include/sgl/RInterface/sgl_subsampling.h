@@ -1,9 +1,20 @@
 /*
- * sgl_subsampling.h
- *
- *  Created on: Jun 10, 2013
- *      Author: martin
- */
+	Sgl template library for optimizing sparse group lasso penalized objectives.
+    Copyright (C) 2012 Martin Vincent
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>
+*/
 
 // Registration macro
 #ifndef SGL_SUBSAMPLING
@@ -35,12 +46,6 @@ SEXP FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP 
 	const sgl::numeric alpha = get_value < sgl::numeric > (r_alpha);
 
 	sgl::DimConfig dim_config = sgl::createDimConfig(block_dim, blockWeights, parameterWeights);
-
-	if (config.verbose) {
-		Rcpp::Rcout << "sgl, subsampling" << endl;
-		Rcpp::Rcout << "Number of blocks : " << dim_config.n_blocks << " - total dimension : " << dim_config.dim << " - L2 penalty for block 0 : "
-		<< dim_config.L2_penalty_weight(0) << endl;
-	}
 
 	////// Do subsampling
 

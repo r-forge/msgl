@@ -53,7 +53,7 @@ sgl.algorithm.config <- function(tolerance_penalized_main_equation_loop = 1e-10,
 		stepsize_opt_penalized_initial_t = 1,
 		stepsize_opt_penalized_a = 0.1, 
 		stepsize_opt_penalized_b = 0.1, 
-		verbose = FALSE) {
+		verbose = TRUE) {
 	
 	config <- list()
 	
@@ -88,3 +88,12 @@ sgl.algorithm.config <- function(tolerance_penalized_main_equation_loop = 1e-10,
 #' @export
 sgl.standard.config <- sgl.algorithm.config();
 
+
+#' Simulated data set
+#'
+#' This data set is for testing only.
+#'
+#' @name test.data
+#' @docType data
+#' @keywords data
+NULL

@@ -3,19 +3,23 @@
 \title{Create sgl data}
 \usage{
   create.sgldata(x, y, weights = rep(1/nrow(x), nrow(x)),
-    sampleGrouping = NULL)
+    sampleGrouping = NULL, sparseX = is(x, "sparseMatrix"))
 }
 \arguments{
   \item{x}{design matrix, matrix of size \eqn{N \times p}.}
 
   \item{y}{responses, vector of length \eqn{N}.}
 
-  \item{sampleWeights}{sample weights, a vector of length
+  \item{weights}{sample weights, a vector of length
   \eqn{N}.}
 
   \item{sampleGrouping}{grouping of samples, a factor of
   length \eqn{N}. Default is no grouping (NULL), that is
-  all samples is the same group}
+  all samples is the same group.}
+
+  \item{sparseX}{if TRUE \code{x} will be converted to a
+  sparse matrix, if FALSE \code{x} will be converted to a
+  dens matrix.}
 }
 \description{
   Create sgl data

@@ -1,17 +1,17 @@
 Package: sglOptim
 Type: Package
-Title: Sparse group lasso optimizer
+Title: Sparse group lasso generic optimizer
 Version: 0.0.80
 Date: 2013-20-05
 Author: Martin Vincent
 Maintainer: Martin Vincent <vincent@math.ku.dk>
-Description: Fast algorithm for solving sparse group lasso convex
-    optimization problems. This package apply template metaprogramming
-    techniques, therefore -- when compiling the package from source -- a high
-    level of optimization is needed to gain full speed (e.g. for the GCC
-    compiler use -O3). Use of multiple processors for cross validation and
-    subsampling is supported through OpenMP. The Armadillo C++ library is used
-    as the primary linear algebra engine.
+Description: Fast generic solver for sparse group lasso optimization problems.
+    The loss (objective) function must be defined in a C++ module. This package
+    apply template metaprogramming techniques, therefore -- when compiling the
+    package from source -- a high level of optimization is needed to gain full
+    speed (e.g. for the GCC compiler use -O3). Use of multiple processors for
+    cross validation and subsampling is supported through OpenMP. The Armadillo
+    C++ library is used as the primary linear algebra engine.
 URL: http://dx.doi.org/10.1016/j.csda.2013.06.004
 License: GPL (>= 2)
 LazyLoad: yes

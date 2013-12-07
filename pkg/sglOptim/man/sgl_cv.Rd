@@ -1,8 +1,8 @@
 \name{sgl_cv}
 \alias{sgl_cv}
-\title{Sparse group lasso cross validation using multiple possessors}
+\title{Generic sparse group lasso cross validation using multiple possessors}
 \usage{
-  sgl_cv(module_name, PACKAGE, data, covariateGrouping,
+  sgl_cv(module_name, PACKAGE, data, parameterGrouping,
     groupWeights, parameterWeights, alpha, lambda,
     fold = 2L, cv.indices = list(), max.threads = 2L,
     seed = 331L, algorithm.config = sgl.standard.config)
@@ -11,7 +11,7 @@
   \item{module_name}{reference to objective specific C++
   routines}
 
-  \item{PACKAGE}{name of the package}
+  \item{PACKAGE}{name of the calling package}
 
   \item{data}{a list of data objects -- will be parsed to
   the specified module}
@@ -63,8 +63,8 @@
   sgl object content will depend on the C++ response class
 }
 \description{
-  Sparse group lasso cross validation using multiple
-  possessors
+  Generic sparse group lasso cross validation using
+  multiple possessors
 }
 \author{
   Martin Vincent

@@ -25,25 +25,25 @@
 #' \deqn{\mathrm{loss}(\beta) + \lambda \left( (1-\alpha) \sum_{J=1}^m \gamma_J \|\beta^{(J)}\|_2 + \alpha \sum_{i=1}^{n} \xi_i |\beta_i| \right)}
 #' where \eqn{\mathrm{loss}} is the loss/objective function specified by \code{module_name}.
 #' The parameters are organized in the parameter matrix \eqn{\beta} with dimension \eqn{q\times p}.
-#' The vector \eqn{\beta^{(J)}} denotes the $J$ parameter group.  
+#' The vector \eqn{\beta^{(J)}} denotes the \eqn{J} parameter group.  
 #' The group weights \eqn{\gamma \in [0,\infty)^m} and the parameter weights \eqn{\xi = (\xi^{(1)},\dots, \xi^{(m)}) \in [0,\infty)^n} 
 #' with \eqn{\xi^{(1)}\in [0,\infty)^{n_1},\dots, \xi^{(m)} \in [0,\infty)^{n_m}}.
 #'
-#' @param module_name reference to objective specific C++ routines
-#' @param PACKAGE name of the package
-#' @param data a list of data objects -- will be parsed to the specified module
+#' @param module_name reference to objective specific C++ routines.
+#' @param PACKAGE name of the calling package.
+#' @param data a list of data objects -- will be parsed to the specified module.
 #' @param parameterGrouping grouping of parameters, a vector of length \eqn{p}. Each element of the vector specifying the group of the parameters in the corresponding column of \eqn{\beta}. 
 #' @param groupWeights the group weights, a vector of length \code{length(unique(parameterGrouping))} (the number of groups). 
 #' @param parameterWeights a matrix of size \eqn{q \times p}. 
 #' @param alpha the \eqn{\alpha} value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
 #' @param lambda the lambda sequence for the regularization path.
-#' @param return the indices of lambda values for which to return a the fitted parameters.
+#' @param return the indices of lambda values for which to return fitted parameters.
 #' @param algorithm.config the algorithm configuration to be used. 
 #' @return 
-#' \item{beta}{the fitted parameters -- a list of length \code{length(lambda)} with each entry a matrix of size \eqn{q\times (p+1)} holding the fitted parameters}
-#' \item{loss}{the values of the loss function}
-#' \item{objective}{the values of the objective function (i.e. loss + penalty)}
-#' \item{lambda}{the lambda values used}
+#' \item{beta}{the fitted parameters -- a list of length \code{length(return)} with each entry a matrix of size \eqn{q\times (p+1)} holding the fitted parameters.}
+#' \item{loss}{the values of the loss function.}
+#' \item{objective}{the values of the objective function (i.e. loss + penalty).}
+#' \item{lambda}{the lambda values used.}
 #' @author Martin Vincent
 #' @export
 #' @import Matrix

@@ -1,5 +1,5 @@
 /*
- Routines for multinomial sparse group lasso regression.
+ Routines for sparse group lasso regression.
  Intended for use with R.
  Copyright (C) 2012 Martin Vincent
 
@@ -68,7 +68,6 @@ public:
 	//Gradient
 
 	sgl::vector const gradient() const;
-	sgl::block_vector const gradient(sgl::natural_vector const& indices) const;
 
 	sgl::vector const compute_block_gradient(sgl::natural feature_index) const;
 
@@ -169,17 +168,6 @@ sgl::vector const GenralizedLinearLossBase < T , E >::gradient() const
 
 	return reshape(T::gradients() * X, n_features * n_groups, 1);
 }
-
-//TODO remove
-//template<typename T, typename E>
-//sgl::block_vector const GenralizedLinearLossBase<T, E>::gradient(sgl::natural_vector const& indices) const {
-//
-//	throw std::runtime_error("GenralizedLinearLoss::gradient : Not implemented");
-//
-//	sgl::block_vector gradient(n_features, n_groups);
-//
-//	return gradient;
-//}
 
 //note this function may return inf
 template < typename T , typename E >
