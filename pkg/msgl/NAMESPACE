@@ -1,0 +1,7 @@
+export(msgl)
+export(msgl.cv)
+export(msgl.lambda.seq)
+export(msgl.subsampling)
+import(Matrix)
+S3method(predict,msgl)
+useDynLib(msgl,.registration=TRUE)

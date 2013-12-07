@@ -1,0 +1,19 @@
+Package: lsgl
+Type: Package
+Title: Linear sparse group lasso
+Version: 0.0.80
+Date: 2013-20-05
+Author: Martin Vincent
+Maintainer: Martin Vincent <vincent@math.ku.dk>
+Description: 
+URL: http://arxiv.org/abs/1205.1245 http://arma.sourceforge.net/,
+    http://www.boost.org/
+License: GPL (>= 2)
+LazyLoad: yes
+Depends:
+    R (>= 3.0.0),
+    sglOptim,
+    Matrix
+LinkingTo: sglOptim, Rcpp, RcppProgress, RcppArmadillo, BH
+Collate:
+    'lsgl.R'
