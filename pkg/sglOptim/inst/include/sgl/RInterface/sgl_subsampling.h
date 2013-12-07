@@ -57,8 +57,6 @@ SEXP FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP 
 	const field<Indices> training_samples = get_field < Indices > (r_training_samples);
 	const field<Indices> test_samples = get_field < Indices > (r_test_samples);
 
-	sgl::natural n_subsamples = training_samples.n_elem;
-
 	sgl::Interface < sgl::AlgorithmConfiguration, OBJECTIVE > sgl_optimizer(obj_type, dim_config, alpha, config);
 
 	boost::tuple<field<field<PREDICTOR::response_type> >, sgl::natural_matrix,

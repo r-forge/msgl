@@ -113,7 +113,7 @@ static const R_CallMethodDef sglCallMethods[] = {
 		SGL_PREDICT(sgl_test_dense), SGL_PREDICT(sgl_test_sparse),
 		SGL_CV(sgl_test_dense), SGL_CV(sgl_test_sparse),
 		SGL_SUBSAMPLING(sgl_test_dense), SGL_SUBSAMPLING(sgl_test_sparse),
-		NULL};
+		{NULL}};
 
 extern "C" {
 	void R_init_sglOptim(DllInfo *info);

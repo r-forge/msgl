@@ -36,7 +36,7 @@ template<typename CONFIG>
 
     sgl::numeric
     penalty(sgl::parameter const& x, sgl::numeric const alpha,
-        sgl::numeric const lambda) const __attribute__((always_inline));
+        sgl::numeric const lambda) const;
 
     //lambda max
     sgl::numeric

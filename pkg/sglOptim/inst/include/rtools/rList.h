@@ -41,7 +41,7 @@ public:
 
 		SEXP SEXP_names = Rf_getAttrib(list, R_NamesSymbol);
 
-		for (unsigned int i = 0; i < Rf_length(list); ++i)
+		for (int i = 0; i < Rf_length(list); ++i)
 		{
 			attach(VECTOR_ELT(list, i), CHAR(STRING_ELT(SEXP_names, i)));
 		}

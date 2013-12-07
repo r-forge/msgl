@@ -11,8 +11,8 @@ covariateGrouping <- factor(1:ncol(x))
 groupWeights <- c(sqrt(length(levels(sampleGrouping))*table(covariateGrouping)))
 parameterWeights <-  matrix(1, nrow = length(levels(sampleGrouping)), ncol = ncol(x))
 alpha <- 0.5
-d <- 100L
-lambda.min <- 0.1
+d <- 50L
+lambda.min <- 0.5
 algorithm.config <- sgl.standard.config 
 
 # create data
