@@ -28,7 +28,8 @@ SEXP R_FUN_NAME(sgl_predict, MODULE_NAME) (SEXP r_data, SEXP r_beta);
 SEXP FUN_NAME(sgl_predict, MODULE_NAME) (SEXP r_data, SEXP r_beta) {
 
 	//Data and objective
-	const PREDICTOR::data_type data(r_data);
+	const rList data_rList(r_data);
+	const PREDICTOR::data_type data(data_rList);
 
 	//Parameters
 	const sgl::sparse_matrix_field beta = get_field < sgl::sparse_matrix > (r_beta);

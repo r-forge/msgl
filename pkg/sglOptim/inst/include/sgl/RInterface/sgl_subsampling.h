@@ -36,7 +36,8 @@ SEXP FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP 
 	const sgl::AlgorithmConfiguration config(rlist_config);
 
 	//Data and objective
-	const DATA data(r_data);
+	const rList data_rList(r_data);
+	const DATA data(data_rList);
 	const OBJECTIVE obj_type(data);
 
 	//Penalty and otimizer

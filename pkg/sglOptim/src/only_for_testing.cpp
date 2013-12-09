@@ -123,12 +123,12 @@ void R_init_sglOptim(DllInfo *info)
 {
 	// Print warnings
 #ifndef SGL_USE_OPENMP
-	Rcout << "SglOptimizer warning: openmp (multithreading) not supported on this system" << endl;
+	Rcout << "SglOptim warning: openmp (multithreading) not supported on this system" << endl;
 #endif
 
 #ifdef SGL_DEBUG
 	Rcout
-			<< "SglOptimizer warning: compiled with debugging on -- this may slow down the runtime of the sgl routines"
+			<< "SglOptim warning: compiled with debugging on -- this may slow down the runtime of the sgl routines"
 			<< endl;
 #endif
 

@@ -34,9 +34,9 @@ public:
 	LinearLoss()
 			: 	n_samples(0),
 				n_groups(0),
-				G(static_cast < sgl::natural >(0)),
-				W(static_cast < sgl::natural >(0)),
-				Y(static_cast < sgl::natural >(0)),
+				G(sgl::null_natural_vector),
+				W(sgl::null_vector),
+				Y(sgl::null_vector),
 				lp(n_samples, n_groups),
 				hessian_matrices(static_cast < sgl::natural >(0)),
 				hessians_computed(false)
