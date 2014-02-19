@@ -30,8 +30,8 @@ fit1b <- sgl_fit("sgl_test_sparse", "sglOptim", data, covariateGrouping, groupWe
 res1b <- sgl_predict("sgl_test_sparse", "sglOptim", fit1b, data)
 
 
-if(max(abs(fit1a$beta[[25]]-fit1b$beta[[25]])) > 1e-10) stop()
-if(max(abs(res1a$link[[25]]-res1b$link[[25]])) > 1e-10) stop()
+if(max(abs(fit1a$beta[[25]]-fit1b$beta[[25]])) > 1e-7) stop()
+if(max(abs(res1a$link[[25]]-res1b$link[[25]])) > 1e-7) stop()
 
 
 	
