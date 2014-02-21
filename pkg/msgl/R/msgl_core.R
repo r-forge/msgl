@@ -114,6 +114,8 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 		res$beta <- .to_org_scale(beta = res$beta, x.scale = x.scale, x.center = x.center)
 	}
 	
+	res$msgl_version <- packageVersion("msgl")
+	
 	class(res) <- "msgl"
 	return(res)
 }
@@ -316,6 +318,8 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 	res$link <- lapply(X = res$link, FUN = function(m) {dimnames(m) <- dim.names; m})
 	res$response <- lapply(X = res$response, FUN = function(m) {dimnames(m) <- dim.names; m})
 	
+	res$msgl_version <- packageVersion("msgl")
+	
 	class(res) <- "msgl"
 	return(res)
 }
@@ -413,11 +417,9 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 	if(data$sparseX) {
 		
 		res <- sgl_subsampling("msgl_sparse", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
-		
 	} else {
 		
 		res <- sgl_subsampling("msgl_dense", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
-		
 	}
 	
 	### Reorganize
@@ -447,6 +449,8 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 		res$response[[i]] <- lapply(X = res$response[[i]], FUN = function(m) {dimnames(m) <- list(dim.names[[1]], dim.names[[2]][test[[i]]]); m})
 	}
 	
+	res$msgl_version <- packageVersion("msgl")
+	
 	class(res) <- "msgl"
 	return(res)
 }
@@ -462,19 +466,6 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 	
 	return(beta)
 }
-
-#TODO do we need this ??
-#.to_std_scale <- function(beta, x.scale, x.center) {
-#	
-#	for(l in 1:length(beta)) {
-#		beta.std <- t(t(beta[[l]])*c(1, x.scale))
-#		beta.std[,1] <- beta.std[,1] + rowSums(t(t(beta[[l]][,-1])*(x.center)))
-#		
-#		beta[[l]] <- beta.std
-#	}
-#	
-#	return(beta)
-#}
 
 #' Predict
 #' 
@@ -537,6 +528,8 @@ predict.msgl <- function(object, x, sparse.data = FALSE, ...) {
 	# Set dim names for link and response
 	res$link <- lapply(X = res$link, FUN = function(m) {dimnames(m) <- dim.names; m})
 	res$response <- lapply(X = res$response, FUN = function(m) {dimnames(m) <- dim.names; m})
+	
+	res$msgl_version <- packageVersion("msgl")
 	
 	class(res) <- "msgl"
 	return(res)

@@ -24,5 +24,4 @@ Depends:
     Matrix,
     sglOptim
 LinkingTo: Rcpp, RcppProgress, RcppArmadillo, BH, sglOptim
-Collate:
-    'msgl_multinomial.R'
+Collate: 'msgl_core.R' 'msgl_summary.R'
