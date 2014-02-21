@@ -1,7 +1,7 @@
 Package: sglOptim
 Type: Package
 Title: Sparse group lasso generic optimizer
-Version: 0.0.81
+Version: 0.0.90
 Date: 2013-7-12
 Author: Martin Vincent
 Maintainer: Martin Vincent <vincent@math.ku.dk>
