@@ -7,7 +7,7 @@ x <- sim.data$x
 classes <- sim.data$classes
 
 ## Lambda sequence
-lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 25L, lambda.min = 0.05, standardize = FALSE)
+lambda <- msgl.lambda.seq(x, classes, alpha = 0, d = 25L, lambda.min = 0.05, standardize = FALSE)
 
 ## Group lasso
 
