@@ -19,51 +19,51 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-features <- function(object) {
+features <- function(x) {
 
-  if(class(object) == "msgl") {
-      return(sapply(object$beta, function(beta) sum(colSums(beta != 0) != 0)))
+  if(class(x) == "msgl") {
+      return(sapply(x$beta, function(beta) sum(colSums(beta != 0) != 0)))
   }
   
   stop("Unknown object class")
 
 }
 
-parameters <- function(object) {
+parameters <- function(x) {
 
-  if(class(object) == "msgl") {
-      return(sapply(object$beta, function(beta) sum(beta != 0)))
+  if(class(x) == "msgl") {
+      return(sapply(x$beta, function(beta) sum(beta != 0)))
   }
   
   stop("Unknown object class")
 }
 
-nmod <- function(object) {
-  return(length(object$beta))
+nmod <- function(x) {
+  return(length(x$beta))
 }
 
-models <- function(object, index = 1:nmod(object)) {
-  return(object$beta[index])
+models <- function(x, index = 1:nmod(x)) {
+  return(x$beta[index])
 }
 
-coef <- function(object, index = 1:nmod(object)) {
+coef <- function(x, index = 1:nmod(x)) {
 
-  featurenames = if(is.null(colnames(object$beta[[1]]))) 1:ncol(object$beta[[1]]) else colnames(object$beta[[1]])
+  featurenames = if(is.null(colnames(x$beta[[1]]))) 1:ncol(x$beta[[1]]) else colnames(x$beta[[1]])
 
-  return(lapply(object$beta[index], function(beta) beta[,colSums(beta != 0) != 0]))
+  return(lapply(x$beta[index], function(beta) beta[,colSums(beta != 0) != 0]))
 }
 
 
-print.msgl <- function(object) {
+print.msgl <- function(x, ...) {
 
 	#FIXME check that  object$msgl_version exsists
 
-  	message(paste("Multinomial logistic regression models (estimated by msgl version ", object$msgl_version, ")", sep=""))
+  	message(paste("Multinomial logistic regression models (estimated by msgl version ", x$msgl_version, ")", sep=""))
 	message()
-	message(paste("  This object contains ", nmod(object$beta), " sparse models with ", nrow(object$beta[[1]]), " classes", sep=""))
-	message(paste("   between ", min(features(object)), " - ", max(features(object)), " nonzero features and ", min(parameters(object)), " - ", max(parameters(object)), " nonzero parameters.", sep =""))
+	message(paste("  This object contains ", nmod(x$beta), " sparse models with ", nrow(x$beta[[1]]), " classes", sep=""))
+	message(paste("   between ", min(features(x)), " - ", max(features(x)), " nonzero features and ", min(parameters(x)), " - ", max(parameters(x)), " nonzero parameters.", sep =""))
 	message()
-	classnames <- paste(rownames(object$beta[[1]])[1:3], collapse=", ") #FIXME what if less than 3 classes + handle long class names
+	classnames <- paste(rownames(x$beta[[1]])[1:3], collapse=", ") #FIXME what if less than 3 classes + handle long class names
 	message(paste("  The first three classes are: ", classnames, sep=""))
 
 }

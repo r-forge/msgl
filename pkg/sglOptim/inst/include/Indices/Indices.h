@@ -31,7 +31,6 @@ using namespace arma;
 
 #include <exception>
 #include "IntegerSet.h"
-#include "SubMatrix.h"
 
 class Indices
 {
@@ -166,10 +165,11 @@ public:
 
     }
 
-   template<typename T> SubMatrixRow<T> select_rows_view(T & M) const {
-       //TODO empty check
-        return SubMatrixRow<T>(M, getElements());
-    }
+    //TODO remove
+//   template<typename T> SubMatrixRow<T> select_rows_view(T & M) const {
+//       //TODO empty check
+//        return SubMatrixRow<T>(M, getElements());
+//    }
 
   Indices const
   select(Indices const& indices) const

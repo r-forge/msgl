@@ -74,6 +74,37 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
 	call_sym <- paste(module_name, "sgl_cv", sep="_")
 	res <- .Call(call_sym, PACKAGE = PACKAGE, args$data, args$block.dim, args$groupWeights, args$parameterWeights, args$alpha, lambda, fold, cv.indices, use.cv.indices, max.threads, seed, algorithm.config)				
 		
-	class(res) <- "sgl"
+        # Correct cv.indices
+        res$cv.indices <- lapply(res$cv.indices, function(x) x+1L)
+
+        # Reorganize response output
+        response_names <- names(res$response[[1]])
+        res$response <- lapply(1:length(res$response[[1]]), function(i) lapply(1:length(lambda), function(j) lapply(res$response, function(x) x[[i]][[j]])))
+
+        # Set names
+        res$response <- lapply(res$response, function(x) {names(x) <- lambda; x})
+        names(res$response) <- response_names
+
+
+        # Collapse subsample list to matrix
+        res$response <- lapply(res$response, function(response_list) .reorder_response_list(response_list, res$cv.indices, data$group.names, data$sample.names))
+
+        # Set class and return
+        class(res) <- "sgl"
 	return(res)
 }
+
+.reorder_response <- function(responses, cv, group.names, sample.names) {
+
+    r <- matrix(nrow = nrow(responses[[1]]), ncol = length(unlist(cv)))
+    rownames(r) <- group.names
+    colnames(r) <- sample.names
+
+    for(i in 1:length(cv)) {
+        r[,cv[[i]]] <- responses[[i]]
+    }
+
+    return(r)
+}
+
+.reorder_response_list <- function(response_list, cv, group.names, sample.names) lapply(response_list, function(r) .reorder_response(r, cv, group.names, sample.names))

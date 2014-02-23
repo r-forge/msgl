@@ -67,8 +67,6 @@ SEXP FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP 
 	//Build result R list
 	rList res;
 
-	//res << response_field.get<0>();
-
 	res.attach(rObject(create_rList(response_field.get<0>())),"responses");
 	res.attach(rObject(response_field.get<1>()), "features");
 	res.attach(rObject(response_field.get<2>()), "parameters");

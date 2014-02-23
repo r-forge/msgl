@@ -69,6 +69,12 @@ SEXP FUN_NAME(sgl_cv, MODULE_NAME) (SEXP r_data, SEXP r_block_dim, SEXP r_blockW
 		cvgroups = conv < Indices, GroupedIndices > (indices.groupedDisjointSubsets(fold, gen));
 	}
 
+    // Construct training indices
+    field<Indices> training_indices(cvgroups.n_elem);
+    for (u32 i = 0; i < cvgroups.n_elem; ++i) {
+        training_indices(i) = indices - cvgroups(i);
+    }
+
 	////// Do cross validation
 
 	// Predictor
@@ -79,13 +85,21 @@ SEXP FUN_NAME(sgl_cv, MODULE_NAME) (SEXP r_data, SEXP r_block_dim, SEXP r_blockW
 
 	sgl::Interface < sgl::AlgorithmConfiguration, OBJECTIVE > sgl_optimizer(obj_type, dim_config, alpha, config);
 
-	boost::tuple<field<PREDICTOR::response_type>, sgl::vector, sgl::vector> response_field =
-			sgl_optimizer.regular_cv(predictor, lambda_seq, cvgroups, indices, number_of_threads);
+
+    boost::tuple<field<field<PREDICTOR::response_type> >, sgl::natural_matrix,
+    sgl::natural_matrix> response_field = sgl_optimizer.subsampling(predictor, lambda_seq, training_indices, cvgroups,
+            number_of_threads);
+
+    //FIXME remove
+    //boost::tuple<field<PREDICTOR::response_type>, sgl::vector, sgl::vector> response_field =
+    //		sgl_optimizer.regular_cv(predictor, lambda_seq, cvgroups, indices, number_of_threads);
 
 
 	//Build result R list
-	rList res = create_rList(response_field.get<0>());
-	res.attach(rObject(cvgroups), "cv.indices");
+    rList res;
+
+    res.attach(rObject(create_rList(response_field.get<0>())),"responses");
+    res.attach(rObject(cvgroups), "cv.indices");
 	res.attach(rObject(response_field.get<1>()), "features");
 	res.attach(rObject(response_field.get<2>()), "parameters");
 
