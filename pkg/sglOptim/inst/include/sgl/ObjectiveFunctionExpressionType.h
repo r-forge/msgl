@@ -19,11 +19,6 @@
 #ifndef OBJECTIVEFUNCTIONEXPRESSIONTYPE_H_
 #define OBJECTIVEFUNCTIONEXPRESSIONTYPE_H_
 
-//TODO REMOVE
-//class NoData {};
-//
-//static NoData noData;
-
 template <typename E>
 struct type_traits;
 
@@ -43,8 +38,8 @@ public:
 		return static_cast<E&> (*this).create_instance(dim_config);
 	}
 
-	ObjectiveFunctionExpressionType<E> operator()(Indices const& indices) const  {
-		return static_cast<E&> (*this)(indices);
+    ObjectiveFunctionExpressionType<E> subdata(sgl::natural_vector const& samples) const  {
+        return static_cast<E&> (*this).subdata(samples);
 	}
 
 	operator E&() {
@@ -91,8 +86,8 @@ public:
 		return instance_type(fun_type, data, filter);
 	}
 
-	DataFilterType<E, Filter> operator()(Indices const& indices) const  {
-			return DataFilterType<E, Filter>(filter(indices), fun_type(indices));
+    DataFilterType<E, Filter> subdata(sgl::natural_vector const& samples) const  {
+            return DataFilterType<E, Filter>(filter.subdata(samples), fun_type.subdata(samples));
 		}
 };
 
@@ -145,8 +140,8 @@ public:
 	}
 
 	//TODO use constructor instead, this should save 2 constructor calls, hence 2 x data copy
-	ObjectiveFunctionType<E, D> operator()(Indices const& indices) const  {
-			return ObjectiveFunctionType<E, D>(data(indices));
+    ObjectiveFunctionType<E, D> subdata(sgl::natural_vector const& samples) const  {
+            return ObjectiveFunctionType<E, D>(data.subdata(samples));
 	}
 
 	//TODO do we need this ?
@@ -186,8 +181,8 @@ public:
 		return instance_type(lambda, fun_type.create_instance(dim_config));
 	}
 
-	ObjectiveFunctionScalarMultiplicationType<E> operator()(Indices const& indices) const  {
-		return ObjectiveFunctionScalarMultiplicationType<E>(lambda, fun_type(indices));
+    ObjectiveFunctionScalarMultiplicationType<E> subdata(sgl::natural_vector const& samples) const  {
+        return ObjectiveFunctionScalarMultiplicationType<E>(lambda, fun_type.subdata(samples));
 	}
 
 };
@@ -221,8 +216,8 @@ public:
 		return instance_type(fun1_type.create_instance(dim_config), fun2_type.create_instance(dim_config));
 	}
 
-	ObjectiveFunctionAdditionType<A, B> operator()(Indices const& indices) const  {
-			return ObjectiveFunctionAdditionType<A, B>(fun1_type(indices), fun2_type(indices));
+    ObjectiveFunctionAdditionType<A, B> subdata(sgl::natural_vector const& samples) const  {
+            return ObjectiveFunctionAdditionType<A, B>(fun1_type.subdata(samples), fun2_type.subdata(samples));
 		}
 
 };

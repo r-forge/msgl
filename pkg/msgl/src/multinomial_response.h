@@ -51,18 +51,6 @@ public:
 		return *this;
 	}
 
-//	operator rList() const {
-//
-//		rList list;
-//
-//		list.attach(rObject(linear_predictors), "link");
-//		list.attach(rObject(probabilities), "response");
-//		list.attach(rObject(predicted_class), "class");
-//
-//		return list;
-//
-//	}
-
 };
 
 rList create_rList(field<MultinomialResponse> const& responses)

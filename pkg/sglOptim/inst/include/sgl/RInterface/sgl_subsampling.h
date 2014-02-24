@@ -55,12 +55,12 @@ SEXP FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP 
 
 	const sgl::natural number_of_threads = get_value < sgl::natural > (r_number_of_threads);
 	const sgl::vector lambda_seq = get_value < sgl::vector > (r_lambda_seq);
-	const field<Indices> training_samples = get_field < Indices > (r_training_samples);
-	const field<Indices> test_samples = get_field < Indices > (r_test_samples);
+    const sgl::natural_vector_field training_samples = get_field < sgl::natural_vector > (r_training_samples);
+    const sgl::natural_vector_field test_samples = get_field < sgl::natural_vector > (r_test_samples);
 
 	sgl::Interface < sgl::AlgorithmConfiguration, OBJECTIVE > sgl_optimizer(obj_type, dim_config, alpha, config);
 
-	boost::tuple<field<field<PREDICTOR::response_type> >, sgl::natural_matrix,
+    boost::tuple<arma::field<arma::field<PREDICTOR::response_type> >, sgl::natural_matrix,
 	sgl::natural_matrix> response_field = sgl_optimizer.subsampling(predictor, lambda_seq, training_samples, test_samples,
 			number_of_threads);
 

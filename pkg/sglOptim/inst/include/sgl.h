@@ -53,6 +53,23 @@
 #include <Backtrace.h>
 #endif
 
+//Should openmp be used
+#ifndef _OPENMP
+//No openmp
+//openmp (multithreading) not supported on this system - compiling without openmp support
+#else
+//Use openmp
+#define SGL_USE_OPENMP
+#endif
+
+//Switch off openmp on sparc for the time being
+#ifdef __sparc
+#ifdef SGL_USE_OPENMP
+#undef SGL_USE_OPENMP
+#endif
+#endif
+
+
 #include <armadillo>
 #include <Rcpp.h>
 
@@ -67,10 +84,6 @@ using boost::tuple;
 
 //Arma additions
 #include <sgl/arma_additions.h>
-
-//Indices tools
-#include <Indices/Indices.h>
-#include <Indices/GroupedIndices.h>
 
 //R tools
 #include <rtools.h>

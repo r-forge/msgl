@@ -36,19 +36,13 @@
 #' @param cv.indices a list of indices of a cross validation splitting. 
 #' If \code{cv.indices = NULL} then a random splitting will be generated using the \code{fold} argument.
 #' @param max.threads the maximal number of threads to be used.
-#' @param seed the seed used for generating the random cross validation splitting, only used if \code{fold}\eqn{\le}\code{max(table(classes))}. 
 #' @param algorithm.config the algorithm configuration to be used. 
 #' @return sgl object content will depend on the C++ response class.
 #' @author Martin Vincent
 #' @export
-sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, fold = 2L, cv.indices = list(), max.threads = 2L, seed = 331L, algorithm.config = sgl.standard.config) {
-	
-	args <- prepare.args(data, parameterGrouping, groupWeights, parameterWeights, alpha)
-	
+sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, fold = 2L, cv.indices = list(), max.threads = 2L, algorithm.config = sgl.standard.config) {
 	
 	if(length(cv.indices) == 0) {
-		
-		use.cv.indices <- FALSE
 		
 		# Check fold
 		if(fold < 2) {
@@ -65,15 +59,18 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
 			cv.indices <- split(sample(0:(length(data$G))-1L), 1:fold)
 		}
 		
-	} else {
+		#TODO compute random cv split
 		
-		cv.indices <- lapply(cv.indices, function(x) as.integer(x-1))
-		use.cv.indices <- TRUE
+	} else {
+	  cv.indices <- lapply(cv.indices, function(x) as.integer(x-1))
 	}
 	
-	call_sym <- paste(module_name, "sgl_cv", sep="_")
-	res <- .Call(call_sym, PACKAGE = PACKAGE, args$data, args$block.dim, args$groupWeights, args$parameterWeights, args$alpha, lambda, fold, cv.indices, use.cv.indices, max.threads, seed, algorithm.config)				
-		
+	samples <- 1:max(unlist(cv.indices))
+	training <- lapply(cv.indices, function(x) samples[-x])
+	test <- cv.indices
+	
+	res <- sgl_subsampling(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
+	
         # Correct cv.indices
         res$cv.indices <- lapply(res$cv.indices, function(x) x+1L)
 
@@ -84,7 +81,6 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
         # Set names
         res$response <- lapply(res$response, function(x) {names(x) <- lambda; x})
         names(res$response) <- response_names
-
 
         # Collapse subsample list to matrix
         res$response <- lapply(res$response, function(response_list) .reorder_response_list(response_list, res$cv.indices, data$group.names, data$sample.names))

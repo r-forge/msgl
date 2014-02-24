@@ -37,15 +37,6 @@
 //Should the timers be activated (only needed for profiling the code)
 //#define SGL_TIMING
 
-//Should openmp be used
-#ifndef _OPENMP
-//No openmp
-//openmp (multithreading) not supported on this system - compiling without openmp support
-#else
-//Use openmp
-#define SGL_USE_OPENMP
-#endif
-
 //Sgl optimizer
 #include <sgl.h>
 
@@ -70,7 +61,6 @@
 #define PREDICTOR sgl::LinearPredictor < sgl::matrix , sgl::LinearResponse >
 
 #include <sgl/RInterface/sgl_predict.h>
-#include <sgl/RInterface/sgl_cv.h>
 #include <sgl/RInterface/sgl_subsampling.h>
 
 /*********************************
@@ -96,7 +86,6 @@
 #define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , sgl::LinearResponse >
 
 #include <sgl/RInterface/sgl_predict.h>
-#include <sgl/RInterface/sgl_cv.h>
 #include <sgl/RInterface/sgl_subsampling.h>
 
 /* **********************************
@@ -111,8 +100,7 @@ static const R_CallMethodDef sglCallMethods[] = {
 		SGL_LAMBDA(sgl_test_dense), SGL_LAMBDA(sgl_test_sparse),
 		SGL_FIT(sgl_test_dense), SGL_FIT(sgl_test_sparse),
 		SGL_PREDICT(sgl_test_dense), SGL_PREDICT(sgl_test_sparse),
-		SGL_CV(sgl_test_dense), SGL_CV(sgl_test_sparse),
-		SGL_SUBSAMPLING(sgl_test_dense), SGL_SUBSAMPLING(sgl_test_sparse),
+        SGL_SUBSAMPLING(sgl_test_dense), SGL_SUBSAMPLING(sgl_test_sparse),
 		{NULL}};
 
 extern "C" {

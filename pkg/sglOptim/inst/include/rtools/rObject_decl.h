@@ -50,10 +50,8 @@ public:
 	rObject(arma::Mat<double> const& m);
 	rObject(arma::Mat<arma::u32> const& m);
 
-	rObject(Col<double> const& v);
-	rObject(Col<arma::u32> const& v);
-
-	rObject(Indices i);
+    rObject(arma::Col<double> const& v);
+    rObject(arma::Col<arma::u32> const& v);
 
 	rObject(arma::sp_mat const& m);
 

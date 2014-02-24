@@ -92,11 +92,6 @@ arma::Col<arma::s32> get_value(SEXP exp) {
 }
 
 template<>
-Indices get_value(SEXP exp) {
-	return Indices(get_value<arma::Col<arma::u32> >(exp));
-}
-
-template<>
 arma::sp_mat get_value(SEXP exp) {
 
 	SEXP dim = VECTOR_ELT(exp, 0);
@@ -115,7 +110,7 @@ arma::sp_mat get_value(SEXP exp) {
 		return m;
 	}
 
-	arma::uword* new_row_indices = arma::memory::acquire_chunked < uword > (n_nonzero + 1);
+    arma::uword* new_row_indices = arma::memory::acquire_chunked < arma::uword > (n_nonzero + 1);
 	double* new_values = arma::memory::acquire_chunked<double>(n_nonzero + 1);
 
 	arma::arrayops::copy(new_values, REAL(values), n_nonzero);

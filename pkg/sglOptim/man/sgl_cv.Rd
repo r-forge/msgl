@@ -5,16 +5,16 @@
   sgl_cv(module_name, PACKAGE, data, parameterGrouping,
     groupWeights, parameterWeights, alpha, lambda,
     fold = 2L, cv.indices = list(), max.threads = 2L,
-    seed = 331L, algorithm.config = sgl.standard.config)
+    algorithm.config = sgl.standard.config)
 }
 \arguments{
   \item{module_name}{reference to objective specific C++
-  routines}
+  routines.}
 
-  \item{PACKAGE}{name of the calling package}
+  \item{PACKAGE}{name of the calling package.}
 
   \item{data}{a list of data objects -- will be parsed to
-  the specified module}
+  the specified module.}
 
   \item{parameterGrouping}{grouping of parameters, a vector
   of length \eqn{p}. Each element of the vector specifying
@@ -50,17 +50,13 @@
   argument.}
 
   \item{max.threads}{the maximal number of threads to be
-  used}
-
-  \item{seed}{the seed used for generating the random cross
-  validation splitting, only used if
-  \code{fold}\eqn{\le}\code{max(table(classes))}.}
+  used.}
 
   \item{algorithm.config}{the algorithm configuration to be
   used.}
 }
 \value{
-  sgl object content will depend on the C++ response class
+  sgl object content will depend on the C++ response class.
 }
 \description{
   Generic sparse group lasso cross validation using

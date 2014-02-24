@@ -9,12 +9,12 @@
 }
 \arguments{
   \item{module_name}{reference to objective specific C++
-  routines}
+  routines.}
 
-  \item{PACKAGE}{name of the calling package}
+  \item{PACKAGE}{name of the calling package.}
 
   \item{data}{a list of data objects -- will be parsed to
-  the specified module}
+  the specified module.}
 
   \item{parameterGrouping}{grouping of parameters, a vector
   of length \eqn{p}. Each element of the vector specifying
@@ -32,7 +32,7 @@
   for lasso, between 0 and 1 gives a sparse group lasso
   penalty.}
 
-  \item{d}{the length of lambda sequence}
+  \item{d}{the length of lambda sequence.}
 
   \item{lambda.min}{the smallest lambda value in the
   computed sequence.}

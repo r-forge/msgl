@@ -9,12 +9,12 @@
 }
 \arguments{
   \item{module_name}{reference to objective specific C++
-  routines}
+  routines.}
 
-  \item{PACKAGE}{name of the calling package}
+  \item{PACKAGE}{name of the calling package.}
 
   \item{data}{a list of data objects -- will be parsed to
-  the specified module}
+  the specified module.}
 
   \item{parameterGrouping}{grouping of parameters, a vector
   of length \eqn{p}. Each element of the vector specifying
@@ -36,19 +36,19 @@
   path.}
 
   \item{return}{the indices of lambda values for which to
-  return a the fitted parameters.}
+  return fitted parameters.}
 
   \item{algorithm.config}{the algorithm configuration to be
   used.}
 }
 \value{
   \item{beta}{the fitted parameters -- a list of length
-  \code{length(lambda)} with each entry a matrix of size
-  \eqn{q\times (p+1)} holding the fitted parameters}
-  \item{loss}{the values of the loss function}
+  \code{length(return)} with each entry a matrix of size
+  \eqn{q\times (p+1)} holding the fitted parameters.}
+  \item{loss}{the values of the loss function.}
   \item{objective}{the values of the objective function
-  (i.e. loss + penalty)} \item{lambda}{the lambda values
-  used}
+  (i.e. loss + penalty).} \item{lambda}{the lambda values
+  used.}
 }
 \description{
   A sequence of minimizers (one for each lambda given in
@@ -59,7 +59,7 @@
   function specified by \code{module_name}. The parameters
   are organized in the parameter matrix \eqn{\beta} with
   dimension \eqn{q\times p}. The vector \eqn{\beta^{(J)}}
-  denotes the $J$ parameter group. The group weights
+  denotes the \eqn{J} parameter group. The group weights
   \eqn{\gamma \in [0,\infty)^m} and the parameter weights
   \eqn{\xi = (\xi^{(1)},\dots, \xi^{(m)}) \in [0,\infty)^n}
   with \eqn{\xi^{(1)}\in [0,\infty)^{n_1},\dots, \xi^{(m)}

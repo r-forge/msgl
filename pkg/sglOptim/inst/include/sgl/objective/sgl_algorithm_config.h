@@ -30,7 +30,7 @@ static type getConfigAttribute(rList const& config, std::string const& name) {
 
 	} else {
 
-		string msg = "Missing configuration parameter : ";
+        std::string msg = "Missing configuration parameter : ";
 		throw std::domain_error(msg.append(name).c_str());
 		return type(); //avoid compiler warnings
 	}

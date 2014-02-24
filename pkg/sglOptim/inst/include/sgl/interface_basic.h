@@ -85,11 +85,11 @@ public:
 			const sgl::vector & lambda_sequence) const;
 
 	template<typename Predictor>
-	boost::tuple<field<field<typename Predictor::response_type> >,
+    boost::tuple<arma::field<arma::field<typename Predictor::response_type> >,
 			sgl::natural_matrix, sgl::natural_matrix>
 	subsampling(Predictor const& predictor, sgl::vector const& lambda_sequence,
-			field<Indices> const& training_samples,
-			field<Indices> const& test_samples,
+            natural_vector_field const& training_samples,
+            natural_vector_field const& test_samples,
 			sgl::natural const number_of_threads) const;
 	//Lambda
 
@@ -213,12 +213,12 @@ inline sgl::natural Interface<CONFIG, ObjectiveFunctionType>::optimize(
 
 template<typename CONFIG, typename ObjectiveFunctionType>
 template<typename Predictor>
-inline boost::tuple<field<field<typename Predictor::response_type> >,
+inline boost::tuple<arma::field<arma::field<typename Predictor::response_type> >,
 		sgl::natural_matrix, sgl::natural_matrix> Interface<CONFIG,
 		ObjectiveFunctionType>::subsampling(Predictor const& predictor,
 		sgl::vector const& lambda_sequence,
-		field<Indices> const& training_samples,
-		field<Indices> const& test_samples,
+        natural_vector_field const& training_samples,
+        natural_vector_field const& test_samples,
 		sgl::natural const number_of_threads) const {
 
 	//Domain checks
@@ -238,7 +238,7 @@ inline boost::tuple<field<field<typename Predictor::response_type> >,
 	sgl::natural n_subsamples = training_samples.n_elem;
 
 	//Result matrix
-	field < field<typename Predictor::response_type>
+    arma::field < arma::field<typename Predictor::response_type>
 			> response_field_subsamples(n_subsamples);
 
 	sgl::natural_matrix number_of_features(n_subsamples,
@@ -247,7 +247,7 @@ inline boost::tuple<field<field<typename Predictor::response_type> >,
 			lambda_sequence.n_elem);
 
 	bool exception_caught = false;
-	string exception_msg;
+    std::string exception_msg;
 
 	// create progress monitor
 	Progress p(lambda_sequence.n_elem * n_subsamples, sgl.config.verbose);
@@ -271,16 +271,15 @@ inline boost::tuple<field<field<typename Predictor::response_type> >,
 #pragma omp critical
 #endif
 				{
-					traning_objective.set_data(
-							objective_type.data(training_samples(i)));
-					test_data = objective_type.data(test_samples(i));
+                    traning_objective.set_data(objective_type.data.subdata(training_samples(i)));
+                    test_data = objective_type.data.subdata(test_samples(i));
 				}
 
 				typename ObjectiveFunctionType::instance_type objective(
 						traning_objective.create_instance(sgl.setup));
 
 				//Response field
-				field<typename Predictor::response_type> response_field(
+                arma::field<typename Predictor::response_type> response_field(
 						test_samples(i).size(), lambda_sequence.n_elem);
 
 				//Fit
@@ -314,7 +313,8 @@ inline boost::tuple<field<field<typename Predictor::response_type> >,
 
 					//next lambda
 					++lambda_index;
-					//Increas progress monitor
+
+                    //Increas progress monitor
 					p.increment();
 
 					if (lambda_index >= lambda_sequence.n_elem) {

@@ -25,8 +25,8 @@ class rList {
 
 private:
 
-	vector < rObject > objects;
-	vector < string > names;
+    std::vector < rObject > objects;
+    std::vector < std::string > names;
 
 public:
 
@@ -64,7 +64,7 @@ public:
 	{
 	}
 
-	void attach(rObject const& object, string const& name)
+    void attach(rObject const& object, std::string const& name)
 	{
 		objects.push_back(object);
 		names.push_back(name);
@@ -76,7 +76,7 @@ public:
 		return objects[index];
 	}
 
-	string getName(unsigned int index) const
+    std::string getName(unsigned int index) const
 	{
 		return names[index];
 	}
@@ -86,10 +86,10 @@ public:
 		return objects.size();
 	}
 
-	int getIndex(string const& name) const
+    int getIndex(std::string const& name) const
 	{
 
-		for (u32 index = 0; index < objects.size(); ++index)
+        for (int index = 0; index < objects.size(); ++index)
 		{
 			if (name.compare(names[index]) == 0)
 			{

@@ -106,8 +106,8 @@ template<typename MATRIX, typename VECTOR>
 template<typename MATRIX, typename VECTOR>
   inline
   BlockVector<MATRIX, VECTOR>::BlockVector() :
-      matrix(), block_pos(static_cast<u32>(0)), block_sizes(
-          static_cast<u32>(0)), n_blocks(0), n_elem(0), n_nonzero(0), n_nonzero_blocks(
+      matrix(), block_pos(static_cast<arma::u32>(0)), block_sizes(
+          static_cast<arma::u32>(0)), n_blocks(0), n_elem(0), n_nonzero(0), n_nonzero_blocks(
           0)
   {
   }
@@ -196,10 +196,10 @@ template<typename MATRIX, typename VECTOR>
     matrix.zeros();
 
     const_cast<arma::uvec&>(this->block_sizes) = source.block_sizes;
-    const_cast<u32&>(this->n_blocks) = source.n_blocks;
-    const_cast<u32&>(this->n_elem) = source.n_elem;
-    const_cast<u32&>(this->n_nonzero) = 0;
-    const_cast<u32&>(this->n_nonzero_blocks) = 0;
+    const_cast<arma::u32&>(this->n_blocks) = source.n_blocks;
+    const_cast<arma::u32&>(this->n_elem) = source.n_elem;
+    const_cast<arma::u32&>(this->n_nonzero) = 0;
+    const_cast<arma::u32&>(this->n_nonzero_blocks) = 0;
 
     const_cast<arma::uvec&>(this->block_pos) = compute_block_pos(matrix.n_rows,
         block_sizes);
@@ -230,8 +230,8 @@ template<typename MATRIX, typename VECTOR>
   {
     matrix.zeros();
 
-    const_cast<u32&>(this->n_nonzero) = 0;
-    const_cast<u32&>(this->n_nonzero_blocks) = 0;
+    const_cast<arma::u32&>(this->n_nonzero) = 0;
+    const_cast<arma::u32&>(this->n_nonzero_blocks) = 0;
   }
 
 template<typename MATRIX, typename VECTOR>
@@ -380,7 +380,7 @@ template<typename MATRIX, typename VECTOR>
 
     MATRIX tmp(a);
     tmp.reshape(n_rows, n_cols);
-    return as_scalar(accu(tmp % b.as_matrix()));
+    return arma::as_scalar(accu(tmp % b.as_matrix()));
   }
 
 template<typename MATRIX, typename VECTOR>

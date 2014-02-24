@@ -6,20 +6,20 @@
 }
 \arguments{
   \item{module_name}{reference to objective specific C++
-  routines}
+  routines.}
 
-  \item{PACKAGE}{name of the calling package}
+  \item{PACKAGE}{name of the calling package.}
 
   \item{object}{a sgl object containing a list of estimated
-  models}
+  models.}
 
   \item{data}{a list of data objects -- will be parsed to
-  the specified module}
+  the specified module.}
 
-  \item{...}{not used}
+  \item{...}{not used.}
 }
 \value{
-  sgl object content will depend on the C++ response class
+  sgl object content will depend on the C++ response class.
 }
 \description{
   Sgl predict

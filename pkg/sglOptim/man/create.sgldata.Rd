@@ -17,9 +17,8 @@
   length \eqn{N}. Default is no grouping (NULL), that is
   all samples is the same group.}
 
-  \item{sparseX}{if TRUE \code{x} will be converted to a
-  sparse matrix, if FALSE \code{x} will be converted to a
-  dens matrix.}
+  \item{sparseX}{if TRUE \code{x} will be treated as
+  sparse, if FALSE \code{x} will be treated as dens.}
 }
 \description{
   Create sgl data

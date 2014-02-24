@@ -84,7 +84,7 @@ sgl::numeric SglProblem<CONFIG>::dist(sgl::parameter const& x0, sgl::parameter c
         for (sgl::natural block_index = 0; block_index < setup.n_blocks; block_index++) {
 
                 if (!x0.is_block_zero(block_index) || !x1.is_block_zero(block_index)) {
-                        d += as_scalar(sum(square(x0.block(block_index) - x1.block(block_index))));
+                        d += arma::as_scalar(sum(square(x0.block(block_index) - x1.block(block_index))));
                 }
         }
 
