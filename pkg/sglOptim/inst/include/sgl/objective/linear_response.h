@@ -38,49 +38,9 @@ public:
 		return *this;
 	}
 
-};
-
-
-rList create_rList(arma::field<LinearResponse> const& responses)
-    {
-        rList list;
-
-        sgl::natural number_of_samples = responses.n_rows;
-        sgl::natural length_of_lambda = responses.n_cols;
-
-        //TODO remove
-        //sgl::natural number_of_groups = responses(0, 0).n_groups;
-
-        sgl::matrix_field link(length_of_lambda);
-
-        for (sgl::natural i = 0; i < length_of_lambda; ++i) {
-
-            link(i).set_size(responses(0, i).linear_predictors.n_elem, number_of_samples);
-
-            for (sgl::natural j = 0; j < number_of_samples; ++j) {
-
-                link(i).col(j) = responses(j, i).linear_predictors;
-            }
-        }
-
-        list.attach(rObject(link), "link");
-
-        return list;
+    operator rObject() const {
+        return rObject(linear_predictors);
     }
-
-rList create_rList(arma::field< arma::field<LinearResponse> > const& responses) {
-
-	rList list;
-
-    for(int i = 0; i < responses.n_elem; ++i) {
-
-		std::stringstream ss;
-		ss << "subsample " << i;
-
-		list.attach(rObject(create_rList(responses(i))), ss.str());
-	}
-
-	return list;
-}
+};
 
 #endif /* LINEAR_RESPONSE_H_ */

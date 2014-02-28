@@ -75,21 +75,21 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
 	training <- lapply(cv.indices, function(x) samples[-x])
 	test <- cv.indices
 	
-	res <- sgl_subsampling(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
+        res <- sgl_subsampling(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
 	
         # Zero correct and add cv.indices
         res$cv.indices <- cv.indices
 
         # Reorganize response output
-        response_names <- names(res$response[[1]])
-        res$response <- lapply(1:length(res$response[[1]]), function(i) lapply(1:length(lambda), function(j) lapply(res$response, function(x) x[[i]][[j]])))
+        response <- NULL
+        for(x in res$response) {
+            response <- rbind(response, x)
+        }
+        res$response <- response[order(unlist(res$cv.indices)),]
 
         # Set names
-        res$response <- lapply(res$response, function(x) {names(x) <- lambda; x})
-        names(res$response) <- response_names
-
-        # Collapse subsample list to matrix
-        res$response <- lapply(res$response, function(response_list) .reorder_response_list(response_list, res$cv.indices, data$group.names, data$sample.names))
+        rownames(res$response) <- data$sample.names
+        colnames(res$response) <- lambda
 
         # Set class and return
         class(res) <- "sgl"
@@ -109,17 +109,18 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
     return(lapply(2:length(tmp), function(i) indices[(tmp[i-1]+1):tmp[i]]))
 }
 
-.reorder_response <- function(responses, cv, group.names, sample.names) {
+#TODO remove
+#.reorder_response <- function(responses, cv, group.names, sample.names) {
 
-    r <- matrix(nrow = nrow(responses[[1]]), ncol = length(unlist(cv)))
-    rownames(r) <- group.names
-    colnames(r) <- sample.names
+#    r <- matrix(nrow = nrow(responses[[1]]), ncol = length(unlist(cv)))
+#    rownames(r) <- group.names
+#    colnames(r) <- sample.names
 
-    for(i in 1:length(cv)) {
-        r[,cv[[i]]] <- responses[[i]]
-    }
+#    for(i in 1:length(cv)) {
+#        r[,cv[[i]]] <- responses[[i]]
+#    }
 
-    return(r)
-}
+#    return(r)
+#}
 
-.reorder_response_list <- function(response_list, cv, group.names, sample.names) lapply(response_list, function(r) .reorder_response(r, cv, group.names, sample.names))
+#.reorder_response_list <- function(response_list, cv, group.names, sample.names) lapply(response_list, function(r) .reorder_response(r, cv, group.names, sample.names))

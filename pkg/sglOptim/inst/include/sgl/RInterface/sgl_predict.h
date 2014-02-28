@@ -37,7 +37,7 @@ SEXP FUN_NAME(sgl_predict, MODULE_NAME) (SEXP r_data, SEXP r_beta) {
 	PREDICTOR predictor;
     arma::field<PREDICTOR::response_type> responses = predictor.predict(data, beta);
 
-	return rObject(rObject(create_rList(responses)));
+    return rObject(responses);
 }
 
 SEXP R_FUN_NAME(sgl_predict, MODULE_NAME) (SEXP r_data, SEXP r_beta) {

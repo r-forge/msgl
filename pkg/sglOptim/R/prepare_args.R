@@ -19,6 +19,7 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
+
 rearrange <- function(data, covariate.order, ...) UseMethod("rearrange")
 
 

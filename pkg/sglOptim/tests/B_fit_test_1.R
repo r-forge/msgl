@@ -22,16 +22,18 @@ fit1a <- sgl_fit("sgl_test_dense", "sglOptim", data, covariateGrouping, groupWei
 
 # Predict test
 res1a <- sgl_predict("sgl_test_dense", "sglOptim", fit1a, data)
+res1a <- simplify(res1a, simplify_vector)
 
 data <- create.sgldata(x, y, weights, sampleGrouping, sparseX = TRUE)
 fit1b <- sgl_fit("sgl_test_sparse", "sglOptim", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
 
 # Predict test
 res1b <- sgl_predict("sgl_test_sparse", "sglOptim", fit1b, data)
+res1b <- simplify(res1b, simplify_vector)
 
 
 if(max(abs(fit1a$beta[[25]]-fit1b$beta[[25]])) > 1e-7) stop()
-if(max(abs(res1a$link[[25]]-res1b$link[[25]])) > 1e-7) stop()
+if(max(abs(res1a[[25]]-res1b[[25]])) > 1e-7) stop()
 
 
 	

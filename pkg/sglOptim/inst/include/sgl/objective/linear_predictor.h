@@ -44,7 +44,7 @@ private:
 
 		sgl::natural n_samples = X.n_rows;
 
-        arma::field < response_type > response(n_samples);
+		arma::field < response_type > response(n_samples);
 
 		sgl::matrix lp(X);
 		lp = beta * trans(lp);

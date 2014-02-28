@@ -170,27 +170,30 @@ rObject::rObject(arma::sp_mat const& m) :
     arma::arrayops::copy(REAL(values), m.values, m.n_nonzero);
 }
 
-//TODO use rList instead
 template<typename T>
 rObject::rObject(arma::field<T> const& field) :
-		number_of_protects(1), unprotect_on_destruction(new bool), exp_counter(
-				new int) {
+        number_of_protects(2), unprotect_on_destruction(new bool), exp_counter(
+                new int) {
 
-	*this->unprotect_on_destruction = unprotect_on_destruction;
-	*exp_counter = 1;
+    *this->unprotect_on_destruction = unprotect_on_destruction;
+    *exp_counter = 1;
 
-	PROTECT(exp = Rf_allocVector(VECSXP, field.n_elem)); // Creating a list with n_elem elements
+    SEXP matrixDim;
+    PROTECT(matrixDim = Rf_allocVector(INTSXP, 2));
+    INTEGER(matrixDim)[0] = field.n_rows;
+    INTEGER(matrixDim)[1] = field.n_cols;
 
-	//Construct list
-	unsigned int i;
-	for (i = 0; i < field.n_elem; i++) {
-		// attaching
-		rObject tmp(field(i));
-		number_of_protects += tmp.takeover_protection();
+    PROTECT(exp = Rf_allocVector(VECSXP, field.n_elem)); // Creating a list with n_elem elements
 
-		SET_VECTOR_ELT(exp, i, tmp);
-	}
+    //Construct list
+    unsigned int i;
+    for (i = 0; i < field.n_elem; i++) {
+        // attaching
+        rObject tmp(field(i));
+        SET_VECTOR_ELT(exp, i, tmp);
+    }
 
+    Rf_setAttrib(exp, R_DimSymbol, matrixDim);
 }
 
 rObject::rObject(rList const& list) :

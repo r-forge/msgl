@@ -22,6 +22,7 @@ LinkingTo: Rcpp, RcppProgress, RcppArmadillo, BH
 Collate:
     'lambda_sequence.R'
     'prepare_args.R'
+    'simplify.R'
     'sgl_fit.R'
     'sgl_config.R'
     'sgl_predict.R'

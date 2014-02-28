@@ -42,9 +42,10 @@ sgl_predict <- function(module_name, PACKAGE, object, data, ...) {
 		res <- .Call(call_sym, PACKAGE = PACKAGE, data, beta)
 		
 	} else  {
-		stop("No models found - missing beta")
+                stop("No models found -- missing beta")
 	}
-	
-	class(res) <- "sgl"
+
+
+        class(res) <- "sgl"
 	return(res)
 }
