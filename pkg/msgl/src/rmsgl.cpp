@@ -77,7 +77,6 @@
 #define PREDICTOR sgl::LinearPredictor < sgl::matrix , MultinomialResponse >
 
 #include <sgl/RInterface/sgl_predict.h>
-#include <sgl/RInterface/sgl_cv.h>
 #include <sgl/RInterface/sgl_subsampling.h>
 
 /*********************************
@@ -106,7 +105,6 @@
 #define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , MultinomialResponse >
 
 #include <sgl/RInterface/sgl_predict.h>
-#include <sgl/RInterface/sgl_cv.h>
 #include <sgl/RInterface/sgl_subsampling.h>
 
 /* **********************************
@@ -121,8 +119,7 @@ static const R_CallMethodDef sglCallMethods[] = {
 		SGL_LAMBDA(msgl_dense), SGL_LAMBDA(msgl_sparse),
 		SGL_FIT(msgl_dense), SGL_FIT(msgl_sparse),
 		SGL_PREDICT(msgl_dense), SGL_PREDICT(msgl_sparse),
-		SGL_CV(msgl_dense), SGL_CV(msgl_sparse),
-		SGL_SUBSAMPLING(msgl_dense), SGL_SUBSAMPLING(msgl_sparse),
+        SGL_SUBSAMPLING(msgl_dense), SGL_SUBSAMPLING(msgl_sparse),
 		NULL};
 
 extern "C" {

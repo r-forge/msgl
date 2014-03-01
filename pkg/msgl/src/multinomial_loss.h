@@ -44,7 +44,7 @@ public:
 
 
 	MultinomialLoss() :
-			n_samples(0), n_classes(0), Y(sgl::null_natural_vector), W(sgl::null_vector), prob(n_samples, n_classes), hessian_matrices(static_cast<u32>(0)), hessians_computed(false) {
+            n_samples(0), n_classes(0), Y(sgl::null_natural_vector), W(sgl::null_vector), prob(n_samples, n_classes), hessian_matrices(), hessians_computed(false) {
 	}
 
 	MultinomialLoss(data_type const& data) :
@@ -83,7 +83,7 @@ public:
 		hessians_computed = true;
 	}
 
-	const sgl::matrix& hessians(u32 i) const {
+    const sgl::matrix& hessians(sgl::natural i) const {
 		return hessian_matrices(i);
 	}
 

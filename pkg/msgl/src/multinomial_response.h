@@ -51,53 +51,64 @@ public:
 		return *this;
 	}
 
+    operator rObject() const {
+        rList list;
+
+        list.attach(rObject(linear_predictors), "link");
+        list.attach(rObject(probabilities), "response");
+        list.attach(rObject(predicted_class+1), "classes");
+
+        return rObject(list);
+    }
+
 };
 
-rList create_rList(field<MultinomialResponse> const& responses)
-	{
-		rList list;
+//TODO remove
+//rList create_rList(field<MultinomialResponse> const& responses)
+//	{
+//		rList list;
 
-		sgl::natural number_of_samples = responses.n_rows;
-		sgl::natural length_of_lambda = responses.n_cols;
+//		sgl::natural number_of_samples = responses.n_rows;
+//		sgl::natural length_of_lambda = responses.n_cols;
 
-		sgl::matrix_field link(length_of_lambda);
-		sgl::matrix_field probabilities(length_of_lambda);
-		sgl::natural_matrix classes(number_of_samples, length_of_lambda);
+//		sgl::matrix_field link(length_of_lambda);
+//		sgl::matrix_field probabilities(length_of_lambda);
+//		sgl::natural_matrix classes(number_of_samples, length_of_lambda);
 
-		for (sgl::natural i = 0; i < length_of_lambda; ++i) {
+//		for (sgl::natural i = 0; i < length_of_lambda; ++i) {
 
-			link(i).set_size(responses(0, i).linear_predictors.n_elem, number_of_samples);
-			probabilities(i).set_size(responses(0, i).linear_predictors.n_elem, number_of_samples);
+//			link(i).set_size(responses(0, i).linear_predictors.n_elem, number_of_samples);
+//			probabilities(i).set_size(responses(0, i).linear_predictors.n_elem, number_of_samples);
 
-			for (sgl::natural j = 0; j < number_of_samples; ++j) {
+//			for (sgl::natural j = 0; j < number_of_samples; ++j) {
 
-				link(i).col(j) = responses(j, i).linear_predictors;
-				probabilities(i).col(j) = responses(j, i).probabilities;
-				classes(j, i) = responses(j, i).predicted_class;
-			}
-		}
+//				link(i).col(j) = responses(j, i).linear_predictors;
+//				probabilities(i).col(j) = responses(j, i).probabilities;
+//				classes(j, i) = responses(j, i).predicted_class;
+//			}
+//		}
 
-		list.attach(rObject(link), "link");
-		list.attach(rObject(probabilities), "response");
-		list.attach(rObject(classes), "classes");
+//		list.attach(rObject(link), "link");
+//		list.attach(rObject(probabilities), "response");
+//		list.attach(rObject(classes), "classes");
 
-		return list;
-	}
+//		return list;
+//	}
 
-rList create_rList(field< field<MultinomialResponse> > const& responses) {
+//rList create_rList(field< field<MultinomialResponse> > const& responses) {
 
-	rList list;
+//	rList list;
 
-	for(u32 i = 0; i < responses.n_elem; ++i) {
+//	for(u32 i = 0; i < responses.n_elem; ++i) {
 
-		std::stringstream ss;
-		ss << "subsample " << i;
+//		std::stringstream ss;
+//		ss << "subsample " << i;
 
-		list.attach(rObject(create_rList(responses(i))), ss.str());
-	}
+//		list.attach(rObject(create_rList(responses(i))), ss.str());
+//	}
 
-	return list;
-}
+//	return list;
+//}
 
 
 

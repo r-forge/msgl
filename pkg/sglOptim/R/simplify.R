@@ -21,16 +21,38 @@
 
 #TODO dim names
 
-simplify_vector <- function(responses) {
+#TODO generic s3 function
+#sgl_simplify <- function(x, ...) UseMethod("sgl_simplify")
+
+
+sgl_simplify_list <- function(x, ...) {
 
     require(plyr)
 
-    return(laply(responses, .fun = function(x) x))
+    return(laply(x, .fun = function(y) y))
 }
 
-simplify <- function(res, simplify.fun) {
+simplify <- function(x) {
 
     require(plyr)
 
-    return(alply(res, .margins = 2, .fun = simplify.fun))
+    if(class(x[[1,1]]) == "list") {
+        response.names <- names(x[[1,1]])
+
+        res <- llply(response.names, function(name)  simplify(llply(x, .fun = function(y) y[[name]])))
+        names(res) <- response.names
+
+        return(res)
+    }
+
+    if(is.vector(class(x[[1,1]])) && length(x[[1,1]]) > 1) {
+        return(alply(x, .margins = 2, .fun = sgl_simplify_list))
+    }
+
+    if(is.vector(class(x[[1,1]]))) {
+        return(aaply(x, .margins=c(1,2), .fun = function(y) y))
+    }
+
+    stop("Cannot simplify object")
 }
+

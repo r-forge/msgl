@@ -58,10 +58,10 @@ print.msgl <- function(x, ...) {
 
 	#FIXME check that  object$msgl_version exsists
 
-  	message(paste("Multinomial logistic regression models (estimated by msgl version ", x$msgl_version, ")", sep=""))
+        message(paste("High dimensional Multinomial logistic regression models (estimated by msgl version ", x$msgl_version, ")", sep=""))
 	message()
-	message(paste("  This object contains ", nmod(x$beta), " sparse models with ", nrow(x$beta[[1]]), " classes", sep=""))
-	message(paste("   between ", min(features(x)), " - ", max(features(x)), " nonzero features and ", min(parameters(x)), " - ", max(parameters(x)), " nonzero parameters.", sep =""))
+        message(paste("  This object contains ", nmod(x), " sparse models with ", nrow(x$beta[[1]]), " classes.", sep=""))
+        message(paste("   The models contain between ", min(features(x)), " - ", max(features(x)), " nonzero features and ", min(parameters(x)), " - ", max(parameters(x)), " nonzero parameters.", sep =""))
 	message()
 	classnames <- paste(rownames(x$beta[[1]])[1:3], collapse=", ") #FIXME what if less than 3 classes + handle long class names
 	message(paste("  The first three classes are: ", classnames, sep=""))

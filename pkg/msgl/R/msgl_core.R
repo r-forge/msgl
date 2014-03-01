@@ -515,22 +515,12 @@ predict.msgl <- function(object, x, sparse.data = FALSE, ...) {
 		
 	}
 	
-	### Set correct dim names
-	dim.names <-  list(rownames(object$beta[[1]]), rownames(x))
-	
-	# classes
-	rownames(res$classes) <- dim.names[[2]]
-	
-	if(!is.null(dim.names[[1]])) {
-		res$classes <- apply(X = res$classes, MARGIN = c(1,2), FUN = function(x) dim.names[[1]][x+1])
-	}
-	
-	# Set dim names for link and response
-	res$link <- lapply(X = res$link, FUN = function(m) {dimnames(m) <- dim.names; m})
-	res$response <- lapply(X = res$response, FUN = function(m) {dimnames(m) <- dim.names; m})
-	
-	res$msgl_version <- packageVersion("msgl")
-	
+        res <- simplify(res)
+        res$link <- lapply(res$link, function(x) t(x))
+        res$response <- lapply(res$response, function(x) t(x))
+        res$classes <- apply(res$classes, MARGIN = 2, function(y) rownames(object$beta[[1]])[y]) #FIXME use classes.names in fit object
+        dimnames(res$classes) <- list(Samples = rownames(x), Lambda.index = 1:length(object$lambda))
+
 	class(res) <- "msgl"
 	return(res)
 }
