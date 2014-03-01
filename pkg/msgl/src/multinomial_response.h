@@ -20,6 +20,9 @@
 #ifndef MSGL_MULTINOMIAL_RESPONSE_H_
 #define MSGL_MULTINOMIAL_RESPONSE_H_
 
+class PredictedClass {};
+class LP {};
+class Probabilities {};
 
 class MultinomialResponse {
 
@@ -51,64 +54,30 @@ public:
 		return *this;
 	}
 
-    operator rObject() const {
-        rList list;
+    sgl::natural const& get(PredictedClass) const {
+        return predicted_class;
+    }
 
-        list.attach(rObject(linear_predictors), "link");
-        list.attach(rObject(probabilities), "response");
-        list.attach(rObject(predicted_class+1), "classes");
+    sgl::vector const& get(LP) const {
+        return linear_predictors;
+    }
 
-        return rObject(list);
+    sgl::vector const& get(Probabilities) const {
+        return probabilities;
+    }
+
+    template<typename T>
+    static void simplify(rList & list, T const& responses) {
+
+        list.attach(sgl::simplifier<sgl::vector, LP>::simplify(responses), "link");
+        list.attach(sgl::simplifier<sgl::vector, Probabilities>::simplify(responses), "response");
+        list.attach(sgl::simplifier<sgl::natural, PredictedClass>::simplify(responses), "classes");
+
     }
 
 };
 
-//TODO remove
-//rList create_rList(field<MultinomialResponse> const& responses)
-//	{
-//		rList list;
 
-//		sgl::natural number_of_samples = responses.n_rows;
-//		sgl::natural length_of_lambda = responses.n_cols;
-
-//		sgl::matrix_field link(length_of_lambda);
-//		sgl::matrix_field probabilities(length_of_lambda);
-//		sgl::natural_matrix classes(number_of_samples, length_of_lambda);
-
-//		for (sgl::natural i = 0; i < length_of_lambda; ++i) {
-
-//			link(i).set_size(responses(0, i).linear_predictors.n_elem, number_of_samples);
-//			probabilities(i).set_size(responses(0, i).linear_predictors.n_elem, number_of_samples);
-
-//			for (sgl::natural j = 0; j < number_of_samples; ++j) {
-
-//				link(i).col(j) = responses(j, i).linear_predictors;
-//				probabilities(i).col(j) = responses(j, i).probabilities;
-//				classes(j, i) = responses(j, i).predicted_class;
-//			}
-//		}
-
-//		list.attach(rObject(link), "link");
-//		list.attach(rObject(probabilities), "response");
-//		list.attach(rObject(classes), "classes");
-
-//		return list;
-//	}
-
-//rList create_rList(field< field<MultinomialResponse> > const& responses) {
-
-//	rList list;
-
-//	for(u32 i = 0; i < responses.n_elem; ++i) {
-
-//		std::stringstream ss;
-//		ss << "subsample " << i;
-
-//		list.attach(rObject(create_rList(responses(i))), ss.str());
-//	}
-
-//	return list;
-//}
 
 
 

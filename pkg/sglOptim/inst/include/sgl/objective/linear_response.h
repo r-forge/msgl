@@ -8,6 +8,7 @@
 #ifndef LINEAR_RESPONSE_H_
 #define LINEAR_RESPONSE_H_
 
+class LP {}; //linear predictors
 
 class LinearResponse {
 
@@ -38,9 +39,15 @@ public:
 		return *this;
 	}
 
-    operator rObject() const {
-        return rObject(linear_predictors);
+    sgl::vector const& get(LP) const {
+        return linear_predictors;
     }
+
+    template<typename T>
+    static void simplify(rList & list, T const& responses) {
+        list.attach(simplifier<sgl::vector, LP>::simplify(responses), "link");
+     }
+
 };
 
 #endif /* LINEAR_RESPONSE_H_ */

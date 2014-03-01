@@ -113,6 +113,7 @@ namespace sgl {
 #include "sgl/objective/sgl_matrix_data.h"
 #include "sgl/objective/sgl_gl_loss.h"
 #include "sgl/objective/sgl_algorithm_config.h"
+#include "sgl/objective/simplifier.h"
 #include "sgl/objective/linear_response.h"
 #include "sgl/objective/linear_predictor.h"
 }

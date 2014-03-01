@@ -424,14 +424,14 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 	
 	### Reorganize
 
-	res_reorg <- list()
-	res_reorg$classes <- lapply(res$responses, function(x) x$classes + 1)
-	res_reorg$response <- lapply(res$responses, function(x) x$response)
-	res_reorg$link <- lapply(res$responses, function(x) x$link)
-	res_reorg$features <- res$features
-	res_reorg$parameters <- res$parameters
+#	res_reorg <- list()
+#	res_reorg$classes <- lapply(res$responses, function(x) x$classes + 1)
+#	res_reorg$response <- lapply(res$responses, function(x) x$response)
+#	res_reorg$link <- lapply(res$responses, function(x) x$link)
+#	res_reorg$features <- res$features
+#	res_reorg$parameters <- res$parameters
 	
-	res <- res_reorg
+#	res <- res_reorg
 			
 	### Set correct dim names
 	dim.names <- list(data$group.names, data$sample.names)
@@ -515,11 +515,11 @@ predict.msgl <- function(object, x, sparse.data = FALSE, ...) {
 		
 	}
 	
-        res <- simplify(res)
-        res$link <- lapply(res$link, function(x) t(x))
-        res$response <- lapply(res$response, function(x) t(x))
-        res$classes <- apply(res$classes, MARGIN = 2, function(y) rownames(object$beta[[1]])[y]) #FIXME use classes.names in fit object
-        dimnames(res$classes) <- list(Samples = rownames(x), Lambda.index = 1:length(object$lambda))
+        #res <- simplify(res)
+        #res$link <- lapply(res$link, function(x) t(x))
+        #res$response <- lapply(res$response, function(x) t(x))
+        #res$classes <- apply(res$classes, MARGIN = 2, function(y) rownames(object$beta[[1]])[y]) #FIXME use classes.names in fit object
+        #dimnames(res$classes) <- list(Samples = rownames(x), Lambda.index = 1:length(object$lambda))
 
 	class(res) <- "msgl"
 	return(res)

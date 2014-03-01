@@ -77,19 +77,19 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
 	
         res <- sgl_subsampling(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
 	
-        # Zero correct and add cv.indices
-        res$cv.indices <- cv.indices
+        # Add cv.indices
+#        res$cv.indices <- cv.indices
 
-        # Reorganize response output
-        response <- NULL
-        for(x in res$response) {
-            response <- rbind(response, x)
-        }
-        res$response <- response[order(unlist(res$cv.indices)),]
+#        # Reorganize response output
+#        response <- NULL
+#        for(x in res$response) {
+#            response <- rbind(response, x)
+#        }
+#        res$response <- response[order(unlist(res$cv.indices)),]
 
-        # Set names
-        rownames(res$response) <- data$sample.names
-        colnames(res$response) <- lambda
+#        # Set names
+#        rownames(res$response) <- data$sample.names
+#        colnames(res$response) <- lambda
 
         # Set class and return
         class(res) <- "sgl"
