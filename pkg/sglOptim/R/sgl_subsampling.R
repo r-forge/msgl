@@ -37,12 +37,13 @@
 #' @param test a list of test samples, each item of the list corresponding to a subsample.
 #' Each item in the list must be vector with the indices of the test samples for the corresponding subsample.
 #' The length of the list must equal the length of the \code{training} list.
+#' @param collapse if \code{TRUE} the results for each subsample will be collapse into one result (this is useful if the subsamples are not overlapping)
 #' @param max.threads the maximal number of threads to be used.
 #' @param algorithm.config the algorithm configuration to be used. 
 #' @return sgl object content will depend on the C++ response class
 #' @author Martin Vincent
 #' @export
-sgl_subsampling <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads = 2L, algorithm.config = sgl.standard.config) {
+sgl_subsampling <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, collapse = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
 		
 		args <- prepare.args(data, parameterGrouping, groupWeights, parameterWeights, alpha)
 				
@@ -50,7 +51,7 @@ sgl_subsampling <- function(module_name, PACKAGE, data, parameterGrouping, group
 		test.0 <- lapply(test, function(x) as.integer(x - 1))
 		
 		call_sym <- paste(module_name, "sgl_subsampling", sep="_")
-		res <- .Call(call_sym, PACKAGE = PACKAGE, args$data, args$block.dim, args$groupWeights, args$parameterWeights, args$alpha, lambda, training.0, test.0, max.threads, algorithm.config)				
+                res <- .Call(call_sym, PACKAGE = PACKAGE, args$data, args$block.dim, args$groupWeights, args$parameterWeights, args$alpha, lambda, training.0, test.0, collapse, max.threads, algorithm.config)
 		
 		class(res) <- "sgl"
 		return(res)

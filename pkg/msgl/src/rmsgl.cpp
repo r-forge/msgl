@@ -17,7 +17,7 @@
 */
 
 //Uncomment to turn on debuging
-//#undef NDEBUG
+#undef NDEBUG
 
 //Should the timers be activated (only needed for profiling the code)
 //#define SGL_TIMING
@@ -130,13 +130,13 @@ void R_init_msgl(DllInfo *info)
 {
 	// Print warnings
 #ifndef SGL_USE_OPENMP
-	Rcout << "warning: openmp (multithreading) not supported on this system" << endl;
+    Rcout << "NOTE : openmp (multithreading) not supported on this system" << std::endl;
 #endif
 
 #ifdef SGL_DEBUG
 	Rcout
-			<< "warning: msgl compiled with debugging on -- this may slow down the runtime of the msgl routines"
-			<< endl;
+            << "WARNING : msgl debugging is turned on -- this may increase the runtime"
+            << std::endl;
 #endif
 
 // Register the .Call routines.

@@ -64,7 +64,7 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
                         # compute cv indices
                         cv.indices <- lapply(unique(data$G), function(x) .divide_indices(which(data$G == x), fold))
                         cv.indices <- lapply(cv.indices, function(x) sample(x))
-                        cv.indices <- lapply(1:fold, function(i) unlist(lapply(cv.indices, function(x) x[[i]])))
+                        cv.indices <- lapply(1:fold, function(i) sample(unlist(lapply(cv.indices, function(x) x[[i]]))))
                 }
 
 	} else {
@@ -75,10 +75,10 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
 	training <- lapply(cv.indices, function(x) samples[-x])
 	test <- cv.indices
 	
-        res <- sgl_subsampling(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
+        res <- sgl_subsampling(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, TRUE, max.threads, algorithm.config)
 	
         # Add cv.indices
-#        res$cv.indices <- cv.indices
+        res$cv.indices <- cv.indices
 
 #        # Reorganize response output
 #        response <- NULL

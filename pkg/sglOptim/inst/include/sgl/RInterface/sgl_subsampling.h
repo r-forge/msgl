@@ -18,22 +18,23 @@
 
 // Registration macro
 #ifndef SGL_SUBSAMPLING
-#define SGL_SUBSAMPLING(MODULE) CALL_METHOD(sgl_subsampling, MODULE, 10)
+#define SGL_SUBSAMPLING(MODULE) CALL_METHOD(sgl_subsampling, MODULE, 11)
 #endif
 
 extern "C" {
 SEXP R_FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP r_blockWeights,
 		SEXP r_parameterWeights, SEXP r_alpha, SEXP r_lambda_seq, SEXP r_training_samples,
-		SEXP r_test_samples, SEXP r_number_of_threads, SEXP r_config);
+        SEXP r_test_samples, SEXP r_collapse ,SEXP r_number_of_threads, SEXP r_config);
 }
 
 SEXP FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP r_blockWeights,
 		SEXP r_parameterWeights, SEXP r_alpha, SEXP r_lambda_seq, SEXP r_training_samples,
-		SEXP r_test_samples, SEXP r_number_of_threads, SEXP r_config) {
+        SEXP r_test_samples, SEXP r_collapse, SEXP r_number_of_threads, SEXP r_config) {
 
 	// Configuration
 	rList rlist_config(r_config);
 	const sgl::AlgorithmConfiguration config(rlist_config);
+    const bool do_collapse = get_value<bool>(r_collapse);
 
 	//Data and objective
 	const rList data_rList(r_data);
@@ -67,8 +68,14 @@ SEXP FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP 
 	//Build result R list
 	rList res;
 
-    PREDICTOR::response_type::simplify(res, response_field.get<0>());
-	res.attach(rObject(response_field.get<1>()), "features");
+    if(do_collapse) {
+        res.attach(PREDICTOR::response_type::simplify(sgl::collapse_this(response_field.get<0>())), "responses");
+    }
+    else {
+        res.attach(PREDICTOR::response_type::simplify(response_field.get<0>()), "responses");
+    }
+
+    res.attach(rObject(response_field.get<1>()), "features");
 	res.attach(rObject(response_field.get<2>()), "parameters");
 
 	return rObject(res);
@@ -76,12 +83,12 @@ SEXP FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP 
 
 SEXP R_FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP r_blockWeights,
 		SEXP r_parameterWeights, SEXP r_alpha, SEXP r_lambda_seq, SEXP r_training_samples,
-		SEXP r_test_samples, SEXP r_number_of_threads, SEXP r_config) {
+        SEXP r_test_samples, SEXP r_collapse, SEXP r_number_of_threads, SEXP r_config) {
 
 	try {
 
 		return FUN_NAME(sgl_subsampling, MODULE_NAME)(r_data, r_block_dim, r_blockWeights, r_parameterWeights, r_alpha,
-				r_lambda_seq, r_training_samples, r_test_samples, r_number_of_threads, r_config);
+                r_lambda_seq, r_training_samples, r_test_samples, r_collapse, r_number_of_threads, r_config);
 
 		//Catch unhandled exceptions
 

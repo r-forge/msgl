@@ -67,12 +67,15 @@ public:
     }
 
     template<typename T>
-    static void simplify(rList & list, T const& responses) {
+    static rList simplify(T const& responses) {
+
+        rList list;
 
         list.attach(sgl::simplifier<sgl::vector, LP>::simplify(responses), "link");
         list.attach(sgl::simplifier<sgl::vector, Probabilities>::simplify(responses), "response");
         list.attach(sgl::simplifier<sgl::natural, PredictedClass>::simplify(responses), "classes");
 
+        return list;
     }
 
 };

@@ -43,9 +43,15 @@ public:
         return linear_predictors;
     }
 
+    //TODO automate the construction of these functions
     template<typename T>
-    static void simplify(rList & list, T const& responses) {
+    static rList simplify(T const& responses) {
+
+        rList list;
+
         list.attach(simplifier<sgl::vector, LP>::simplify(responses), "link");
+
+        return list;
      }
 
 };
