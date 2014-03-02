@@ -1,5 +1,0 @@
-library(roxygen2)
-library(tools)
-
-roxygenize("/media/sgl/SparseGroupLasso/SglOptimizer/pkg")
-
