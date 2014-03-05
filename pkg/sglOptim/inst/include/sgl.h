@@ -62,14 +62,6 @@
 #define SGL_USE_OPENMP
 #endif
 
-//Switch off openmp on sparc for the time being
-#ifdef __sparc
-#ifdef SGL_USE_OPENMP
-#undef SGL_USE_OPENMP
-#endif
-#endif
-
-
 #include <armadillo>
 #include <Rcpp.h>
 

@@ -1,6 +1,6 @@
-/* Routines for multinomial and logistic sparse group lasso regression.
+/* Routines for linear sparse group lasso regression.
  Intended for use with R.
- Copyright (C) 2012 Martin Vincent
+ Copyright (C) 2014 Martin Vincent
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -111,13 +111,13 @@ void R_init_sglOptim(DllInfo *info)
 {
 	// Print warnings
 #ifndef SGL_USE_OPENMP
-	Rcout << "SglOptim warning: openmp (multithreading) not supported on this system" << endl;
+	Rcout << "SglOptim warning: openmp (multithreading) not supported on this system" << std::endl;
 #endif
 
 #ifdef SGL_DEBUG
 	Rcout
 			<< "SglOptim warning: compiled with debugging on -- this may slow down the runtime of the sgl routines"
-			<< endl;
+			<< std::endl;
 #endif
 
 // Register the .Call routines.

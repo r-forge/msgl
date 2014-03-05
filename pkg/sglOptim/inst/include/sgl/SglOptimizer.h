@@ -240,7 +240,7 @@ sgl::parameter SglOptimizer < SGL >::optimize_single(sgl::parameter & x, sgl::pa
 
 			//Continue quadratic loop
 
-			ASSERT_IS_NON_NEGATIVE(f_old - f + std::numeric_limits < sgl::numeric > ::epsilon());
+			ASSERT_IS_NON_NEGATIVE(f_old - f + 1e3*std::numeric_limits < sgl::numeric > ::epsilon());
 
 			gradient = objective.gradient();
 
