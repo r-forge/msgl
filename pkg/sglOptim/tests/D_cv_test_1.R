@@ -21,5 +21,8 @@ lambda <- sgl_lambda_sequence("sgl_test_dense", "sglOptim", data, covariateGroup
 fit1a.cv <- sgl_cv("sgl_test_dense", "sglOptim", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, fold = 2L, cv.indices = list(), max.threads = 1L, algorithm.config)
 
 data <- create.sgldata(x, y, weights, sampleGrouping, sparseX = TRUE)
-fit1b.cv <- sgl_cv("sgl_test_sparse", "sglOptim", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, fold = 2L, cv.indices = list(), max.threads = 1L, algorithm.config)
 
+#Seed used for cv splitting
+set.seed(300)
+
+fit1b.cv <- sgl_cv("sgl_test_sparse", "sglOptim", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, fold = 2L, cv.indices = list(), max.threads = 1L, algorithm.config)

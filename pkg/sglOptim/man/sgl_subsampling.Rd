@@ -4,7 +4,8 @@
 \usage{
   sgl_subsampling(module_name, PACKAGE, data,
     parameterGrouping, groupWeights, parameterWeights,
-    alpha, lambda, training, test, max.threads = 2L,
+    alpha, lambda, training, test, collapse = FALSE,
+    max.threads = 2L,
     algorithm.config = sgl.standard.config)
 }
 \arguments{
@@ -46,6 +47,10 @@
   be vector with the indices of the test samples for the
   corresponding subsample. The length of the list must
   equal the length of the \code{training} list.}
+
+  \item{collapse}{if \code{TRUE} the results for each
+  subsample will be collapse into one result (this is
+  useful if the subsamples are not overlapping)}
 
   \item{max.threads}{the maximal number of threads to be
   used.}
