@@ -7,7 +7,7 @@
     parameterWeights = NULL, alpha = 0.5,
     standardize = TRUE, lambda, fold = 10L,
     cv.indices = list(), sparse.data = FALSE,
-    max.threads = 2L, seed = 331L,
+    max.threads = 2L,
     algorithm.config = sgl.standard.config)
 }
 \arguments{
@@ -66,10 +66,6 @@
   \item{max.threads}{the maximal number of threads to be
   used}
 
-  \item{seed}{the seed used for generating the random cross
-  validation splitting, only used if
-  \code{fold}\eqn{\le}\code{max(table(classes))}.}
-
   \item{algorithm.config}{the algorithm configuration to be
   used.}
 }
@@ -101,7 +97,7 @@ lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 25L, lambda.min = 0.03)
 fit.cv <- msgl.cv(x, classes, alpha = .5, lambda = lambda)
 
 # Missclassification count
-colSums(fit.cv$classes != classes)
+#TODO colSums(fit.cv$classes != classes)
 }
 \author{
   Martin Vincent

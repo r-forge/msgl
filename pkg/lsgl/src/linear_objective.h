@@ -34,9 +34,9 @@ public:
 	LinearLoss()
 			: 	n_samples(0),
 				n_groups(0),
-				G(static_cast < sgl::natural >(0)),
-				W(static_cast < sgl::natural >(0)),
-				Y(static_cast < sgl::natural >(0)),
+				G(sgl::null_natural_vector),
+				W(sgl::null_vector),
+				Y(sgl::null_vector),
 				lp(n_samples, n_groups),
 				hessian_matrices(static_cast < sgl::natural >(0)),
 				hessians_computed(false)
@@ -72,7 +72,7 @@ public:
 	const sgl::matrix gradients() const
 	{
 
-		sgl::matrix grad = zeros < sgl::matrix > (n_groups, n_samples);
+        sgl::matrix grad = arma::zeros < sgl::matrix > (n_groups, n_samples);
 
 		for (sgl::natural i = 0; i < n_samples; ++i)
 		{
@@ -100,7 +100,7 @@ public:
 		hessians_computed = true;
 	}
 
-	const sgl::matrix& hessians(u32 i) const
+    const sgl::matrix& hessians(sgl::natural i) const
 	{
 		return hessian_matrices(i);
 	}

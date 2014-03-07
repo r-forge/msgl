@@ -66,7 +66,9 @@ sgl_fit <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights,
 	
 	# Restore org order
 	res$beta <- lapply(res$beta, function(beta.matrix) beta.matrix[, order(args$group.order)])
-		
-        class(res) <- "sgl"
+	
+	res$sglOptim_version <- packageVersion("sglOptim")
+	class(res) <- "sgl"
+	
 	return(res)
 }

@@ -46,14 +46,58 @@
 sgl_subsampling <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, collapse = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
 		
 		args <- prepare.args(data, parameterGrouping, groupWeights, parameterWeights, alpha)
-				
+
+		training <- lapply(training, sort)
+		test <- lapply(test, sort)
+		
 		training.0 <- lapply(training, function(x) as.integer(x - 1))
 		test.0 <- lapply(test, function(x) as.integer(x - 1))
 		
 		call_sym <- paste(module_name, "sgl_subsampling", sep="_")
-                res <- .Call(call_sym, PACKAGE = PACKAGE, args$data, args$block.dim, args$groupWeights, args$parameterWeights, args$alpha, lambda, training.0, test.0, collapse, max.threads, algorithm.config)
+        res <- .Call(call_sym, PACKAGE = PACKAGE, args$data, args$block.dim, args$groupWeights, args$parameterWeights, args$alpha, lambda, training.0, test.0, collapse, max.threads, algorithm.config)
+
+		# Sample names
+		sample.names <- data$sample.names
 		
+		if(collapse == TRUE) {
+			# Reorder responses and set sample names
+			sample.order <- order(unlist(test))
+			res$responses <- lapply(res$responses, function(x) .order_response(x, sample.order))
+			res$responses <- lapply(res$responses, function(x) .set_sample_names(x, sample.names))
+		} else {
+			#Set sample names
+			res$responses <- lapply(res$responses, function(x) lapply(1:length(x), function(i) .set_sample_names(x[[i]], sample.names[test[[i]]])))
+		}
+		
+		res$sglOptim_version <- packageVersion("sglOptim")
 		class(res) <- "sgl"
 		return(res)
 	}
 	
+.set_sample_names <- function(response, sample.names) {
+	
+	if(is.list(response)) {
+		return(lapply(response, function(x) t(.set_sample_names(t(x), sample.names))))
+	}
+	
+	if(is.matrix(response)) {
+		rownames(response) <- sample.names
+		return(response)
+	}
+	
+	stop("Unknown response type")
+	
+}
+	
+.order_response <- function(response, sample.order) {
+	
+	if(is.list(response)) {
+		return(lapply(response, function(x) t(.order_response(t(x), sample.order))))
+	}
+	
+	if(is.matrix(response)) {
+		return(response[sample.order,])
+	}
+	
+	stop("Unknown response type")
+}

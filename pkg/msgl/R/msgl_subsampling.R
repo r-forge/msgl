@@ -23,6 +23,7 @@
 #' Each item in the list must be vector with the indices of the test samples for the corresponding subsample.
 #' The length of the list must equal the length of the \code{training} list.
 #' @param sparse.data if TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
+#' @param collapse if \code{TRUE} the results for each subsample will be collapse into one result (this is useful if the subsamples are not overlapping)
 #' @param max.threads the maximal number of threads to be used
 #' @param algorithm.config the algorithm configuration to be used.
 #' @return
@@ -44,12 +45,12 @@
 #'  training = train, test = test)
 #'
 #' # Missclassification count of second subsample
-#' colSums(fit.sub$classes[[2]] != classes[test[[2]]])
+#' #TODO colSums(fit.sub$classes[[2]] != classes[test[[2]]])
 #' @author Martin Vincent
 #' @export
 #' @useDynLib msgl .registration=TRUE
 msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, standardize = TRUE,
-                lambda, training, test, sparse.data = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
+                lambda, training, test, sparse.data = FALSE, collapse = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
 
         # Default values
         if(is.null(grouping)) {
@@ -90,12 +91,14 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
         # call sglOptim function
         if(data$sparseX) {
 
-                res <- sgl_subsampling("msgl_sparse", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
+                res <- sgl_subsampling("msgl_sparse", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, collapse, max.threads, algorithm.config)
         } else {
 
-                res <- sgl_subsampling("msgl_dense", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, max.threads, algorithm.config)
+                res <- sgl_subsampling("msgl_dense", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, collapse, max.threads, algorithm.config)
         }
 
+		#TODO organize output and set dimnames
+		
         ### Reorganize
 
 #	res_reorg <- list()
@@ -108,20 +111,20 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 #	res <- res_reorg
 
         ### Set correct dim names
-        dim.names <- list(data$group.names, data$sample.names)
-
-        for(i in 1:length(test)) {
-
-                #Set class names
-                rownames(res$classes[[i]]) <- dim.names[[2]][test[[i]]]
-
-                if(!is.null(dim.names[[1]])) {
-                        res$classes[[i]] <- apply(X = res$classes[[i]], MARGIN = c(1,2), FUN = function(x) dim.names[[1]][x])
-                }
-
-                res$link[[i]] <- lapply(X = res$link[[i]], FUN = function(m) {dimnames(m) <- list(dim.names[[1]], dim.names[[2]][test[[i]]]); m})
-                res$response[[i]] <- lapply(X = res$response[[i]], FUN = function(m) {dimnames(m) <- list(dim.names[[1]], dim.names[[2]][test[[i]]]); m})
-        }
+#        dim.names <- list(data$group.names, data$sample.names)
+#
+#        for(i in 1:length(test)) {
+#
+#                #Set class names
+#                rownames(res$classes[[i]]) <- dim.names[[2]][test[[i]]]
+#
+#                if(!is.null(dim.names[[1]])) {
+#                        res$classes[[i]] <- apply(X = res$classes[[i]], MARGIN = c(1,2), FUN = function(x) dim.names[[1]][x])
+#                }
+#
+#                res$link[[i]] <- lapply(X = res$link[[i]], FUN = function(m) {dimnames(m) <- list(dim.names[[1]], dim.names[[2]][test[[i]]]); m})
+#                res$response[[i]] <- lapply(X = res$response[[i]], FUN = function(m) {dimnames(m) <- list(dim.names[[1]], dim.names[[2]][test[[i]]]); m})
+#        }
 
         res$msgl_version <- packageVersion("msgl")
 

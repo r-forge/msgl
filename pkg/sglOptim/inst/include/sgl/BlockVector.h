@@ -8,8 +8,6 @@
 #ifndef BLOCKVECTOR_H_
 #define BLOCKVECTOR_H_
 
-//FIXME REMOVE
-//static int bv_count = 0;
 
 template<typename MATRIX, typename VECTOR>
   class BlockVector
@@ -42,7 +40,6 @@ template<typename MATRIX, typename VECTOR>
 
     BlockVector<MATRIX, VECTOR>(MATRIX const& source,
         const sgl::DimConfig & dim);
-    //BlockVector<MATRIX, VECTOR>(MATRIX const& source);
 
     void
     set_dim(sgl::DimConfig const& dim);
@@ -73,10 +70,11 @@ template<typename MATRIX, typename VECTOR>
       return matrix;
     }
 
-    operator arma::mat const() const
-    {
-      return static_cast<arma::mat>(matrix);
-    }
+    //TODO remove
+//    operator arma::mat const() const
+//    {
+//      return static_cast<arma::mat>(matrix);
+//    }
 
     MATRIX const&
     as_matrix() const
@@ -156,18 +154,6 @@ template<typename MATRIX, typename VECTOR>
     const_cast<arma::u32&>(this->n_nonzero_blocks) = nonzero_blocks;
 
   }
-
-//template<typename MATRIX, typename VECTOR>
-//  inline
-//  BlockVector<MATRIX, VECTOR>::BlockVector(const MATRIX & source) :
-//      matrix(source), block_pos(
-//          compute_block_pos(matrix.n_rows,
-//              ones < arma::uvec > (source.n_cols))), blocks(block_pos.n_elem-1), block_sizes(
-//          ones < arma::uvec > (source.n_cols)), n_blocks(source.n_cols), n_elem(
-//          source.n_elem), n_nonzero(source.n_nonzero), n_nonzero_blocks(
-//          nonzero_cols(source))
-//  {
-//  }
 
 template<typename MATRIX, typename VECTOR>
   inline void

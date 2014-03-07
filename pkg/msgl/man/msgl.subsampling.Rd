@@ -7,7 +7,8 @@
     grouping = NULL, groupWeights = NULL,
     parameterWeights = NULL, alpha = 0.5,
     standardize = TRUE, lambda, training, test,
-    sparse.data = FALSE, max.threads = 2L,
+    sparse.data = FALSE, collapse = FALSE,
+    max.threads = 2L,
     algorithm.config = sgl.standard.config)
 }
 \arguments{
@@ -61,6 +62,10 @@
   sparse, if \code{x} is a sparse matrix it will be treated
   as sparse by default.}
 
+  \item{collapse}{if \code{TRUE} the results for each
+  subsample will be collapse into one result (this is
+  useful if the subsamples are not overlapping)}
+
   \item{max.threads}{the maximal number of threads to be
   used}
 
@@ -101,7 +106,7 @@ fit.sub <- msgl.subsampling(x, classes, alpha = .5, lambda = lambda,
  training = train, test = test)
 
 # Missclassification count of second subsample
-colSums(fit.sub$classes[[2]] != classes[test[[2]]])
+#TODO colSums(fit.sub$classes[[2]] != classes[test[[2]]])
 }
 \author{
   Martin Vincent

@@ -45,7 +45,10 @@ sgl_predict <- function(module_name, PACKAGE, object, data, ...) {
                 stop("No models found -- missing beta")
 	}
 
-
-        class(res) <- "sgl"
+	#TODO sample names
+	
+	res$sglOptim_version <- packageVersion("sglOptim")
+	class(res) <- "sgl"
+	
 	return(res)
 }

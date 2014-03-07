@@ -37,15 +37,6 @@
 //Should the timers be activated (only needed for profiling the code)
 //#define SGL_TIMING
 
-//Should openmp be used
-#ifndef _OPENMP
-//No openmp
-//openmp (multithreading) not supported on this system - compiling without openmp support
-#else
-//Use openmp
-#define SGL_USE_OPENMP
-#endif
-
 //Sgl optimizer
 #include <sgl.h>
 
@@ -70,8 +61,7 @@
 #define PREDICTOR sgl::LinearPredictor < sgl::matrix , sgl::LinearResponse >
 
 #include <sgl/RInterface/sgl_predict.h>
-#include <sgl/RInterface/sgl_cv.h>
-//#include <sgl/RInterface/sgl_subsampling.h> //TODO
+#include <sgl/RInterface/sgl_subsampling.h>
 
 /*********************************
  *
@@ -99,8 +89,7 @@
 #define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , sgl::LinearResponse >
 
 #include <sgl/RInterface/sgl_predict.h>
-#include <sgl/RInterface/sgl_cv.h>
-//#include <sgl/RInterface/sgl_subsampling.h> //TODO
+#include <sgl/RInterface/sgl_subsampling.h>
 
 /* **********************************
  *
@@ -114,25 +103,22 @@ static const R_CallMethodDef sglCallMethods[] = {
 		SGL_LAMBDA(lsgl_dense), SGL_LAMBDA(lsgl_sparse),
 		SGL_FIT(lsgl_dense), SGL_FIT(lsgl_sparse),
 		SGL_PREDICT(lsgl_dense), SGL_PREDICT(lsgl_sparse),
-		SGL_CV(lsgl_dense), SGL_CV(lsgl_sparse),
-//TODO subsampling, 11
+		SGL_SUBSAMPLING(lsgl_dense), SGL_SUBSAMPLING(lsgl_sparse),
 		NULL};
 
 extern "C" {
 	void R_init_lsgl(DllInfo *info);
 }
 
-void R_init_lsgl(DllInfo *info)
+void R_init_msgl(DllInfo *info)
 {
 	// Print warnings
 #ifndef SGL_USE_OPENMP
-	Rcout << "SglOptimizer warning: openmp (multithreading) not supported on this system" << endl;
+    Rcout << "NOTE : openMP (multithreading) is not supported on this system" << std::endl;
 #endif
 
 #ifdef SGL_DEBUG
-	Rcout
-			<< "SglOptimizer warning: compiled with debugging on -- this may slow down the runtime of the sgl routines"
-			<< endl;
+	Rcout << "WARNING : debugging is turned on -- this may increase the runtime" << std::endl;
 #endif
 
 // Register the .Call routines.

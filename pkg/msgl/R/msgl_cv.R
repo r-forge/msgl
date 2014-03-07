@@ -42,7 +42,6 @@
 #' If \code{cv.indices = NULL} then a random splitting will be generated using the \code{fold} argument.
 #' @param sparse.data if TRUE \code{x} will be treated as sparse, if \code{x} is a sparse matrix it will be treated as sparse by default.
 #' @param max.threads the maximal number of threads to be used
-#' @param seed the seed used for generating the random cross validation splitting, only used if \code{fold}\eqn{\le}\code{max(table(classes))}.
 #' @param algorithm.config the algorithm configuration to be used.
 #' @return
 #' \item{link}{the linear predictors -- a list of length \code{length(lambda)} one item for each lambda value, with each item a matrix of size \eqn{K \times N} containing the linear predictors.}
@@ -59,7 +58,7 @@
 #' fit.cv <- msgl.cv(x, classes, alpha = .5, lambda = lambda)
 #'
 #' # Missclassification count
-#' colSums(fit.cv$classes != classes)
+#' #TODO colSums(fit.cv$classes != classes)
 #' @author Martin Vincent
 #' @export
 #' @useDynLib msgl .registration=TRUE
@@ -123,16 +122,21 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 
         }
 
-        ### Set correct dim names
-#	dim.names <- list(data$group.names, data$sample.names)
-
+#		res$classes <- res$responses$classes
+#		res$response <- res$responses$response
+#		res$link <- res$responses$link
+#		res$responses <- NULL
+#		
+#        ### Set correct dim names
+#		dim.names <- list(data$group.names, data$sample.names)
+#
 #	# classes
 #	rownames(res$classes) <- dim.names[[2]]
-
+#
 #	if(!is.null(dim.names[[1]])) {
 #		res$classes <- apply(X = res$classes, MARGIN = c(1,2), FUN = function(x) dim.names[[1]][x+1])
 #	}
-
+#
 #	# Set dim names for link and response
 #	res$link <- lapply(X = res$link, FUN = function(m) {dimnames(m) <- dim.names; m})
 #	res$response <- lapply(X = res$response, FUN = function(m) {dimnames(m) <- dim.names; m})
