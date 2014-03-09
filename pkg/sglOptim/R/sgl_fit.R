@@ -56,16 +56,15 @@ sgl_fit <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights,
 	
 	call_sym <- paste(module_name, "sgl_fit", sep="_")
 	res <- .Call(call_sym, PACKAGE = PACKAGE, args$data, args$block.dim, args$groupWeights, args$parameterWeights, args$alpha, lambda, return, algorithm.config)
-	
-	# Dim names
-	covariate.names <- args$data$covariate.names
-	group.names <- args$data$group.names
-	
-	# Create R sparse matrix
-	res$beta <- lapply(1:length(res$beta), function(i) sparseMatrix(p = res$beta[[i]][[2]], i = res$beta[[i]][[3]], x = res$beta[[i]][[4]], dims = res$beta[[i]][[1]], dimnames = list(group.names, covariate.names), index1 = FALSE))
+
+	## Create R sparse matrix
+	res$beta <- lapply(1:length(res$beta), function(i) sparseMatrix(p = res$beta[[i]][[2]], i = res$beta[[i]][[3]], x = res$beta[[i]][[4]], dims = res$beta[[i]][[1]], index1 = FALSE))
 	
 	# Restore org order
-	res$beta <- lapply(res$beta, function(beta.matrix) beta.matrix[, order(args$group.order)])
+	res$beta <- lapply(res$beta, function(x) x[, order(args$group.order)])
+
+	# Dim names
+	res$beta <- lapply(res$beta, function(x) { dimnames(x) <- list(data$group.names, data$covariate.names); x })
 	
 	res$sglOptim_version <- packageVersion("sglOptim")
 	class(res) <- "sgl"

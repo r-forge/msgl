@@ -59,7 +59,8 @@
 //openmp (multithreading) not supported on this system - compiling without openmp support
 #else
 //Use openmp
-#define SGL_USE_OPENMP
+#define SGL_OPENMP_SUPP
+#include <omp.h>
 #endif
 
 #include <armadillo>
@@ -79,11 +80,6 @@ using boost::tuple;
 
 //R tools
 #include <rtools.h>
-
-//Open mp
-#ifdef SGL_USE_OPENMP
-#include <omp.h>
-#endif
 
 #include <limits>
 #include <time.h>

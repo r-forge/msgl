@@ -44,9 +44,19 @@
 #' @author Martin Vincent
 #' @export
 sgl_subsampling <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, collapse = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
-		
-		args <- prepare.args(data, parameterGrouping, groupWeights, parameterWeights, alpha)
 
+		#Check training and test consistency:
+		if(!is.list(training) | !is.list(test)) {
+			stop("The arguments traning and test should be lists")
+		}
+		
+		if(length(training) != length(test)) {
+			stop("The length of the lists traning and test should be equal")
+		}
+
+		# Prapare arguments
+		args <- prepare.args(data, parameterGrouping, groupWeights, parameterWeights, alpha)
+		
 		training <- lapply(training, sort)
 		test <- lapply(test, sort)
 		
@@ -68,6 +78,11 @@ sgl_subsampling <- function(module_name, PACKAGE, data, parameterGrouping, group
 			#Set sample names
 			res$responses <- lapply(res$responses, function(x) lapply(1:length(x), function(i) .set_sample_names(x[[i]], sample.names[test[[i]]])))
 		}
+		
+		# Names
+		rownames(res$features) <- paste("subsample", 1:length(training))
+		rownames(res$parameters) <- paste("subsample", 1:length(training))
+		
 		
 		res$sglOptim_version <- packageVersion("sglOptim")
 		class(res) <- "sgl"

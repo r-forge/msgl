@@ -30,12 +30,12 @@ public:
 
 	sgl::natural const n_classes;
 
-	sgl::natural const predicted_class;
+	sgl::natural const predicted_class; // 1 based, i.e first classes has number 1 (not 0)
 	sgl::vector const linear_predictors;
 	sgl::vector const probabilities;
 
 	MultinomialResponse(sgl::vector const& linear_predictors) :
-			n_classes(linear_predictors.n_elem), predicted_class(argmax(linear_predictors)), linear_predictors(
+			n_classes(linear_predictors.n_elem), predicted_class(argmax(linear_predictors)+1), linear_predictors(
 					linear_predictors), probabilities(exp(linear_predictors) * (1/ sum(exp(linear_predictors)))) {
 	}
 

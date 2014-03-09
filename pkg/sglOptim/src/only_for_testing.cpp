@@ -110,7 +110,7 @@ extern "C" {
 void R_init_sglOptim(DllInfo *info)
 {
 	// Print warnings
-#ifndef SGL_USE_OPENMP
+#ifndef SGL_OPENMP_SUPP
 	Rcout << "SglOptim warning: openmp (multithreading) not supported on this system" << std::endl;
 #endif
 

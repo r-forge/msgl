@@ -19,7 +19,7 @@
 #'
 #' # Training error
 #' res <- predict(fit, x)
-#' #TODO colSums(res$classes != classes)
+#' colSums(res$classes != classes)
 #' @author Martin Vincent
 #' @method predict msgl
 #' @S3method predict msgl
@@ -35,23 +35,35 @@ predict.msgl <- function(object, x, sparse.data = FALSE, ...) {
 
                 x <- as(x, "CsparseMatrix")
                 data$X <- list(dim(x), x@p, x@i, x@x)
+				data$sample.names <- rownames(x)
 
                 res <- sgl_predict("msgl_sparse", "msgl", object, data)
 
         } else {
 
                 data$X <- as.matrix(x)
-
+				data$sample.names <- rownames(x)
+								
                 res <- sgl_predict("msgl_dense", "msgl", object, data)
 
         }
 
-        #res <- simplify(res)
-        #res$link <- lapply(res$link, function(x) t(x))
-        #res$response <- lapply(res$response, function(x) t(x))
-        #res$classes <- apply(res$classes, MARGIN = 2, function(y) rownames(object$beta[[1]])[y]) #FIXME use classes.names in fit object
-        #dimnames(res$classes) <- list(Samples = rownames(x), Lambda.index = 1:length(object$lambda))
-
+		### Responses
+		res$classes <- res$responses$classes
+		res$response <- res$responses$response
+		res$link <- res$responses$link
+		res$responses <- NULL
+		
+		class.names <- rownames(object$beta[[1]])
+		if(!is.null(class.names)) {
+			# Set class names
+			res$classes <- apply(X = res$classes, MARGIN = c(1,2), FUN = function(x) class.names[x])
+			res$link <- lapply(X = res$link, FUN = function(x) {rownames(x) <- class.names; x})
+			res$response <- lapply(X = res$response, FUN = function(x) {rownames(x) <- class.names; x})
+		}
+		
+		res$msgl_version <- packageVersion("msgl")
+		
         class(res) <- "msgl"
         return(res)
 }

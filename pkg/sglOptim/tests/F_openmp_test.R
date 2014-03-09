@@ -13,7 +13,6 @@ parameterWeights <-  matrix(1, nrow = length(levels(sampleGrouping)), ncol = nco
 alpha <- 0.5
 d <- 20L
 lambda.min <- 0.5
-algorithm.config <- sgl.standard.config
 
 # create data
 data <- create.sgldata(x, y, weights, sampleGrouping)

@@ -99,14 +99,17 @@ x <- sim.data$x
 classes <- sim.data$classes
 lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.03)
 
-test <- replicate(5, sample(1:length(classes))[1:20], simplify = FALSE)
+test <- replicate(2, sample(1:length(classes))[1:20], simplify = FALSE)
 train <- lapply(test, function(s) (1:length(classes))[-s])
 
 fit.sub <- msgl.subsampling(x, classes, alpha = .5, lambda = lambda,
  training = train, test = test)
 
 # Missclassification count of second subsample
-#TODO colSums(fit.sub$classes[[2]] != classes[test[[2]]])
+# subsample 1
+colSums(fit.sub$classes[[1]] != classes[test[[1]]])
+# subsample 2
+colSums(fit.sub$classes[[2]] != classes[test[[2]]])
 }
 \author{
   Martin Vincent

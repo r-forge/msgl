@@ -121,7 +121,6 @@ inline boost::tuple < sgl::block_vector_field , sgl::vector , sgl::vector > SglO
 	return boost::make_tuple(x_field, object_value, function_value);
 }
 
-//TODO remove gradinet_old
 //TODO stopping criteria an object of it own
 template < typename SGL >
 bool SglOptimizer < SGL >::is_stopping_criteria_fulfilled(sgl::parameter const& x,
@@ -826,8 +825,8 @@ sgl::numeric SglOptimizer < SGL >::solve_main_equation(sgl::numeric const c, sgl
 
 		sgl::numeric value = c + h * new_x + p * new_x / sqrt(new_x * new_x + r);
 
-		if (abs(value) < 1e-10)
-		{ //TODO configurable
+		if (abs(value) < 1e-10) //TODO configurable
+		{
 			x0 = new_x;
 			break;
 		}
@@ -843,6 +842,7 @@ sgl::numeric SglOptimizer < SGL >::solve_main_equation(sgl::numeric const c, sgl
 	} while (abs(x0 - x1) > sgl.config.tolerance_penalized_main_equation_loop);
 
 	ASSERT_IS_FINITE(x0);
+
 	return abs(x0);
 }
 

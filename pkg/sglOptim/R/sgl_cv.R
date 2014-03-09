@@ -80,8 +80,6 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
 	# Add cv.indices
 	res$cv.indices <- cv.indices
 	
-	# Order samples
-	
 	# Set class and return
 	class(res) <- "sgl"
 	return(res)

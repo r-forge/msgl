@@ -31,8 +31,6 @@
 #' @export
 sgl_predict <- function(module_name, PACKAGE, object, data, ...) {
 
-	res <- list()
-	
 	if("beta" %in% names(object)) {
 
 		beta <- lapply(X = object$beta, FUN = function(m) as(m, "CsparseMatrix"))
@@ -45,7 +43,10 @@ sgl_predict <- function(module_name, PACKAGE, object, data, ...) {
                 stop("No models found -- missing beta")
 	}
 
-	#TODO sample names
+	if(!is.null(data$sample.names)) {
+		# Set sample names
+		res$responses <- lapply(res$responses, function(x) .set_sample_names(x, data$sample.names))
+	}
 	
 	res$sglOptim_version <- packageVersion("sglOptim")
 	class(res) <- "sgl"

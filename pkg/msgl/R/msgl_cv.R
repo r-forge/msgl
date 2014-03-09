@@ -58,7 +58,7 @@
 #' fit.cv <- msgl.cv(x, classes, alpha = .5, lambda = lambda)
 #'
 #' # Missclassification count
-#' #TODO colSums(fit.cv$classes != classes)
+#' colSums(fit.cv$classes != classes)
 #' @author Martin Vincent
 #' @export
 #' @useDynLib msgl .registration=TRUE
@@ -122,24 +122,18 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 
         }
 
-#		res$classes <- res$responses$classes
-#		res$response <- res$responses$response
-#		res$link <- res$responses$link
-#		res$responses <- NULL
-#		
-#        ### Set correct dim names
-#		dim.names <- list(data$group.names, data$sample.names)
-#
-#	# classes
-#	rownames(res$classes) <- dim.names[[2]]
-#
-#	if(!is.null(dim.names[[1]])) {
-#		res$classes <- apply(X = res$classes, MARGIN = c(1,2), FUN = function(x) dim.names[[1]][x+1])
-#	}
-#
-#	# Set dim names for link and response
-#	res$link <- lapply(X = res$link, FUN = function(m) {dimnames(m) <- dim.names; m})
-#	res$response <- lapply(X = res$response, FUN = function(m) {dimnames(m) <- dim.names; m})
+		### Responses
+		res$classes <- res$responses$classes
+		res$response <- res$responses$response
+		res$link <- res$responses$link
+		res$responses <- NULL
+		
+       # Set class names
+		if(!is.null(data$group.names)) {
+			res$classes <- apply(X = res$classes, MARGIN = c(1,2), FUN = function(x) data$group.names[x])
+			res$link <- lapply(X = res$link, FUN = function(m) {rownames(m) <- data$group.names; m})
+			res$response <- lapply(X = res$response, FUN = function(m) {rownames(m) <- data$group.names; m})
+		}
 
         res$msgl_version <- packageVersion("msgl")
 

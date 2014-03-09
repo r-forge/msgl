@@ -44,7 +44,7 @@ fit <- msgl(x, classes, alpha = .5, lambda = lambda)
 
 # Training error
 res <- predict(fit, x)
-#TODO colSums(res$classes != classes)
+colSums(res$classes != classes)
 }
 \author{
   Martin Vincent

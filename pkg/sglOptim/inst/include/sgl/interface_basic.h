@@ -1,6 +1,6 @@
 /*
  Sgl template library for optimizing sparse group lasso penalized objectives.
- Copyright (C) 2012 Martin Vincent
+ Copyright (C) 2014 Martin Vincent
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
+
 #ifndef INTERFACE_BASIC_H_
 #define INTERFACE_BASIC_H_
 
@@ -45,29 +46,6 @@ public:
 
 		//TODO obj_func -> check dim match with dim_config
 	}
-
-	/**
-	 * Optimize the given objective.
-	 * Returns results for all lambda values.
-	 *
-	 * @param lambda_sequence lambda sequence to optimize over
-	 * @return respectively fitted parameter values, objective function values and penalised objective function_value.
-	 */
-	boost::tuple<sgl::block_vector_field, sgl::vector, sgl::vector>
-	optimize(sgl::vector const& lambda_sequence) const;
-
-	/**
-	 * Optimize the given objective.
-	 * Returns results only for the lambda values with indices given in needed_solutions.
-	 * This reduces memory use.
-	 *
-	 * @param lambda_sequence the lambda sequence to optimize over
-	 * @param needed_solutions indices of the lambda values for the needed solutions
-	 * @return respectively fitted parameter values, objective function values and penalised objective function_value.
-	 */
-	boost::tuple<sgl::block_vector_field, sgl::vector, sgl::vector>
-	optimize(sgl::vector const& lambda_sequence,
-			sgl::natural_vector needed_solutions) const;
 
 	/**
 	 * Optimize the given objective.
@@ -146,50 +124,6 @@ sgl::vector Interface<CONFIG, ObjectiveFunctionType>::lambda_sequence(
 }
 
 template<typename CONFIG, typename ObjectiveFunctionType>
-inline boost::tuple<sgl::block_vector_field, sgl::vector, sgl::vector> Interface<
-		CONFIG, ObjectiveFunctionType>::optimize(
-		const sgl::vector & lambda_sequence) const {
-
-	//Domain checks
-	if (!sgl::is_decreasing(lambda_sequence)
-			|| !sgl::is_positive(lambda_sequence)) {
-		throw std::domain_error(
-				"the lambda sequence must be decreasing and positive");
-	}
-
-	sgl::natural_vector needed_solutions(lambda_sequence.n_elem);
-	sgl::seq(needed_solutions, 0, 1);
-
-	typename ObjectiveFunctionType::instance_type objective =
-			objective_type.create_instance(sgl.setup);
-
-	return optimizer.optimize(objective, lambda_sequence, needed_solutions,
-			true);
-}
-
-template<typename CONFIG, typename ObjectiveFunctionType>
-inline boost::tuple<sgl::block_vector_field, sgl::vector, sgl::vector> Interface<
-		CONFIG, ObjectiveFunctionType>::optimize(
-		const sgl::vector & lambda_sequence,
-		sgl::natural_vector needed_solutions) const {
-
-	//Domain checks
-	if (!sgl::is_decreasing(lambda_sequence)
-			|| !sgl::is_positive(lambda_sequence)) {
-		throw std::domain_error(
-				"the lambda sequence must be decreasing and positive");
-	}
-
-	//TODO check that all elements of needed_solutions are unique and less than the length of lambda_sequence
-
-	typename ObjectiveFunctionType::instance_type objective =
-			objective_type.create_instance();
-
-	return optimizer.optimize(objective, lambda_sequence, needed_solutions,
-			true);
-}
-
-template<typename CONFIG, typename ObjectiveFunctionType>
 inline sgl::natural Interface<CONFIG, ObjectiveFunctionType>::optimize(
 		sgl::parameter_field & x_field, sgl::natural_vector needed_solutions,
 		sgl::vector & object_value, sgl::vector & function_value,
@@ -235,149 +169,24 @@ inline boost::tuple<arma::field<arma::field<typename Predictor::response_type> >
 
 	//TODO domain checks
 
-	sgl::natural n_subsamples = training_samples.n_elem;
-
-	//Result matrix
-    arma::field < arma::field<typename Predictor::response_type>
-			> response_field_subsamples(n_subsamples);
-
-	sgl::natural_matrix number_of_features(n_subsamples,
-			lambda_sequence.n_elem);
-	sgl::natural_matrix number_of_parameters(n_subsamples,
-			lambda_sequence.n_elem);
-
-	bool exception_caught = false;
-    std::string exception_msg;
-
-	// create progress monitor
-	Progress p(lambda_sequence.n_elem * n_subsamples, sgl.config.verbose);
-
-
-#ifdef SGL_USE_OPENMP
-	omp_set_num_threads(number_of_threads);
-
-#pragma omp parallel for schedule(dynamic)
+	if(number_of_threads > 1) {
+#ifndef SGL_OPENMP_SUPP
+	report_warning("Openmp not supported -- will only use one thread")
+#else
+#ifndef SGL_USE_OPENMP
+#define SGL_USE_OPENMP
 #endif
-	for (int i = 0; i < static_cast<int>(n_subsamples); i++) {
-
-		if ( ! exception_caught || ! p.is_aborted() ) {
-
-			try {
-
-				ObjectiveFunctionType traning_objective; //Note traning_objective stores the X matrix
-				typename ObjectiveFunctionType::data_type test_data;
-
-#ifdef SGL_USE_OPENMP
-#pragma omp critical
+#include"subsampling.h"
 #endif
-				{
-                    traning_objective.set_data(objective_type.data.subdata(training_samples(i)));
-                    test_data = objective_type.data.subdata(test_samples(i));
-				}
-
-				typename ObjectiveFunctionType::instance_type objective(
-						traning_objective.create_instance(sgl.setup));
-
-				//Response field
-                arma::field<typename Predictor::response_type> response_field(
-						test_samples(i).size(), lambda_sequence.n_elem);
-
-				//Fit
-				sgl::parameter x(sgl.setup);
-				sgl::parameter x0(sgl.setup);
-				sgl::vector gradient(sgl.setup.dim);
-
-				//Start at zero
-				x.zeros();
-				x0.zeros();
-				objective.at_zero();
-				gradient = objective.gradient();
-
-				//Lambda loop
-				sgl::natural lambda_index = 0;
-
-				while (true) {
-
-					sgl::numeric const lambda = lambda_sequence(lambda_index);
-
-					optimizer.optimize_single(x, x0, gradient, objective,
-							lambda);
-
-					//set number of features / parameters
-					number_of_features(i, lambda_index) = x.n_nonzero_blocks;
-					number_of_parameters(i, lambda_index) = x.n_nonzero;
-
-					//Predict fold
-					response_field.col(lambda_index) = predictor.predict(
-							test_data, x);
-
-					//next lambda
-					++lambda_index;
-
-                    //Increas progress monitor
-					p.increment();
-
-					if (lambda_index >= lambda_sequence.n_elem) {
-						//No more lambda values - exit
-						break;
-					}
-
-					//Go one step back, (avoid computing the gradient) - hence start at x0
-					x = x0;
-					objective.at(x0);
-
-				}
-
-#ifdef SGL_USE_OPENMP
-#pragma omp critical
-#endif
-				{
-					response_field_subsamples(i) = response_field;
-				}
-			} catch (SGL_EXCEPTIONS & ex) {
-
-#ifdef SGL_USE_OPENMP
-#pragma omp critical //Needed in the case when tow or more threads throws an exception at the same time
-#endif
-				{
-					if (!exception_caught) {
-
-						//Mark exception caught
-						exception_caught = true;
-
-						//Copy msg
-						if (ex.what() != NULL) {
-							exception_msg = ex.what();
-						}
-
-						else {
-							exception_msg = "Unknown error";
-						}
-
-						//Interrupt all threads
-						SGL_INTERRUPT;
-
-					}
-				}
-			}
-		}
+		// this point will not be reached
 	}
 
-	if (exception_caught) {
-
-		SGL_INTERRUPT_RESET;
-
-		//handle exception
-
-		throw std::runtime_error(exception_msg.c_str());
-	}
-
-	if(p.is_aborted()) {
-		throw std::runtime_error("Aborted by user");
-	}
-
-	return boost::make_tuple(response_field_subsamples, number_of_features,
-			number_of_parameters);
+#ifdef SGL_USE_OPENMP
+#undef SGL_USE_OPENMP
+#endif
+		//No openmp
+		#include"subsampling.h"
+		// this point will not be reached
 }
 
 #endif /* INTERFACE_BASIC_H_ */

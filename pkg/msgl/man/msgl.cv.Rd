@@ -97,7 +97,7 @@ lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 25L, lambda.min = 0.03)
 fit.cv <- msgl.cv(x, classes, alpha = .5, lambda = lambda)
 
 # Missclassification count
-#TODO colSums(fit.cv$classes != classes)
+colSums(fit.cv$classes != classes)
 }
 \author{
   Martin Vincent

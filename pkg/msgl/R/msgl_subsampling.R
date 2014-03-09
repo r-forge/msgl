@@ -38,20 +38,23 @@
 #' classes <- sim.data$classes
 #' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.03)
 #'
-#' test <- replicate(5, sample(1:length(classes))[1:20], simplify = FALSE)
+#' test <- replicate(2, sample(1:length(classes))[1:20], simplify = FALSE)
 #' train <- lapply(test, function(s) (1:length(classes))[-s])
 #'
 #' fit.sub <- msgl.subsampling(x, classes, alpha = .5, lambda = lambda,
 #'  training = train, test = test)
 #'
 #' # Missclassification count of second subsample
-#' #TODO colSums(fit.sub$classes[[2]] != classes[test[[2]]])
+#' # subsample 1
+#' colSums(fit.sub$classes[[1]] != classes[test[[1]]])
+#' # subsample 2
+#' colSums(fit.sub$classes[[2]] != classes[test[[2]]])
 #' @author Martin Vincent
 #' @export
 #' @useDynLib msgl .registration=TRUE
 msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, standardize = TRUE,
                 lambda, training, test, sparse.data = FALSE, collapse = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
-
+	
         # Default values
         if(is.null(grouping)) {
                 covariateGrouping <- factor(1:ncol(x))
@@ -97,35 +100,21 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
                 res <- sgl_subsampling("msgl_dense", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, collapse, max.threads, algorithm.config)
         }
 
-		#TODO organize output and set dimnames
+		### Responses
+		res$classes <- res$responses$classes
+		res$response <- res$responses$response
+		res$link <- res$responses$link
+		res$responses <- NULL
 		
-        ### Reorganize
-
-#	res_reorg <- list()
-#	res_reorg$classes <- lapply(res$responses, function(x) x$classes + 1)
-#	res_reorg$response <- lapply(res$responses, function(x) x$response)
-#	res_reorg$link <- lapply(res$responses, function(x) x$link)
-#	res_reorg$features <- res$features
-#	res_reorg$parameters <- res$parameters
-
-#	res <- res_reorg
-
-        ### Set correct dim names
-#        dim.names <- list(data$group.names, data$sample.names)
-#
-#        for(i in 1:length(test)) {
-#
-#                #Set class names
-#                rownames(res$classes[[i]]) <- dim.names[[2]][test[[i]]]
-#
-#                if(!is.null(dim.names[[1]])) {
-#                        res$classes[[i]] <- apply(X = res$classes[[i]], MARGIN = c(1,2), FUN = function(x) dim.names[[1]][x])
-#                }
-#
-#                res$link[[i]] <- lapply(X = res$link[[i]], FUN = function(m) {dimnames(m) <- list(dim.names[[1]], dim.names[[2]][test[[i]]]); m})
-#                res$response[[i]] <- lapply(X = res$response[[i]], FUN = function(m) {dimnames(m) <- list(dim.names[[1]], dim.names[[2]][test[[i]]]); m})
-#        }
-
+		# Set class names
+		if(!is.null(data$group.names)) {
+			for(i in 1:length(training)) {
+				res$classes[[i]] <- apply(X = res$classes[[i]], MARGIN = c(1,2), FUN = function(x) data$group.names[x])
+				res$link[[i]] <- lapply(X = res$link[[i]], FUN = function(m) {rownames(m) <- data$group.names; m})
+				res$response[[i]] <- lapply(X = res$response[[i]], FUN = function(m) {rownames(m) <- data$group.names; m})
+			}
+		}
+		
         res$msgl_version <- packageVersion("msgl")
 
         class(res) <- "msgl"
