@@ -171,7 +171,7 @@ inline boost::tuple<arma::field<arma::field<typename Predictor::response_type> >
 
 	if(number_of_threads > 1) {
 #ifndef SGL_OPENMP_SUPP
-	report_warning("Openmp not supported -- will only use one thread")
+	report_warning("Openmp not supported -- will only use one thread");
 #else
 #ifndef SGL_USE_OPENMP
 #define SGL_USE_OPENMP
