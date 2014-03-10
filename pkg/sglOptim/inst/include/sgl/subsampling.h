@@ -16,6 +16,8 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
+//TODO make this a 'dynamic' function and compile two versions one with omp on and one with omp off
+
 sgl::natural n_subsamples = training_samples.n_elem;
 
 //Result matrix
