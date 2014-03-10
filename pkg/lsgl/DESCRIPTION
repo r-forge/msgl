@@ -5,7 +5,7 @@ Version: 0.0.80
 Date: 2013-20-05
 Author: Martin Vincent
 Maintainer: Martin Vincent <vincent@math.ku.dk>
-Description: 
+Description: Linear sparse group lasso
 URL: http://arxiv.org/abs/1205.1245 http://arma.sourceforge.net/,
     http://www.boost.org/
 License: GPL (>= 2)
