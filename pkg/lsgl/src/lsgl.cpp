@@ -110,7 +110,7 @@ extern "C" {
 	void R_init_lsgl(DllInfo *info);
 }
 
-void R_init_msgl(DllInfo *info)
+void R_init_lsgl(DllInfo *info)
 {
 	// Print warnings
 #ifndef SGL_OPENMP_SUPP

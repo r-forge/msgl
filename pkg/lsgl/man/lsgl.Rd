@@ -1,6 +1,6 @@
 \name{lsgl}
 \alias{lsgl}
-\title{Fit}
+\title{Fit a linear multi-response model using sparse group lasso}
 \usage{
   lsgl(x, y, weights = rep(1/nrow(x), nrow(x)),
     sampleGrouping = factor(rep(1, nrow(x))),
@@ -11,13 +11,13 @@
     algorithm.config = sgl.standard.config)
 }
 \arguments{
-  \item{x}{}
+  \item{x}{design matrix, matrix of size \eqn{N \times p}.}
 
-  \item{y}{}
+  \item{y}{response, vector of size \eqn{N}.}
 
-  \item{weights}{}
+  \item{weights,}{sample weights a vector of size \eqn{N}.}
 
-  \item{sampleGrouping}{}
+  \item{sampleGrouping,}{vector of size \eqn{N}}
 
   \item{covariateGrouping}{grouping of covariates, a factor
   or vector of length \eqn{p}. Each element of the
@@ -33,17 +33,41 @@
   for lasso, between 0 and 1 gives a sparse group lasso
   penalty.}
 
-  \item{lambd}{lambda sequence.}
+  \item{lambda}{the lambda sequence.}
 
   \item{algorithm.config}{the algorithm configuration to be
   used.}
 }
 \value{
-  a vector of length \code{d} containing the compute lambda
-  sequence.
+  \item{beta}{the fitted parameters -- a list of length
+  \code{length(lambda)} with each entry a matrix of size
+  \eqn{K\times (p+1)}.} \item{loss}{the values of the loss
+  function.} \item{objective}{the values of the objective
+  function (i.e. loss + penalty).} \item{lambda}{the lambda
+  values used.}
 }
 \description{
-  Fit
+  For a linear multi-response model with \eqn{p} covariates
+  dived into \eqn{m} groups using sparse group lasso.
+}
+\details{
+  This function computes a sequence of minimizers (one for
+  each lambda given in the \code{lambda} argument) of
+  \deqn{R(\beta) + \lambda \left( (1-\alpha) \sum_{J=1}^m
+  \gamma_J \|\beta^{(J)}\|_2 + \alpha \sum_{i=1}^{n} \xi_i
+  |\beta_i| \right)} where \eqn{R} is given below. The
+  vector \eqn{\beta^{(J)}} denotes the parameters
+  associated with the \eqn{J}'th group of covariates. The
+  group weights are denoted by \eqn{\gamma \in
+  [0,\infty)^m} and the parameter weights by \eqn{\xi =
+  (\xi^{(1)},\dots, \xi^{(m)}) \in [0,\infty)^n} with
+  \eqn{\xi^{(1)}\in [0,\infty)^{n_1},\dots, \xi^{(m)} \in
+  [0,\infty)^{n_m}}.
+
+  \deqn{R(\beta) = \sum_{i=1}^N w_i \left(y_i -
+  \beta_{0g_i}\sum_{j=1}^p \beta_{g_ij}x_j\right)} where
+  \eqn{w} is the sample weights and \eqn{g} the sample
+  grouping.
 }
 \author{
   Martin Vincent

@@ -1,24 +1,21 @@
-\name{lsgl.cv}
-\alias{lsgl.cv}
+\name{lsgl.multi.cv}
+\alias{lsgl.multi.cv}
 \title{Cross validation using multiple possessors}
 \usage{
-  lsgl.cv(x, y, weights = rep(1/nrow(x), nrow(x)),
-    sampleGrouping = factor(rep(1, nrow(x))),
-    covariateGrouping = factor(1:ncol(x)),
-    groupWeights = c(sqrt(length(levels(sampleGrouping)) * table(covariateGrouping))),
-    parameterWeights = matrix(1, nrow = length(levels(sampleGrouping)), ncol = ncol(x)),
+  lsgl.multi.cv(X, Y, weights = rep(1/nrow(X), nrow(X)),
+    covariateGrouping = factor(1:ncol(X)),
+    groupWeights = NULL, parameterWeights = NULL,
     alpha = 0.5, lambda, fold = 10L, cv.indices = list(),
     max.threads = 2L,
     algorithm.config = sgl.standard.config)
 }
 \arguments{
-  \item{x}{}
+  \item{X}{design matrix, matrix of size \eqn{N \times p}.}
 
-  \item{y}{}
+  \item{Y}{response matrix, matrix of size \eqn{N \times
+  K}.}
 
-  \item{weights}{}
-
-  \item{sampleGrouping}{}
+  \item{weights,}{sample weights a vector of size \eqn{N}.}
 
   \item{covariateGrouping}{grouping of covariates, a factor
   or vector of length \eqn{p}. Each element of the
@@ -34,7 +31,7 @@
   for lasso, between 0 and 1 gives a sparse group lasso
   penalty.}
 
-  \item{lambd}{lambda sequence.}
+  \item{lambda}{lambda sequence.}
 
   \item{fold}{}
 

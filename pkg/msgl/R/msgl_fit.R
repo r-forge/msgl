@@ -22,7 +22,7 @@
 #' Fit a multinomial sparse group lasso regularization path.
 #'
 #' For a classification problem with  \eqn{K} classes and \eqn{p} covariates dived into \eqn{m} groups.
-#' A sequence of minimizers (one for each lambda given in the \code{lambda} argument) of
+#' This function computes a sequence of minimizers (one for each lambda given in the \code{lambda} argument) of
 #' \deqn{\hat R(\beta) + \lambda \left( (1-\alpha) \sum_{J=1}^m \gamma_J \|\beta^{(J)}\|_2 + \alpha \sum_{i=1}^{n} \xi_i |\beta_i| \right)}
 #' where \eqn{\hat R} is the weighted empirical log-likelihood risk of the multinomial regression model.
 #' The vector \eqn{\beta^{(J)}} denotes the parameters associated with the \eqn{J}'th group of covariates

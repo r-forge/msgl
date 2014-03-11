@@ -66,21 +66,21 @@
 }
 \description{
   For a classification problem with \eqn{K} classes and
-  \eqn{p} covariates dived into \eqn{m} groups. A sequence
-  of minimizers (one for each lambda given in the
-  \code{lambda} argument) of \deqn{\hat R(\beta) + \lambda
-  \left( (1-\alpha) \sum_{J=1}^m \gamma_J \|\beta^{(J)}\|_2
-  + \alpha \sum_{i=1}^{n} \xi_i |\beta_i| \right)} where
-  \eqn{\hat R} is the weighted empirical log-likelihood
-  risk of the multinomial regression model. The vector
-  \eqn{\beta^{(J)}} denotes the parameters associated with
-  the \eqn{J}'th group of covariates (default is one
-  covariate per group, hence the default dimension of
-  \eqn{\beta^{(J)}} is \eqn{K}). The group weights
-  \eqn{\gamma \in [0,\infty)^m} and the parameter weights
-  \eqn{\xi = (\xi^{(1)},\dots, \xi^{(m)}) \in [0,\infty)^n}
-  with \eqn{\xi^{(1)}\in [0,\infty)^{n_1},\dots, \xi^{(m)}
-  \in [0,\infty)^{n_m}}.
+  \eqn{p} covariates dived into \eqn{m} groups. This
+  function computes a sequence of minimizers (one for each
+  lambda given in the \code{lambda} argument) of \deqn{\hat
+  R(\beta) + \lambda \left( (1-\alpha) \sum_{J=1}^m
+  \gamma_J \|\beta^{(J)}\|_2 + \alpha \sum_{i=1}^{n} \xi_i
+  |\beta_i| \right)} where \eqn{\hat R} is the weighted
+  empirical log-likelihood risk of the multinomial
+  regression model. The vector \eqn{\beta^{(J)}} denotes
+  the parameters associated with the \eqn{J}'th group of
+  covariates (default is one covariate per group, hence the
+  default dimension of \eqn{\beta^{(J)}} is \eqn{K}). The
+  group weights \eqn{\gamma \in [0,\infty)^m} and the
+  parameter weights \eqn{\xi = (\xi^{(1)},\dots, \xi^{(m)})
+  \in [0,\infty)^n} with \eqn{\xi^{(1)}\in
+  [0,\infty)^{n_1},\dots, \xi^{(m)} \in [0,\infty)^{n_m}}.
 }
 \examples{
 data(SimData)
