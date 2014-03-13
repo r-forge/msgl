@@ -56,7 +56,6 @@
 #include "multinomial_loss.h"
 
 #define OBJECTIVE multinomial
-#define DATA sgl::WeightedGroupedMatrixData < sgl::matrix >
 
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>
@@ -75,7 +74,6 @@
 // Reset macros
 #undef MODULE_NAME
 #undef OBJECTIVE
-#undef DATA
 #undef PREDICTOR
 
 // Module name
@@ -84,7 +82,6 @@
 //Objective
 #include "multinomial_loss.h"
 #define OBJECTIVE multinomial_spx
-#define DATA sgl::WeightedGroupedMatrixData < sgl::sparse_matrix >
 
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>

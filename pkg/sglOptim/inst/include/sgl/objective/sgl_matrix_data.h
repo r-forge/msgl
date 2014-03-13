@@ -19,8 +19,12 @@
 #ifndef MSGL_MATRIX_DATA_H_
 #define MSGL_MATRIX_DATA_H_
 
+//TODO clean up, n_samples, n_groups should be function and DataPackage should check that they all return the same result if present
+
 template<typename T>
-	const T getData(rList const& rdata, std::string const& name) {
+	const T getData(rList const& rdata, char const symbol) {
+
+		std::string const name(1, symbol);
 
 		int index;
 		if (index = rdata.getIndex(name), index >= 0) {
@@ -84,12 +88,21 @@ public:
         this->validity();
 	}
 
-	MatrixData(rList const& rdata) : data_matrix(getData<T>(rdata, "X")), n_samples(data_matrix.n_rows) {
+	MatrixData(rList const& rdata) : data_matrix(getData<T>(rdata, 'X')), n_samples(data_matrix.n_rows) {
         this->validity();
 	}
 
     ~MatrixData() {
 	}
+
+    MatrixData<T> & operator =(MatrixData<T> const& source) {
+
+    	if (this != &source) {
+    		set_matrix(source.data_matrix);
+    	}
+
+    	return *this;
+    }
 
     const MatrixData<T> subdata(sgl::natural_vector const& samples) const {
         return MatrixData<T>(submatrix<T>(data_matrix, samples));
@@ -113,228 +126,207 @@ private:
     }
 };
 
-template<typename T>
-class GroupedMatrixData: public MatrixData<T> {
+class GroupData {
 
 public:
 
 	sgl::natural_vector const grouping; // grouping
 	sgl::natural const n_groups;
 
-	using MatrixData<T>::data_matrix;
-	using MatrixData<T>::n_samples;
-
-	GroupedMatrixData() :
-			MatrixData<T>(), grouping(static_cast<sgl::natural>(0)), n_groups(0) {
+	GroupData() :
+			grouping(), n_groups(0) {
 	}
 
-	GroupedMatrixData(T const& data_matrix, sgl::natural_vector const& grouping) :
-			MatrixData<T>(data_matrix), grouping(grouping), n_groups(max(grouping)+1) {
+	GroupData(sgl::natural_vector const& grouping) :
+			grouping(grouping), n_groups(max(grouping)+1) {}
 
-		this->validity();
+	GroupData(rList const& rdata) : grouping(getData<sgl::natural_vector>(rdata, 'G')), n_groups(max(grouping)+1) {
 	}
 
-    GroupedMatrixData(MatrixData<T> const& data, sgl::natural_vector const& grouping) :
-            MatrixData<T>(data), grouping(grouping), n_groups(max(grouping)+1) {
+	GroupData(GroupData const& data) :
+			grouping(data.grouping), n_groups(max(grouping)+1) {}
 
-        this->validity();
-    }
+	GroupData & operator =(GroupData const& source) {
 
-	GroupedMatrixData(rList const& rdata) : MatrixData<T>(rdata), grouping(getData<sgl::natural_vector>(rdata, "G")), n_groups(max(grouping)+1) {
-		this->validity();
-	}
+		if (this != &source) {
+			set_grouping(source.grouping);
+		}
 
-	GroupedMatrixData(GroupedMatrixData<T> const& data) :
-			MatrixData<T>(data), grouping(data.grouping), n_groups(max(grouping)+1) {
+		return *this;
 	}
 
 	void set_grouping(sgl::natural_vector const& grouping) {
 
 		const_cast<sgl::natural_vector&>(this->grouping) = grouping;
 		const_cast<sgl::natural&>(this->n_groups) = max(grouping)+1;
-
-		this->validity();
 	}
 
-	GroupedMatrixData<T> & operator =(GroupedMatrixData<T> const& other) {
-
-		if (this != &other) {
-
-			set_matrix(other.data_matrix);
-			set_grouping(other.grouping);
-		}
-
-		return *this;
-	}
-
-    const GroupedMatrixData<T> subdata(sgl::natural_vector const& samples) const {
-        return GroupedMatrixData<T>(MatrixData<T>::subdata(samples), grouping(samples));
+    const GroupData subdata(sgl::natural_vector const& samples) const {
+        return GroupData(grouping(samples));
     }
-
-private:
-
-	void validity() {
-
-		//TODO error msgs
-		//TODO domain checks grouping - all groups represented from 0 to max??
-
-		if (this->grouping.n_elem != n_samples) {
-            throw std::domain_error("The number of elements in the grouping vector is not equal to the number of samples");
-		}
-	}
 };
 
-template<typename T>
-class WeightedGroupedMatrixData: public GroupedMatrixData<T> {
+template<char symbol>
+class MultiResponse {
 
 public:
 
-	sgl::vector const weights;
+	sgl::matrix const response; // data matrix rows -> samples, cols -> features
+	sgl::natural const n_groups; // responses per sample
 
-	using GroupedMatrixData<T>::data_matrix;
-	using GroupedMatrixData<T>::n_samples;
-	using GroupedMatrixData<T>::grouping;
-	using GroupedMatrixData<T>::n_groups;
-
-
-	WeightedGroupedMatrixData() :
-		GroupedMatrixData<T>(), weights(static_cast<sgl::natural>(0)) {
+	MultiResponse() : response(), n_groups(0) {
 	}
 
-	WeightedGroupedMatrixData(T const& data_matrix,
-			sgl::natural_vector const& grouping,
-			sgl::vector const& weights) :
-				GroupedMatrixData<T>(data_matrix, grouping), weights(weights) {
-
-		this->validity();
+	MultiResponse(sgl::matrix const& response) :
+		response(response), n_groups(response.n_cols) {
 	}
 
-    WeightedGroupedMatrixData(GroupedMatrixData<T> const& gdata, sgl::vector const& weights) :
-                GroupedMatrixData<T>(gdata), weights(weights) {
+	MultiResponse(MultiResponse<symbol> const& data) :
+		response(data.response), n_groups(data.n_groups) {
+	}
 
-        this->validity();
+	MultiResponse(rList const& rdata) : response(getData<sgl::matrix>(rdata, symbol)), n_groups(response.n_cols) {
+	}
+
+
+	MultiResponse<symbol> & operator =(MultiResponse<symbol> const& source) {
+
+    	if (this != &source) {
+    		set_matrix(source.response);
+    	}
+
+    	return *this;
     }
 
-	WeightedGroupedMatrixData(rList const& rdata) : GroupedMatrixData<T>(rdata), weights(getData<sgl::vector>(rdata, "W")) {
-		this->validity();
-	}
-
-	WeightedGroupedMatrixData(WeightedGroupedMatrixData const& s) :
-		GroupedMatrixData<T>(s.data_matrix, s.grouping), weights(s.weights) {
-		this->validity();
-	}
-
-	void set_weights(sgl::vector const& weights) {
-		const_cast<sgl::vector&>(this->weights) = weights;
-
-		this->validity();
-	}
-
-	WeightedGroupedMatrixData<T> & operator =(
-			WeightedGroupedMatrixData<T> const& source) {
-
-		if (this != &source) {
-
-			this->set_matrix(source.data_matrix);
-			this->set_grouping(source.grouping);
-			this->set_weights(source.weights);
-		}
-
-		return *this;
-	}
-
-    const WeightedGroupedMatrixData<T> subdata(sgl::natural_vector const& samples) const {
-        return WeightedGroupedMatrixData<T>(GroupedMatrixData<T>::subdata(samples), weights(samples));
+    const MultiResponse<symbol> subdata(sgl::natural_vector const& samples) const {
+        return MultiResponse<symbol>(submatrix<sgl::matrix>(response, samples));
     }
 
-private:
-
-	void validity() {
-
-		//TODO error msgs
-		//TODO domain checks grouping - all groups represented from 0 to max??
-
-        if (weights.n_elem != n_samples) {
-            throw std::domain_error("The number of elements in the sample weight vector is not equal to the number of samples");
-		}
+	void set_matrix(sgl::matrix const& response) {
+		const_cast<sgl::matrix&>(this->response) = response;
+		const_cast<sgl::natural&>(this->n_groups) = response.n_cols;
 	}
 };
 
-template<typename T, typename S>
-class WeightedResponseGroupedMatrixData: public WeightedGroupedMatrixData<T> {
-
+template<typename D, char symbol>
+class Data {
 
 public:
 
-	S const response;
+	D const data;
 
-	using WeightedGroupedMatrixData<T>::data_matrix;
-	using WeightedGroupedMatrixData<T>::n_samples;
-	using WeightedGroupedMatrixData<T>::grouping;
-	using WeightedGroupedMatrixData<T>::n_groups;
-	using WeightedGroupedMatrixData<T>::weights;
+	Data() : data() {}
 
+	Data(D const& data) :
+			data(data) {}
 
-	WeightedResponseGroupedMatrixData() :
-		WeightedGroupedMatrixData<T>(), response(static_cast<sgl::natural>(0)) {
+	Data(rList const& rdata) : data(getData<D>(rdata, symbol)) {
 	}
 
-	WeightedResponseGroupedMatrixData(T const& data_matrix,
-			sgl::natural_vector const& grouping,
-			sgl::vector const& weights, S const& response) :
-				WeightedGroupedMatrixData<T>(data_matrix, grouping, weights), response(response) {
+	Data(Data<D, symbol> const& data) :
+			data(data.data) {}
 
-		this->validity();
-	}
-
-    WeightedResponseGroupedMatrixData(WeightedGroupedMatrixData<T> const& wgdata, S const& response) :
-                WeightedGroupedMatrixData<T>(wgdata), response(response) {
-
-        this->validity();
-    }
-
-	WeightedResponseGroupedMatrixData(rList const& rdata) : WeightedGroupedMatrixData<T>(rdata), response(getData<S>(rdata, "Y")) {
-		this->validity();
-	}
-
-	WeightedResponseGroupedMatrixData(WeightedResponseGroupedMatrixData const& s) :
-		WeightedGroupedMatrixData<T>(s), response(s.response) {
-		this->validity();
-	}
-
-	void set_response(S const& response) {
-		const_cast<S&>(this->response) = response;
-
-		this->validity();
-	}
-
-	WeightedResponseGroupedMatrixData<T, S> & operator =(
-			WeightedResponseGroupedMatrixData<T, S> const& source) {
+	Data<D, symbol> & operator =(Data<D, symbol> const& source) {
 
 		if (this != &source) {
-
-			this->set_matrix(source.data_matrix);
-			this->set_grouping(source.grouping);
-			this->set_weights(source.weights);
-			this->set_response(source.response);
+			set_data(source.data);
 		}
 
 		return *this;
 	}
 
-    const WeightedResponseGroupedMatrixData<T, S> subdata(sgl::natural_vector const& samples) const {
-        return WeightedResponseGroupedMatrixData<T, S>(WeightedGroupedMatrixData<T>::subdata(samples), response(samples));
-    }
-
-private:
-
-	void validity() {
-
-        if (response.n_elem != n_samples) {
-            throw std::domain_error("The number of elements in the response vector is not equal to the number of samples");
-		}
+	void set_data(D const& data) {
+		const_cast<D&>(this->data) = data;
 	}
 
+    const Data subdata(sgl::natural_vector const& samples) const {
+        return Data(data(samples));
+    }
+
+};
+
+template<typename A, typename B>
+class DataPackage_2 : public A, public B {
+
+public:
+
+	DataPackage_2() : A(), B() {}
+
+	DataPackage_2(rList const& data) : A(data), B(data) {}
+
+	DataPackage_2(A const& a, B const& b) : A(a), B(b) {}
+
+	A const& get_A() const {
+		return static_cast<A const&>(*this);
+	}
+
+	B const& get_B() const {
+		return static_cast<B const&>(*this);
+	}
+
+	const DataPackage_2<A, B> subdata(sgl::natural_vector const& samples) const {
+			return DataPackage_2<A, B>(A::subdata(samples), B::subdata(samples));
+		}
+};
+
+template<typename A, typename B, typename C>
+class DataPackage_3 : public A, public B, public C {
+
+public:
+
+	DataPackage_3() : A(), B(), C() {}
+
+	DataPackage_3(rList const& data) : A(data), B(data), C(data) {}
+
+	DataPackage_3(A const& a, B const& b, C const& c) : A(a), B(b), C(c) {}
+
+	A const& get_A() const {
+		return static_cast<A const&>(*this);
+	}
+
+	B const& get_B() const {
+		return static_cast<B const&>(*this);
+	}
+
+	C const& get_C() const {
+		return static_cast<C const&>(*this);
+	}
+
+	const DataPackage_3<A, B, C> subdata(sgl::natural_vector const& samples) const {
+			return DataPackage_3<A, B, C>(A::subdata(samples), B::subdata(samples), C::subdata(samples));
+		}
+};
+
+template<typename A, typename B, typename C, typename D>
+class DataPackage_4 : public A, public B, public C, public D {
+
+public:
+
+	DataPackage_4() : A(), B(), C(), D() {}
+
+	DataPackage_4(rList const& data) : A(data), B(data), C(data), D(data) {}
+
+	DataPackage_4(A const& a, B const& b, C const& c, D const& d) : A(a), B(b), C(c), D(d) {}
+
+	A const& get_A() const {
+		return static_cast<A const&>(*this);
+	}
+
+	B const& get_B() const {
+		return static_cast<B const&>(*this);
+	}
+
+	C const& get_C() const {
+		return static_cast<C const&>(*this);
+	}
+
+	D const& get_D() const {
+		return static_cast<D const&>(*this);
+	}
+
+	const DataPackage_4<A, B, C, D> subdata(sgl::natural_vector const& samples) const {
+			return DataPackage_4<A, B, C, D>(A::subdata(samples), B::subdata(samples), C::subdata(samples), D::subdata(samples));
+		}
 };
 
 #endif /* MSGL_MATRIX_DATA_H_ */

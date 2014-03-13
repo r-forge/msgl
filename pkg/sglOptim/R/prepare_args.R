@@ -63,7 +63,17 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 		data$X <- as.matrix(x)
 	}
 
-	data$Y <- as.numeric(y)
+	if(is.null(y)) {
+		data$Y <- NULL
+	} else if(is.vector(y)) {
+		data$Y <- as.numeric(y)
+	} else if(is.matrix(y)) {
+		data$Y <- apply(y, 2, as.numeric)
+	} else {
+		stop("y is of unknown type")
+	}
+	
+	
 	data$W <- as.numeric(weights)
 	
 	# sample grouping

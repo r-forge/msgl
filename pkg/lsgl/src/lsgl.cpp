@@ -16,6 +16,9 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
+//Uncomment to turn on debuging
+//#undef NDEBUG
+
 //Configuration
 //Debugging
 #ifndef NDEBUG
@@ -35,7 +38,7 @@
 #define SGL_CATCH_EXCEPTIONS
 
 //Should the timers be activated (only needed for profiling the code)
-//#define SGL_TIMING
+#define SGL_TIMING
 
 //Sgl optimizer
 #include <sgl.h>
@@ -50,10 +53,9 @@
 #define MODULE_NAME lsgl_dense
 
 //Objective
-#include "linear_objective.h"
+#include "fobenius_norm_objective.h"
 
-#define OBJECTIVE linear
-#define DATA sgl::WeightedResponseGroupedMatrixData < sgl::matrix , sgl::vector >
+#define OBJECTIVE fobenius
 
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>
@@ -71,17 +73,15 @@
 // Reset macros
 #undef MODULE_NAME
 #undef OBJECTIVE
-#undef DATA
 #undef PREDICTOR
 
 // Module name
 #define MODULE_NAME lsgl_sparse
 
 //Objective
-#include "linear_objective.h"
+#include "fobenius_norm_objective.h"
 
-#define OBJECTIVE linear_spx
-#define DATA sgl::WeightedResponseGroupedMatrixData < sgl::sparse_matrix , sgl::vector >
+#define OBJECTIVE fobenius_spx
 
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>

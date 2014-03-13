@@ -26,30 +26,38 @@ class MultinomialLoss {
 public:
 
 	const sgl::natural n_samples;
-	const sgl::natural n_classes;
+	const sgl::natural n_responses; //number of classes
 
 private:
 
 	sgl::natural_vector const& Y;
 	sgl::vector const& W; //weights - vector of length n_samples
 
-	sgl::matrix prob; //probabilities: n_samples x n_classes
+	sgl::matrix prob; //probabilities: n_samples x n_responses
 
 public:
 
-	typedef sgl::WeightedGroupedMatrixData < T > data_type;
+	static const bool hessian_is_constant = false;
+	typedef sgl::hessian_full hessian_type;
+
+	typedef sgl::DataPackage_3< sgl::MatrixData<T>,
+			sgl::GroupData,
+			sgl::Data<sgl::vector, 'W'> > data_type;
 
 	mutable sgl::matrix_field hessian_matrices;
 	mutable bool hessians_computed;
 
 
 	MultinomialLoss() :
-            n_samples(0), n_classes(0), Y(sgl::null_natural_vector), W(sgl::null_vector), prob(n_samples, n_classes), hessian_matrices(), hessians_computed(false) {
+            n_samples(0), n_responses(0), Y(sgl::null_natural_vector), W(sgl::null_vector), prob(n_samples, n_responses), hessian_matrices(), hessians_computed(false) {
 	}
 
 	MultinomialLoss(data_type const& data) :
-			n_samples(data.grouping.n_elem), n_classes(max(data.grouping) + 1), Y(data.grouping), W(data.weights), prob(
-					n_samples, n_classes), hessian_matrices(n_samples), hessians_computed(false) {
+			n_samples(data.get_A().n_samples),
+			n_responses(data.get_B().n_groups),
+			Y(data.get_B().grouping),
+			W(data.get_C().data),
+			prob(n_samples, n_responses), hessian_matrices(n_samples), hessians_computed(false) {
 
 		set_lp_zero();
 	}
@@ -105,7 +113,7 @@ public:
 
 };
 
-// linp n_samples x n_classes the linear predictors
+// linp n_samples x n_responses the linear predictors
 template<typename T>
 void MultinomialLoss<T>::set_lp(sgl::matrix const& linp) {
 
@@ -124,7 +132,7 @@ void MultinomialLoss<T>::set_lp(sgl::matrix const& linp) {
 template<typename T>
 void MultinomialLoss<T>::set_lp_zero() {
 
-	prob.fill(1 / static_cast<sgl::numeric>(n_classes));
+	prob.fill(1 / static_cast<sgl::numeric>(n_responses));
 	hessians_computed = false;
 }
 

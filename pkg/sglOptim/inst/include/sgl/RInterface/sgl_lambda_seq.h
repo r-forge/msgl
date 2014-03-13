@@ -37,7 +37,7 @@ SEXP FUN_NAME(sgl_lambda, MODULE_NAME) (SEXP r_data, SEXP r_block_dim, SEXP r_bl
 
 	//Data and objective
 	const rList data_rList(r_data);
-	const DATA data(data_rList);
+	const OBJECTIVE::data_type data(data_rList);
 	const OBJECTIVE obj_type(data);
 
 	//Penalty and otimizer

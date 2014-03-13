@@ -23,8 +23,7 @@
 #' 
 #' @param x
 #' @param y
-#' @param weights
-#' @param sampleGrouping
+#' @param intercept
 #' @param covariateGrouping grouping of covariates, a factor or vector of length \eqn{p}. Each element of the factor/vector specifying the group of the covariate. 
 #' @param groupWeights the group weights, a vector of length \eqn{m+1} (the number of groups). 
 #' @param parameterWeights a matrix of size \eqn{K \times (p+1)}. 
@@ -38,11 +37,10 @@
 #' @author Martin Vincent
 #' @useDynLib lsgl .registration=TRUE
 #' @export
-lsgl.cv <- function(x, y, weights = rep(1/nrow(x), nrow(x)), 
-		sampleGrouping = factor(rep(1, nrow(x))), 
+lsgl.cv <- function(x, y, intercept = TRUE,
 		covariateGrouping = factor(1:ncol(x)), 
-		groupWeights = c(sqrt(length(levels(sampleGrouping))*table(covariateGrouping))),
-		parameterWeights =  matrix(1, nrow = length(levels(sampleGrouping)), ncol = ncol(x)), 
+		groupWeights = c(sqrt(ncol(y)*table(covariateGrouping))),
+		parameterWeights =  matrix(1, nrow = ncol(y), ncol = ncol(x)), 
 		alpha = 0.5, lambda, fold = 10L, cv.indices = list(), max.threads = 2L,
 		algorithm.config = sgl.standard.config) 
 {
@@ -51,13 +49,15 @@ lsgl.cv <- function(x, y, weights = rep(1/nrow(x), nrow(x)),
 	sampleGrouping <- factor(sampleGrouping)
 	
 	# add intercept
-	x <- cBind(Intercept = rep(1, nrow(x)), x)
-	groupWeights <- c(0, groupWeights)
-	parameterWeights <- cbind(rep(0, length(levels(sampleGrouping))), parameterWeights)
-	covariateGrouping <- factor(c("Intercept", as.character(covariateGrouping)), levels = c("Intercept", levels(covariateGrouping)))
+	if(intercept) {
+		x <- cBind(Intercept = rep(1, nrow(x)), x)
+		groupWeights <- c(0, groupWeights)
+		parameterWeights <- cbind(rep(0, ncol(y)), parameterWeights)
+		covariateGrouping <- factor(c("Intercept", as.character(covariateGrouping)), levels = c("Intercept", levels(covariateGrouping)))
+	}
 	
 	# create data
-	data <- create.sgldata(x, y, weights, sampleGrouping)
+	data <- create.sgldata(x, y, sampleGrouping = 1:ncol(y))
 	
 	# call SglOptimizer function
 	if(data$sparseX) {
@@ -69,6 +69,8 @@ lsgl.cv <- function(x, y, weights = rep(1/nrow(x), nrow(x)),
 		res <- sgl_cv("lsgl_dense", "lsgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, fold, cv.indices, max.threads, algorithm.config)
 		
 	}
+	
+	res$intercept <- intercept
 	
 	class(res) <- "lsgl"
 	return(res)

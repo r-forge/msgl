@@ -29,7 +29,11 @@
 #' @export
 predict.lsgl <- function(object, x, ...) 
 {
-	x <- cBind(Intercept = rep(1, nrow(x)), x)
+	
+	if(object$intercept){
+		# add intercept
+		x <- cBind(Intercept = rep(1, nrow(x)), x)
+	}	
 	
 	data <- list()
 	

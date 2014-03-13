@@ -19,6 +19,8 @@
 #ifndef GET_VALUE_H_
 #define GET_VALUE_H_
 
+//TODO check that SEXP type match type
+
 template<typename type>
 type get_value(SEXP exp) {
 	// no code should go here

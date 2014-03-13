@@ -19,12 +19,43 @@
 #ifndef MSGL_MG_LOSS_H_
 #define MSGL_MG_LOSS_H_
 
+class hessian_diagonal {
+	//TODO
+};
+
+class hessian_identity {
+
+public:
+	typedef double representation;
+
+	static void add(sgl::matrix & x, sgl::natural j, sgl::natural k, sgl::natural n_groups, double v, double H) {
+		x.submat(j * n_groups, k * n_groups,
+					(j + 1) * n_groups - 1, (k + 1) * n_groups - 1).diag() += v * H;
+	}
+
+};
+
+class hessian_full {
+
+public:
+	typedef sgl::matrix representation;
+
+	static void add(sgl::matrix & x, sgl::natural j, sgl::natural k, sgl::natural n_groups, double v, sgl::matrix const& H) {
+		x.submat(j * n_groups, k * n_groups,
+					(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += v * H;
+	}
+
+};
+
+
 template < typename T , typename E >
 class GenralizedLinearLossBase: public T {
 
 public:
 
 	typedef typename T::data_type data_type;
+
+	typedef typename T::hessian_type hessian_type;
 
 	sgl::DimConfig const& dim_config;
 
@@ -75,7 +106,7 @@ public:
 
 	static sgl::natural compute_unit_size(data_type const& data)
 	{
-		return max(data.grouping) + 1;
+		return data.n_responses;
 	}
 
 	static sgl::natural compute_number_of_units(data_type const& data)
@@ -95,7 +126,7 @@ GenralizedLinearLossBase < T , E >::GenralizedLinearLossBase(data_type const& da
 			dim_config(dim_config),
 			X(data.data_matrix),
 			n_samples(data.n_samples),
-			n_groups(max(data.grouping) + 1),
+			n_groups(data.n_groups),
 			n_features(X.n_cols),
 			partial_hessian(n_groups, n_samples),
 			hessian_diag_mat_computed(dim_config.n_blocks),
@@ -143,7 +174,11 @@ void GenralizedLinearLossBase < T , E >::at(const sgl::parameter & parameters)
 	T::set_lp(lp);
 
 	partial_hessian.zeros();
-	hessian_diag_mat_computed.zeros();
+
+	if(!T::hessian_is_constant) {
+		hessian_diag_mat_computed.zeros();
+	}
+
 	compute_hessian_norm();
 }
 
@@ -222,6 +257,7 @@ public:
 	typedef sgl::matrix matrix_type;
 
 	typedef typename GenralizedLinearLossBase < T , matrix_type >::data_type data_type;
+	typedef typename GenralizedLinearLossBase < T , matrix_type >::hessian_type hessian_type;
 
 	using GenralizedLinearLossBase < T , matrix_type >::dim_config;
 
@@ -285,15 +321,16 @@ inline sgl::matrix const GenralizedLinearLossDense < T >::hessian_diag(
 	for (sgl::natural i = 0; i < n_samples; ++i)
 	{
 
-		sgl::matrix H = T::hessians(i);
+		typename hessian_type::representation H = T::hessians(i);
 
 		for (sgl::natural j = 0; j < tmp.n_cols; ++j)
 		{
 			for (sgl::natural k = j; k < tmp.n_cols; ++k)
 			{
-				hessian_diag_mat(block_index).submat(j * n_groups, k * n_groups,
-						(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += tmp(i, j) * tmp(i, k)
-						* H;
+				hessian_type::add(hessian_diag_mat(block_index), j, k, n_groups, tmp(i, j) * tmp(i, k), H);
+//				hessian_diag_mat(block_index).submat(j * n_groups, k * n_groups,
+//						(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += tmp(i, j) * tmp(i, k)
+//						* H;
 
 			}
 		}
@@ -343,6 +380,8 @@ public:
 	typedef sgl::sparse_matrix matrix_type;
 
 	typedef typename GenralizedLinearLossBase < T , matrix_type >::data_type data_type;
+
+	typedef typename GenralizedLinearLossBase < T , matrix_type >::hessian_type hessian_type;
 
 	using GenralizedLinearLossBase < T , matrix_type >::dim_config;
 
@@ -464,9 +503,11 @@ inline sgl::matrix const GenralizedLinearLossSparse < T >::hessian_diag(
 
 				if (vi2 != 0)
 				{
-					hessian_diag_mat(block_index).submat(j * n_groups, k * n_groups,
-							(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += vi2 * tmp.values[i1]
-							* T::hessians(row1);
+					hessian_type::add(hessian_diag_mat(block_index), j, k, n_groups, vi2 * tmp.values[i1], T::hessians(row1));
+
+//					hessian_diag_mat(block_index).submat(j * n_groups, k * n_groups,
+//							(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += vi2 * tmp.values[i1]
+//							* T::hessians(row1);
 				}
 			}
 		}

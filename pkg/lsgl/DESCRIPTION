@@ -19,4 +19,3 @@ Collate:
     'lsgl_fit.R'
     'lsgl_cv.R'
     'lsgl_predict.R'
-    'lsgl_multi.R'

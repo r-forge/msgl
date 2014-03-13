@@ -1,8 +1,5 @@
 export(lsgl)
 export(lsgl.cv)
 export(lsgl.lambda)
-export(lsgl.multi)
-export(lsgl.multi.cv)
-export(lsgl.multi.lambda)
 export(predict.lsgl)
 useDynLib(lsgl,.registration=TRUE)

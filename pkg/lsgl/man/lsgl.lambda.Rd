@@ -2,22 +2,19 @@
 \alias{lsgl.lambda}
 \title{Compute a lambda sequence for the regularization path}
 \usage{
-  lsgl.lambda(x, y, weights = rep(1/nrow(x), nrow(x)),
-    sampleGrouping = factor(rep(1, nrow(x))),
+  lsgl.lambda(x, y, intercept = TRUE,
     covariateGrouping = factor(1:ncol(x)),
-    groupWeights = c(sqrt(length(levels(sampleGrouping)) * table(covariateGrouping))),
-    parameterWeights = matrix(1, nrow = length(levels(sampleGrouping)), ncol = ncol(x)),
+    groupWeights = c(sqrt(ncol(y) * table(covariateGrouping))),
+    parameterWeights = matrix(1, nrow = ncol(y), ncol = ncol(x)),
     alpha = 0.5, d = 100L, lambda.min,
     algorithm.config = sgl.standard.config)
 }
 \arguments{
-  \item{x}{}
+  \item{X}{}
 
-  \item{y}{}
+  \item{Y}{}
 
-  \item{weights}{}
-
-  \item{sampleGrouping}{}
+  \item{intercept}{}
 
   \item{covariateGrouping}{grouping of covariates, a factor
   or vector of length \eqn{p}. Each element of the

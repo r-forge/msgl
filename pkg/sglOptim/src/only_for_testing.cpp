@@ -53,7 +53,6 @@
 #define MODULE_NAME sgl_test_dense
 
 #define OBJECTIVE linear_test
-#define DATA sgl::WeightedResponseGroupedMatrixData < sgl::matrix , sgl::vector >
 
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>
@@ -71,14 +70,12 @@
 // Reset macros
 #undef MODULE_NAME
 #undef OBJECTIVE
-#undef DATA
 #undef PREDICTOR
 
 // Module name
 #define MODULE_NAME sgl_test_sparse
 
 #define OBJECTIVE linear_test_spx
-#define DATA sgl::WeightedResponseGroupedMatrixData < sgl::sparse_matrix , sgl::vector >
 
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>
