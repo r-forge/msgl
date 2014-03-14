@@ -53,7 +53,7 @@
 #define MODULE_NAME lsgl_dense
 
 //Objective
-#include "fobenius_norm_objective.h"
+#include "frobenius_norm_objective.h"
 
 #define OBJECTIVE fobenius
 
@@ -79,7 +79,7 @@
 #define MODULE_NAME lsgl_sparse
 
 //Objective
-#include "fobenius_norm_objective.h"
+#include "frobenius_norm_objective.h"
 
 #define OBJECTIVE fobenius_spx
 

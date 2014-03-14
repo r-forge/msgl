@@ -41,8 +41,8 @@ public:
 	FobeniusLoss()
 			: 	n_samples(0),
 				n_responses(0),
-				Y(),
-				W(),
+				Y(sgl::null_matrix),
+				W(sgl::null_vector),
 				lp(n_samples, n_responses),
 				hessian_matrices(static_cast < sgl::natural >(0)),
 				hessians_computed(false)

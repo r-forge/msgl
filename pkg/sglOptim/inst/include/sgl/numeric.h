@@ -64,8 +64,9 @@ typedef vector parameter_block_vector;
 
 //Null vectors
 
-static const natural_vector null_natural_vector(static_cast<arma::u32>(0));
-static const vector null_vector(static_cast<arma::u32>(0));
+static const natural_vector null_natural_vector;
+static const vector null_vector;
+static const matrix null_matrix;
 
 //Number of non zero elements
 
