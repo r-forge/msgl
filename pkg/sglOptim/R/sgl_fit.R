@@ -46,6 +46,7 @@
 #' \item{lambda}{the lambda values used.}
 #' @author Martin Vincent
 #' @export
+#' @useDynLib sglOptim .registration=TRUE
 #' @import Matrix
 sgl_fit <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config = sgl.standard.config) {
 	

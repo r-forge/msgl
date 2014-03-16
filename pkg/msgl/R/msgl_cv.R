@@ -137,7 +137,8 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 			res$response <- lapply(X = res$response, FUN = function(m) {rownames(m) <- data$group.names; m})
 		}
 
-        res$msgl_version <- packageVersion("msgl")
+		res$classes.true <- classes
+		res$msgl_version <- packageVersion("msgl")
 
         class(res) <- "msgl"
         return(res)

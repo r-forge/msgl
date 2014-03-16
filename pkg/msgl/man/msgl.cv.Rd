@@ -6,8 +6,8 @@
     grouping = NULL, groupWeights = NULL,
     parameterWeights = NULL, alpha = 0.5,
     standardize = TRUE, lambda, fold = 10L,
-    cv.indices = list(), sparse.data = FALSE,
-    max.threads = 2L,
+    cv.indices = list(),
+    sparse.data = is(x, "sparseMatrix"), max.threads = 2L,
     algorithm.config = sgl.standard.config)
 }
 \arguments{

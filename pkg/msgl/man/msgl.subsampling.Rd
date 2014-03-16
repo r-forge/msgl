@@ -7,7 +7,7 @@
     grouping = NULL, groupWeights = NULL,
     parameterWeights = NULL, alpha = 0.5,
     standardize = TRUE, lambda, training, test,
-    sparse.data = FALSE, collapse = FALSE,
+    sparse.data = is(x, "sparseMatrix"), collapse = FALSE,
     max.threads = 2L,
     algorithm.config = sgl.standard.config)
 }

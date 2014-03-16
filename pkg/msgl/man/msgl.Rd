@@ -7,7 +7,7 @@
     grouping = NULL, groupWeights = NULL,
     parameterWeights = NULL, alpha = 0.5,
     standardize = TRUE, lambda, return = 1:length(lambda),
-    sparse.data = FALSE,
+    sparse.data = is(x, "sparseMatrix"),
     algorithm.config = sgl.standard.config)
 }
 \arguments{

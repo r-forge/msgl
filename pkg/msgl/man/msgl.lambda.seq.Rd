@@ -6,7 +6,8 @@
     sampleWeights = rep(1/length(classes), length(classes)),
     grouping = NULL, groupWeights = NULL,
     parameterWeights = NULL, alpha = 0.5, d = 100L,
-    standardize = TRUE, lambda.min, sparse.data = FALSE,
+    standardize = TRUE, lambda.min,
+    sparse.data = is(x, "sparseMatrix"),
     algorithm.config = sgl.standard.config)
 }
 \arguments{

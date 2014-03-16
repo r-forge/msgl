@@ -19,41 +19,163 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-Err <- function(x, type = "count") { #type = count, rate
+#' Compute the classification error rate 
+#' 
+#' @param x a msgl object
+#' @param type 
+#' @return a vector of error rates
+#' 
+#' @author Martin Vincent
+#' @examples
+#' data(SimData)
+#' x <- sim.data$x
+#' classes <- sim.data$classes
+#' 
+#' # Fit model
+#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.01)
+#' fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+#' 
+#' # Training misclassification error
+#' Err(fit, x)
+#' 
+#' # Misclassification error of xnew
+#' Err(fit, x.new, classes.new)
+#' 
+#' # Do cross validation
+#' fit.cv <- msgl.cv(x, classes, alpha = .5, lambda = lambda)
+#' 
+#' # Cross validation (expected) misclassification error 
+#' Err(fit.cv)
+#' 
+#' # Do subsampling
+#' test <- replicate(2, sample(1:length(classes))[1:20], simplify = FALSE)
+#' train <- lapply(test, function(s) (1:length(classes))[-s])
+#'
+#' fit.sub <- msgl.subsampling(x, classes, alpha = .5, lambda = lambda,
+#'  training = train, test = test)
+#' 
+#' # Mean misclassification error of the tests
+#' Err(fit.sub)
+#'  
+#' @export
+Err <- function(object, x = NULL, classes = object$classes.true, type = "rate") { #type = count, rate
+	
+	if(!is.null(x)) {
+		return(Err(object = predict(object, x), x = NULL, type = type, classes = classes))
+	}
+	
+	if(any(names(object) == "classes")) {
+		
+		if(is.null(classes)) {
+			stop("true classes not found")
+		}
+		
+		if(is.list(object$classes)) {
+			#FIXME
+			err.count <- lapply(object$classes, function(y) colSums(y != classes))
+		} else {
+			err.count <- colSums(object$classes != classes)
+		}
+	} else {
+		stop("no classes found")				
+	}
+	
+	if(type=="rate") {
+		return(err.count/length(classes))
+	}
+	
+	if(type=="count") {
+		return(err.count)
+	}
+	
+	stop("Unknown type")
 	
 }
 
-features <- function(x) {
-
-  if(class(x) == "msgl") {
-      return(sapply(x$beta, function(beta) sum(colSums(beta != 0) != 0)))
-  }
-  
-  stop("Unknown object class")
-
+#' todo
+#' @param x 
+#' @param ... 
+#' @return a list of nonzero features (that is nonzero colums of the beta matrices)
+#' 
+#' @author martin
+#' @method features msgl
+#' @S3method features msgl
+#' @export
+features.msgl <- function(x, ...) {
+	class(x) <- "sgl" # Use std function
+	return(features(x))
 }
 
-parameters <- function(x) {
-
-  if(class(x) == "msgl") {
-      return(sapply(x$beta, function(beta) sum(beta != 0)))
-  }
-  
-  stop("Unknown object class")
+#' todo
+#' @param x 
+#' @param ... 
+#' @return todo
+#' 
+#' @author martin
+#' @method parameters msgl
+#' @S3method parameters msgl
+#' @export
+parameters.msgl <- function(x, ...) {
+	class(x) <- "sgl" # Use std function
+	return(parameters(x))
 }
 
-models <- function(x, index = 1:nmod(x)) {
-  return(x$beta[index])
+#' todo
+#' @param x 
+#' @param ... 
+#' @return todo
+#' 
+#' @author martin
+#' @method nmod msgl
+#' @S3method nmod msgl
+#' @export
+nmod.msgl <- function(x, ...) {
+	class(x) <- "sgl" # Use std function
+	return(nmod(x))
 }
 
-coef <- function(x, index = 1:nmod(x)) {
+#' Exstract the estimated models
+#' 
+#' @param x a msgl object 
+#' @param index the models to be returned
+#' @return a list of sparse matrices
+#' 
+#' @author Martin Vincent
+#' @method models msgl
+#' @S3method models msgl
+#' @export
+models.msgl <- function(x, index = 1:nmod(x), ...) {
+	class(x) <- "sgl" # Use std function
+	return(models(x))
+}
 
-  featurenames = if(is.null(colnames(x$beta[[1]]))) 1:ncol(x$beta[[1]]) else colnames(x$beta[[1]])
-
-  return(lapply(x$beta[index], function(beta) beta[,colSums(beta != 0) != 0]))
+#' todo
+#' @param x 
+#' @param index 
+#' @param ... 
+#' @return todo
+#' 
+#' @author martin
+#' @method coef msgl
+#' @S3method coef msgl
+#' @export
+coef.msgl <- function(x, index = 1:nmod(x), ...) {
+	class(x) <- "sgl" # Use std function
+	return(coef(x))
 }
 
 
+#' Print function for msgl
+#'
+#' This funtion will print some general information about the msgl object
+#'  
+#' @param x msgl object
+#' @param ... not used
+#' 
+#' @method print msgl
+#' @S3method print msgl
+#' @author Martin Vincent
+#' @export
 print.msgl <- function(x, ...) {
 
 	#FIXME check that  object$msgl_version exsists

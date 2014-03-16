@@ -27,3 +27,4 @@ Collate:
     'sgl_predict.R'
     'sgl_cv.R'
     'sgl_subsampling.R'
+    'sgl_navigate.R'

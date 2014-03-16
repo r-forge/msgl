@@ -2,8 +2,8 @@
 \alias{predict.msgl}
 \title{Predict}
 \usage{
-  \method{predict}{msgl} (object, x, sparse.data = FALSE,
-    ...)
+  \method{predict}{msgl} (object, x,
+    sparse.data = is(x, "sparseMatrix"), ...)
 }
 \arguments{
   \item{object}{an object of class msgl, produced with

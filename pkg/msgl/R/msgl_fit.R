@@ -114,6 +114,7 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
                 res$beta <- .to_org_scale(beta = res$beta, x.scale = x.scale, x.center = x.center)
         }
 
+		res$classes.true <- classes
         res$msgl_version <- packageVersion("msgl")
 
         class(res) <- "msgl"
