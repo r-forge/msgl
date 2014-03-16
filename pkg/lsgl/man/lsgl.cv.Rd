@@ -8,7 +8,7 @@
     parameterWeights = matrix(1, nrow = ncol(y), ncol = ncol(x)),
     alpha = 0.5, lambda, fold = 10L, cv.indices = list(),
     max.threads = 2L,
-    algorithm.config = sgl.standard.config)
+    algorithm.config = lsgl.standard.config)
 }
 \arguments{
   \item{x}{}

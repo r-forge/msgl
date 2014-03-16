@@ -7,7 +7,7 @@
     groupWeights = c(sqrt(ncol(y) * table(covariateGrouping))),
     parameterWeights = matrix(1, nrow = ncol(y), ncol = ncol(x)),
     alpha = 0.5, d = 100L, lambda.min,
-    algorithm.config = sgl.standard.config)
+    algorithm.config = lsgl.standard.config)
 }
 \arguments{
   \item{X}{}

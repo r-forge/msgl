@@ -25,13 +25,13 @@
 #' @S3method predict msgl
 #' @export
 #' @useDynLib msgl .registration=TRUE
-predict.msgl <- function(object, x, sparse.data = FALSE, ...) {
+predict.msgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...) {
 
         x <- cBind(Intercept = rep(1, nrow(x)), x)
 
         data <- list()
 
-        if(is(x, "sparseMatrix")) {
+        if(sparse.data) {
 
                 x <- as(x, "CsparseMatrix")
                 data$X <- list(dim(x), x@p, x@i, x@x)

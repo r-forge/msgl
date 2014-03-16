@@ -462,6 +462,7 @@ inline void SglOptimizer < SGL >::optimize_quadratic(T & objective, sgl::paramet
 				}
 				else
 				{
+					TIMER_START;
 
 					block_is_active = sgl.is_block_active(
 							block_gradient
@@ -472,6 +473,8 @@ inline void SglOptimizer < SGL >::optimize_quadratic(T & objective, sgl::paramet
 
 				if (block_is_active)
 				{
+
+					TIMER_START;
 
 					sgl::parameter_block_vector x_block(x.block(block_index));
 
@@ -491,12 +494,6 @@ inline void SglOptimizer < SGL >::optimize_quadratic(T & objective, sgl::paramet
 					{
 						dist = dist_block;
 					}
-
-					//TODO remove
-					//double const discrete_dist_block = sgl::discrete_dist(x_block, x_new);
-//					if (discrete_dist < discrete_dist_block) {
-//						discrete_dist = discrete_dist_block;
-//					}
 
 					objective.hessian_update(block_index, x_new);
 

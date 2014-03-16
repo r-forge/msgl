@@ -28,8 +28,7 @@ private:
 
 public:
 
-	static const bool hessian_is_constant = true;
-	typedef sgl::hessian_identity hessian_type;
+	typedef sgl::hessian_identity<true> hessian_type; //constant hessians of type double * Id
 	//typedef sgl::hessian_full hessian_type;
 
 	typedef sgl::DataPackage_3< sgl::MatrixData<T>,

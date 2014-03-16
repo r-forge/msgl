@@ -48,9 +48,49 @@
 #' \item{objective}{the values of the objective function (i.e. loss + penalty).}
 #' \item{lambda}{the lambda values used.}
 #' @author Martin Vincent
+#' #' @examples
+#' 
+#' ## Simulate from Y=XB+E, the dimension of Y is N x K, X is N x p, B is p x K 
+#' 
+#' N <- 100 #number of samples
+#' p <- 50 #number of covariates
+#' K <- 25  #number of groups
+#' 
+#' Y<-matrix(0,nrow=N,ncol=K)
+#' X<-matrix(rnorm(N*p,1,1),nrow=N,ncol=p)
+#' B<-matrix(rbinom(p*K,1,0.01),nrow=p,ncol=K) 
+#' 
+#' Y<-X%*%B+matrix(rnorm(N*K,0,1),N,K)	
+#' 
+#' lambda<-lsgl.lambda(X,Y, alpha=1, lambda.min=.5, intercept=FALSE)
+#' 
+#' fit <-lsgl(X,Y, alpha=1, lambda = lambda, intercept=FALSE)
+#' 
+#' ## ||B - \beta||_F
+#' sapply(fit$beta, function(beta) sum((B - beta)^2))
+#' 
+#' ## Plot
+#' par(mfrow = c(3,1))
+#' image(B, main = "True B")
+#' image(as.matrix(fit$beta[[50]]), main = "Estimated B(50)")
+#' image(as.matrix(fit$beta[[100]]), main = "Estimated B(100)")
+#' 
+#' ## Predict Y
+#' res <- predict(fit, X)
+#' 
+#' # The weighted norm of the residuals 
+#' sapply(res$Yhat, function(Yhat) 1/N*sum((Y-Yhat)^2))
+#' # In this cases this is simply the loss function
+#' fit$loss
 #' @useDynLib lsgl .registration=TRUE
 #' @export
-lsgl <- function(x, y, intercept = TRUE, covariateGrouping = factor(1:ncol(x)), groupWeights = c(sqrt(ncol(y)*table(covariateGrouping))), parameterWeights =  matrix(1, nrow = ncol(y), ncol = ncol(x)), alpha = 0.5, lambda, algorithm.config = sgl.standard.config) 
+#' @import Matrix
+#' @import sglOptim
+lsgl <- function(x, y, intercept = TRUE, 
+		covariateGrouping = factor(1:ncol(x)), 
+		groupWeights = c(sqrt(ncol(y)*table(covariateGrouping))), 
+		parameterWeights =  matrix(1, nrow = ncol(y), ncol = ncol(x)), 
+		alpha = 0.5, lambda, algorithm.config = lsgl.standard.config) 
 {
 	if(nrow(x) != nrow(y)) {
 		stop("x and y must have the same number of rows")
@@ -77,6 +117,7 @@ lsgl <- function(x, y, intercept = TRUE, covariateGrouping = factor(1:ncol(x)), 
 		res <- sgl_fit("lsgl_dense", "lsgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
 	}
 	
+	res$beta <- lapply(res$beta, t) # Transpose all beta 
 	res$intercept <- intercept
 	
 	class(res) <- "lsgl"
@@ -102,7 +143,11 @@ lsgl <- function(x, y, intercept = TRUE, covariateGrouping = factor(1:ncol(x)), 
 #' @author Martin Vincent
 #' @useDynLib lsgl .registration=TRUE
 #' @export
-lsgl.lambda <- function(x, y, intercept = TRUE, covariateGrouping = factor(1:ncol(x)), groupWeights = c(sqrt(ncol(y)*table(covariateGrouping))), parameterWeights =  matrix(1, nrow = ncol(y), ncol = ncol(x)), alpha = 0.5, d = 100L, lambda.min, algorithm.config = sgl.standard.config) 
+lsgl.lambda <- function(x, y, intercept = TRUE, 
+		covariateGrouping = factor(1:ncol(x)), 
+		groupWeights = c(sqrt(ncol(y)*table(covariateGrouping))), 
+		parameterWeights =  matrix(1, nrow = ncol(y), ncol = ncol(x)), 
+		alpha = 0.5, d = 100L, lambda.min, algorithm.config = lsgl.standard.config) 
 {
 	if(nrow(x) != nrow(y)) {
 		stop("x and y must have the same number of rows")

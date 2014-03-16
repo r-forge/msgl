@@ -64,7 +64,7 @@
 #' @useDynLib msgl .registration=TRUE
 #' @import Matrix
 msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, standardize = TRUE,
-                lambda, return = 1:length(lambda), sparse.data = FALSE, algorithm.config = sgl.standard.config) {
+                lambda, return = 1:length(lambda), sparse.data = is(x, "sparseMatrix"), algorithm.config = sgl.standard.config) {
 
         # Default values
         if(is.null(grouping)) {
@@ -100,8 +100,8 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
         covariateGrouping <- factor(c("Intercept", as.character(covariateGrouping)), levels = c("Intercept", levels(covariateGrouping)))
 
         # create data
-        data <- create.sgldata(x, y = NULL, sampleWeights, classes)
-
+        data <- create.sgldata(x, y = NULL, sampleWeights, classes, sparseX = sparse.data)
+		
         # call SglOptimizer function
         if(data$sparseX) {
                 res <- sgl_fit("msgl_sparse", "msgl", data, covariateGrouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
@@ -151,7 +151,7 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 #' @author Martin Vincent
 #' @export
 #' @useDynLib msgl .registration=TRUE
-msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, d = 100L, standardize = TRUE, lambda.min, sparse.data = FALSE, algorithm.config = sgl.standard.config) {
+msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, d = 100L, standardize = TRUE, lambda.min, sparse.data = is(x, "sparseMatrix"), algorithm.config = sgl.standard.config) {
 
         # cast
         classes <- factor(classes)
@@ -187,7 +187,7 @@ msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), l
         covariateGrouping <- factor(c("Intercept", as.character(covariateGrouping)), levels = c("Intercept", levels(covariateGrouping)))
 
         # create data
-        data <- create.sgldata(x, y = NULL, sampleWeights, classes)
+        data <- create.sgldata(x, y = NULL, sampleWeights, classes, sparseX = sparse.data)
 
         # call SglOptimizer function
         if(data$sparseX) {

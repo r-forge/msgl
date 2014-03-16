@@ -23,9 +23,13 @@ class hessian_diagonal {
 	//TODO
 };
 
+template<bool constant = false>
 class hessian_identity {
 
 public:
+
+	static const bool is_constant = constant;
+
 	typedef double representation;
 
 	static void add(sgl::matrix & x, sgl::natural j, sgl::natural k, sgl::natural n_groups, double v, double H) {
@@ -35,9 +39,13 @@ public:
 
 };
 
+template<bool constant = false>
 class hessian_full {
 
 public:
+
+	static const bool is_constant = constant;
+
 	typedef sgl::matrix representation;
 
 	static void add(sgl::matrix & x, sgl::natural j, sgl::natural k, sgl::natural n_groups, double v, sgl::matrix const& H) {
@@ -77,6 +85,7 @@ protected:
 	sgl::numeric x_norm_max;
 	mutable sgl::numeric partial_hessian_norm;
 	mutable sgl::numeric level0_bound;
+	mutable bool recompute_hessian_norm;
 
 public:
 
@@ -123,17 +132,18 @@ template < typename T , typename E >
 GenralizedLinearLossBase < T , E >::GenralizedLinearLossBase(data_type const& data,
 		sgl::DimConfig const& dim_config)
 		: 	T(data),
-			dim_config(dim_config),
-			X(data.data_matrix),
-			n_samples(data.n_samples),
-			n_groups(data.n_groups),
-			n_features(X.n_cols),
-			partial_hessian(n_groups, n_samples),
-			hessian_diag_mat_computed(dim_config.n_blocks),
-			hessian_diag_mat(dim_config.n_blocks),
-			current_parameters(dim_config),
-			x_norm(dim_config.n_blocks)
-{
+		  	dim_config(dim_config),
+		  	X(data.data_matrix),
+		  	n_samples(data.n_samples),
+		  	n_groups(data.n_groups),
+		  	n_features(X.n_cols),
+		  	partial_hessian(n_groups, n_samples),
+		  	hessian_diag_mat_computed(dim_config.n_blocks),
+		  	hessian_diag_mat(dim_config.n_blocks),
+		  	current_parameters(dim_config),
+		  	x_norm(dim_config.n_blocks),
+		  	recompute_hessian_norm(true)
+		  	{
 
 	TIMER_START;
 
@@ -142,24 +152,18 @@ GenralizedLinearLossBase < T , E >::GenralizedLinearLossBase(data_type const& da
 		throw std::runtime_error("GenralizedLinearLossBase - Dimension mismatch");
 	}
 
-	//Initialize outer and x_norm
+	//Initialize x_norm
 	for (sgl::natural j = 0; j < dim_config.n_blocks; ++j)
 	{
-		x_norm(j) = as_scalar(
-				max(
-						sqrt(
-								sum(
-										square(
-												X.cols(
-														dim_config.block_start_index(j) / n_groups,
-														dim_config.block_end_index(j)
-																/ n_groups)))), 1));
+		x_norm(j) = as_scalar(max(sqrt(sum(square(
+				X.cols(dim_config.block_start_index(j) / n_groups,
+						dim_config.block_end_index(j) / n_groups)))), 1));
 	}
 
 	x_norm_max = x_norm.max();
 
 	at_zero();
-}
+		  	}
 
 template < typename T , typename E >
 void GenralizedLinearLossBase < T , E >::at(const sgl::parameter & parameters)
@@ -175,11 +179,11 @@ void GenralizedLinearLossBase < T , E >::at(const sgl::parameter & parameters)
 
 	partial_hessian.zeros();
 
-	if(!T::hessian_is_constant) {
+	if(!hessian_type::is_constant) {
 		hessian_diag_mat_computed.zeros();
 	}
 
-	compute_hessian_norm();
+	recompute_hessian_norm = true;
 }
 
 template < typename T , typename E >
@@ -191,7 +195,8 @@ void GenralizedLinearLossBase < T , E >::at_zero()
 
 	partial_hessian.zeros();
 	hessian_diag_mat_computed.zeros();
-	compute_hessian_norm();
+
+	recompute_hessian_norm = true;
 }
 
 template < typename T , typename E >
@@ -231,13 +236,25 @@ inline void GenralizedLinearLossBase < T , E >::compute_hessian_norm() const
 
 	TIMER_START;
 
+	if(!recompute_hessian_norm) {
+		return;
+	}
+
+	//TODO norm configable, 2-norm, 1-norm
+
 	partial_hessian_norm = sqrt(as_scalar(max(sum(square(partial_hessian), 1))));
+	//partial_hessian_norm = as_scalar(max(sum(abs(partial_hessian), 1)));
+
 	level0_bound = partial_hessian_norm * x_norm_max;
+
+	recompute_hessian_norm = false;
 }
 
 template < typename T , typename E >
 inline sgl::numeric GenralizedLinearLossBase < T , E >::hessian_bound_level0() const
 {
+	compute_hessian_norm();
+
 	return level0_bound;
 }
 
@@ -245,6 +262,8 @@ template < typename T , typename E >
 inline sgl::numeric GenralizedLinearLossBase < T , E >::hessian_bound_level1(
 		sgl::natural block_index) const
 {
+
+	compute_hessian_norm();
 
 	return partial_hessian_norm * x_norm(block_index);
 }
@@ -278,6 +297,7 @@ private:
 	using GenralizedLinearLossBase < T , matrix_type >::x_norm_max;
 	using GenralizedLinearLossBase < T , matrix_type >::partial_hessian_norm;
 	using GenralizedLinearLossBase < T , matrix_type >::level0_bound;
+	using GenralizedLinearLossBase < T , matrix_type >::recompute_hessian_norm;
 
 public:
 
@@ -314,25 +334,29 @@ inline sgl::matrix const GenralizedLinearLossDense < T >::hessian_diag(
 	hessian_diag_mat(block_index).zeros(dim_config.block_dim(block_index),
 			dim_config.block_dim(block_index));
 
-	sgl::matrix tmp(
-			X.cols(dim_config.block_start_index(block_index) / n_groups,
-					dim_config.block_end_index(block_index) / n_groups));
+	sgl::natural n_cols = (dim_config.block_end_index(block_index) - dim_config.block_start_index(block_index)) / n_groups + 1;
+	sgl::natural X_col_offset = dim_config.block_start_index(block_index) / n_groups;
 
-	for (sgl::natural i = 0; i < n_samples; ++i)
+	for (sgl::natural j = 0; j < n_cols; ++j)
 	{
-
-		typename hessian_type::representation H = T::hessians(i);
-
-		for (sgl::natural j = 0; j < tmp.n_cols; ++j)
+		for (sgl::natural k = j; k < n_cols; ++k)
 		{
-			for (sgl::natural k = j; k < tmp.n_cols; ++k)
-			{
-				hessian_type::add(hessian_diag_mat(block_index), j, k, n_groups, tmp(i, j) * tmp(i, k), H);
-//				hessian_diag_mat(block_index).submat(j * n_groups, k * n_groups,
-//						(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += tmp(i, j) * tmp(i, k)
-//						* H;
 
+			matrix_type::const_col_iterator j_col = X.begin_col(j + X_col_offset);
+			matrix_type::const_col_iterator k_col = X.begin_col(k + X_col_offset);
+
+			typename hessian_type::representation J((*j_col) * (*k_col) * T::hessians(0));
+
+			j_col++;
+			k_col++;
+
+			for (sgl::natural i = 1; i < n_samples; ++i, ++j_col, ++k_col)
+			{
+				J += (*j_col) * (*k_col) * T::hessians(i);
 			}
+
+			hessian_type::add(hessian_diag_mat(block_index), j, k, n_groups, 1, J);
+
 		}
 	}
 
@@ -346,29 +370,51 @@ inline sgl::matrix const GenralizedLinearLossDense < T >::hessian_diag(
 template < typename T >
 void GenralizedLinearLossDense < T >::hessian_update(sgl::natural block_index,
 		sgl::parameter_block_vector const& z)
-{
+		{
 
 	TIMER_START;
 
 	//Update
 	T::compute_hessians();
 
-	sgl::matrix tmp1 = X.cols(dim_config.block_start_index(block_index) / n_groups,
-			dim_config.block_end_index(block_index) / n_groups);
+	//	sgl::matrix tmp1 = X.cols(dim_config.block_start_index(block_index) / n_groups,
+	//			dim_config.block_end_index(block_index) / n_groups);
+	//
+	//	sgl::parameter_block_vector tmp2(z - current_parameters.block(block_index));
+	//	tmp2.reshape(n_groups, dim_config.block_dim(block_index) / n_groups);
+	//
+	//	for (sgl::natural i = 0; i < n_samples; ++i)
+	//	{
+	//		partial_hessian.col(i) += T::hessians(i) * (tmp2 * trans(tmp1.row(i)));
+	//	}
 
 	sgl::parameter_block_vector tmp2(z - current_parameters.block(block_index));
 	tmp2.reshape(n_groups, dim_config.block_dim(block_index) / n_groups);
 
-	for (sgl::natural i = 0; i < n_samples; ++i)
-	{
-		partial_hessian.col(i) += T::hessians(i) * (tmp2 * trans(tmp1.row(i)));
+	if(hessian_type::is_constant) {
+
+		partial_hessian += T::hessians(0)*tmp2*trans(X.cols(dim_config.block_start_index(block_index) / n_groups,
+				dim_config.block_end_index(block_index) / n_groups));
+
 	}
 
-	this->compute_hessian_norm();
+	else {
+
+		sgl::matrix tmp1(tmp2*trans(X.cols(dim_config.block_start_index(block_index) / n_groups,
+				dim_config.block_end_index(block_index) / n_groups)));
+
+		for (sgl::natural i = 0; i < n_samples; ++i)
+		{
+			partial_hessian.col(i) += T::hessians(i) * tmp1.col(i);
+		}
+
+	}
+
+	recompute_hessian_norm = true;
 
 	//Update current x
 	current_parameters.set_block(block_index, z);
-}
+		}
 
 // Sparse matrix specializations
 
@@ -402,6 +448,7 @@ private:
 	using GenralizedLinearLossBase < T , matrix_type >::x_norm_max;
 	using GenralizedLinearLossBase < T , matrix_type >::partial_hessian_norm;
 	using GenralizedLinearLossBase < T , matrix_type >::level0_bound;
+	using GenralizedLinearLossBase < T , matrix_type >::recompute_hessian_norm;
 
 public:
 
@@ -450,7 +497,7 @@ void GenralizedLinearLossSparse < T >::hessian_update(sgl::natural block_index,
 		}
 	}
 
-	this->compute_hessian_norm();
+	recompute_hessian_norm = true;
 
 	//Update current x
 	current_parameters.set_block(block_index, z);
@@ -460,6 +507,8 @@ template < typename T >
 inline sgl::matrix const GenralizedLinearLossSparse < T >::hessian_diag(
 		sgl::natural block_index) const
 {
+
+	//TODO optimize see DENSE
 
 	TIMER_START;
 

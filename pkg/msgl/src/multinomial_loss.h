@@ -37,8 +37,7 @@ private:
 
 public:
 
-	static const bool hessian_is_constant = false;
-	typedef sgl::hessian_full hessian_type;
+	typedef sgl::hessian_full<false> hessian_type; //general hessian - non constant
 
 	typedef sgl::DataPackage_3< sgl::MatrixData<T>,
 			sgl::GroupData,
@@ -68,7 +67,7 @@ public:
 
 	const sgl::matrix gradients() const {
 
-		sgl::matrix grad = trans(prob);
+		sgl::matrix grad(trans(prob));
 
 		for (sgl::natural i = 0; i < n_samples; ++i) {
 			grad(Y(i), i) -= 1;
@@ -116,8 +115,6 @@ public:
 // linp n_samples x n_responses the linear predictors
 template<typename T>
 void MultinomialLoss<T>::set_lp(sgl::matrix const& linp) {
-
-	TIMER_START;
 
 	prob = exp(linp);
 

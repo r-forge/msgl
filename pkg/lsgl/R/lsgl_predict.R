@@ -24,7 +24,8 @@
 #' @param object 
 #' @param x 
 #' @param ... 
-#' @return sgl object
+#' @return
+#' \item{Yhat}{the linear predictors -- a list of length \code{length(fit$beta)} one item for each model, with each item a matrix of size \eqn{N_\textrm{new} \times K} containing the linear predictors.}
 #' @author Martin Vincent
 #' @export
 predict.lsgl <- function(object, x, ...) 
@@ -34,6 +35,8 @@ predict.lsgl <- function(object, x, ...)
 		# add intercept
 		x <- cBind(Intercept = rep(1, nrow(x)), x)
 	}	
+	
+	object$beta <- lapply(object$beta, t)
 	
 	data <- list()
 	
@@ -52,6 +55,10 @@ predict.lsgl <- function(object, x, ...)
 		
 	}
 	
+	#Responses
+	
+	res$Yhat <- lapply(res$responses$link, t)
+	res$responses <- NULL
 	
 	return(res)
 }

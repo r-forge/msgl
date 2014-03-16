@@ -29,8 +29,8 @@ private:
 
 public:
 
-	static const bool hessian_is_constant = false; //TODO we should test true and false  (they are constant)
-	typedef sgl::hessian_full hessian_type; //TODO test all types
+	//TODO we should test true (constant hessian) and false  (they are constant)
+	typedef sgl::hessian_full<false> hessian_type; //TODO test all types
 	//typedef sgl::hessian_identity hessian_type;
 
 	typedef sgl::DataPackage_4< sgl::MatrixData<T>,

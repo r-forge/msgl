@@ -53,7 +53,7 @@
 #' @export
 #' @useDynLib msgl .registration=TRUE
 msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, standardize = TRUE,
-                lambda, training, test, sparse.data = FALSE, collapse = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
+                lambda, training, test, sparse.data = is(x, "sparseMatrix"), collapse = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
 	
         # Default values
         if(is.null(grouping)) {
@@ -89,7 +89,7 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
         covariateGrouping <- factor(c("Intercept", as.character(covariateGrouping)), levels = c("Intercept", levels(covariateGrouping)))
 
         # create data
-        data <- create.sgldata(x, y = NULL, sampleWeights, classes)
+        data <- create.sgldata(x, y = NULL, sampleWeights, classes, sparseX = sparse.data)
 
         # call sglOptim function
         if(data$sparseX) {
