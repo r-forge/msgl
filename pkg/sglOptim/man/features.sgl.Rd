@@ -1,22 +1,22 @@
 \name{features.sgl}
 \alias{features.sgl}
-\title{todo}
+\title{Extracting nonzero features}
 \usage{
-  \method{features}{sgl} (x, ...)
+  \method{features}{sgl} (object, ...)
 }
 \arguments{
-  \item{x}{}
+  \item{object}{a sgl object}
 
-  \item{...}{}
+  \item{...}{not used}
 }
 \value{
-  a list of nonzero features (that is nonzero colums of the
-  beta matrices)
+  a list of vectors containing the nonzero features (that
+  is nonzero columns of the \eqn{beta} matrices)
 }
 \description{
-  todo
+  Extracting nonzero features
 }
 \author{
-  martin
+  Martin Vincent
 }
 

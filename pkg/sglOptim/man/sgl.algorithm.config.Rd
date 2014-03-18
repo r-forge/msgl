@@ -64,7 +64,7 @@
   recommended to change any of the default values.
 }
 \examples{
-config.verbose <- sgl.algorithm.config(verbose = TRUE)
+config.no_progressbar <- sgl.algorithm.config(verbose = FALSE)
 }
 \author{
   Martin Vincent

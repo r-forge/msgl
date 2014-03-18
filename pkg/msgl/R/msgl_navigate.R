@@ -22,70 +22,81 @@
 #' Compute the classification error rate 
 #' 
 #' @param x a msgl object
-#' @param type 
+#' @param data a matrix of 
+#' @param response a vector of classes
+#' @param classes a vector of classes
+#' @param type type of error rate \code{rate} or \code{count}
+#' @param ... not used
 #' @return a vector of error rates
 #' 
 #' @author Martin Vincent
 #' @examples
 #' data(SimData)
-#' x <- sim.data$x
-#' classes <- sim.data$classes
+#' x.all <- sim.data$x
+#' x.1 <- sim.data$x[1:50,]
+#' x.2 <- sim.data$x[51:100,]
+#' classes.all <- sim.data$classes
+#' classes.1 <- sim.data$classes[1:50]
+#' classes.2 <- sim.data$classes[51:100]
 #' 
-#' # Fit model
-#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 100L, lambda.min = 0.01)
-#' fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+#' #### Fit models using x.1
+#' lambda <- msgl.lambda.seq(x.1, classes.1, alpha = .5, d = 25L, lambda.min = 0.03)
+#' fit <- msgl(x.1, classes.1, alpha = .5, lambda = lambda)
 #' 
-#' # Training misclassification error
-#' Err(fit, x)
+#' #### Training errors:
 #' 
-#' # Misclassification error of xnew
-#' Err(fit, x.new, classes.new)
+#' # Misclassification rate
+#' Err(fit, x.1)
 #' 
-#' # Do cross validation
-#' fit.cv <- msgl.cv(x, classes, alpha = .5, lambda = lambda)
+#' # Misclassification count
+#' Err(fit, x.1, type = "count")
 #' 
-#' # Cross validation (expected) misclassification error 
+#' # Negative log likelihood error
+#' Err(fit, x.1, type="loglike")
+#'  
+#' # Misclassification rate of x.2
+#' Err(fit, x.2, classes.2)
+#' 
+#' #### Do cross validation
+#' fit.cv <- msgl.cv(x.all, classes.all, alpha = .5, lambda = lambda)
+#' 
+#' #### Cross validation errors (estimated expected generalization error)
+#' 
+#' # Misclassification rate
 #' Err(fit.cv)
 #' 
-#' # Do subsampling
-#' test <- replicate(2, sample(1:length(classes))[1:20], simplify = FALSE)
-#' train <- lapply(test, function(s) (1:length(classes))[-s])
+#' # Negative log likelihood error
+#' Err(fit.cv, type="loglike")
+#' 
+#' #### Do subsampling
+#' test <- list(1:20, 21:40)
+#' train <- lapply(test, function(s) (1:length(classes.all))[-s])
 #'
-#' fit.sub <- msgl.subsampling(x, classes, alpha = .5, lambda = lambda,
-#'  training = train, test = test)
+#' fit.sub <- msgl.subsampling(x.all, classes.all, alpha = .5, lambda = lambda, training = train, test = test)
 #' 
 #' # Mean misclassification error of the tests
 #' Err(fit.sub)
+#' 
+#' # Negative log likelihood error
+#' Err(fit.sub, type="loglike")
 #'  
+#' @method Err msgl
+#' @S3method Err msgl
+#' @import sglOptim
 #' @export
-Err <- function(object, x = NULL, classes = object$classes.true, type = "rate") { #type = count, rate
-	
-	if(!is.null(x)) {
-		return(Err(object = predict(object, x), x = NULL, type = type, classes = classes))
-	}
-	
-	if(any(names(object) == "classes")) {
-		
-		if(is.null(classes)) {
-			stop("true classes not found")
-		}
-		
-		if(is.list(object$classes)) {
-			#FIXME
-			err.count <- lapply(object$classes, function(y) colSums(y != classes))
-		} else {
-			err.count <- colSums(object$classes != classes)
-		}
-	} else {
-		stop("no classes found")				
-	}
+Err.msgl <- function(x, data = NULL, response = x$classes.true, classes = response, type = "rate", ... ) {
 	
 	if(type=="rate") {
-		return(err.count/length(classes))
+		return(compute_error(x, data = data, response.name = "classes", response = response, loss = function(x,y) mean(x != y)))
 	}
 	
 	if(type=="count") {
-		return(err.count)
+		return(compute_error(x, data = data, response.name = "classes", response = response, loss = function(x,y) sum(x != y)))
+	}
+	
+	if(type=="loglike") {
+		loss <- function(x,y) -mean(log(sapply(1:length(y), function(i) x[as.integer(y[i]),i])))
+		return(compute_error(x, data = data, response.name = "response", response = response, loss = loss))
 	}
 	
 	stop("Unknown type")
@@ -93,13 +104,14 @@ Err <- function(object, x = NULL, classes = object$classes.true, type = "rate") 
 }
 
 #' todo
-#' @param x 
-#' @param ... 
+#' @param x a msgl object
+#' @param ... not used
 #' @return a list of nonzero features (that is nonzero colums of the beta matrices)
 #' 
 #' @author martin
 #' @method features msgl
 #' @S3method features msgl
+#' @import sglOptim
 #' @export
 features.msgl <- function(x, ...) {
 	class(x) <- "sgl" # Use std function
@@ -107,13 +119,14 @@ features.msgl <- function(x, ...) {
 }
 
 #' todo
-#' @param x 
-#' @param ... 
+#' @param x a msgl object
+#' @param ... not used
 #' @return todo
 #' 
 #' @author martin
 #' @method parameters msgl
 #' @S3method parameters msgl
+#' @import sglOptim
 #' @export
 parameters.msgl <- function(x, ...) {
 	class(x) <- "sgl" # Use std function
@@ -121,13 +134,14 @@ parameters.msgl <- function(x, ...) {
 }
 
 #' todo
-#' @param x 
-#' @param ... 
+#' @param x a msgl object
+#' @param ... not used
 #' @return todo
 #' 
 #' @author martin
 #' @method nmod msgl
 #' @S3method nmod msgl
+#' @import sglOptim
 #' @export
 nmod.msgl <- function(x, ...) {
 	class(x) <- "sgl" # Use std function
@@ -143,6 +157,7 @@ nmod.msgl <- function(x, ...) {
 #' @author Martin Vincent
 #' @method models msgl
 #' @S3method models msgl
+#' @import sglOptim
 #' @export
 models.msgl <- function(x, index = 1:nmod(x), ...) {
 	class(x) <- "sgl" # Use std function
@@ -158,6 +173,7 @@ models.msgl <- function(x, index = 1:nmod(x), ...) {
 #' @author martin
 #' @method coef msgl
 #' @S3method coef msgl
+#' @import sglOptim
 #' @export
 coef.msgl <- function(x, index = 1:nmod(x), ...) {
 	class(x) <- "sgl" # Use std function
@@ -175,6 +191,7 @@ coef.msgl <- function(x, index = 1:nmod(x), ...) {
 #' @method print msgl
 #' @S3method print msgl
 #' @author Martin Vincent
+#' @import sglOptim
 #' @export
 print.msgl <- function(x, ...) {
 
@@ -189,4 +206,3 @@ print.msgl <- function(x, ...) {
 	message(paste("  The first three classes are: ", classnames, sep=""))
 
 }
-

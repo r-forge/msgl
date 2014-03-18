@@ -5,9 +5,9 @@
   \method{nmod}{msgl} (x, ...)
 }
 \arguments{
-  \item{x}{}
+  \item{x}{a msgl object}
 
-  \item{...}{}
+  \item{...}{not used}
 }
 \value{
   todo

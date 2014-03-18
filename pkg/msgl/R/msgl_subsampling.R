@@ -115,7 +115,7 @@ msgl.subsampling <- function(x, classes, sampleWeights = rep(1/length(classes), 
 			}
 		}
 		
-		res$classes.true <- classes
+		res$classes.true <- lapply(test, function(sub) classes[sub])
 		res$msgl_version <- packageVersion("msgl")
 
         class(res) <- "msgl"

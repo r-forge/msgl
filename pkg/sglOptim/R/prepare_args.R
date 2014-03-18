@@ -20,8 +20,30 @@
 #
 
 
+#' todo
+#' @param data a data object
+#' @param covariate.order the new order of the covarites
+#' @param ... additional paramters
+#' @return rearranged sgl data
+#' 
+#' @author Martin Vincent
+#' @export
 rearrange <- function(data, covariate.order, ...) UseMethod("rearrange")
 
+#' todo
+#' @param data a data object
+#' @param ... additional paramters
+#' @return 
+#' \item{block.dim}{a vector}
+#' \item{groupWeights}{}
+#' \item{parameterWeights}{}
+#' \item{alpha}{}
+#' \item{data}{}
+#' \item{group.order}{}
+#' @author Martin Vincent
+#' @export
+prepare.args <- function(data, ...) UseMethod("prepare.args")
+	
 
 #' Rearrange sgldata
 #' 
@@ -30,6 +52,10 @@ rearrange <- function(data, covariate.order, ...) UseMethod("rearrange")
 #' @param ... not used
 #' @return a sgl data object with the covariates reordered
 #' @author Martin Vincent
+#' @method rearrange sgldata
+#' @S3method rearrange sgldata
+#' @export
+#' @family sgldata
 rearrange.sgldata <- function(data, covariate.order, ...) 
 {
 	
@@ -48,6 +74,7 @@ rearrange.sgldata <- function(data, covariate.order, ...)
 #' @param sparseX if TRUE \code{x} will be treated as sparse, if FALSE \code{x} will be treated as dens.
 #' @author Martin Vincent
 #' @export
+#' @family sgldata
 create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGrouping = NULL, sparseX = is(x, "sparseMatrix")) {
 	
 	#TODO dim checks
@@ -110,8 +137,13 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 #' @param groupWeights the group weights, a vector of length \code{length(unique(parameterGrouping))} (the number of groups). 
 #' @param parameterWeights a matrix of size \eqn{q \times p}. 
 #' @param alpha the \eqn{\alpha} value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
+#' @param ... not used
+#' @method prepare.args sgldata
+#' @S3method prepare.args sgldata
+#' @export
+#' @family sgldata
 #' @author Martin Vincent
-prepare.args <- function(data, parameterGrouping, groupWeights, parameterWeights, alpha) {
+prepare.args.sgldata <- function(data, parameterGrouping, groupWeights, parameterWeights, alpha, ...) {
 	
 	#If Lasso then ignore grouping
 	if(alpha == 1) {

@@ -17,9 +17,9 @@ public:
 	typedef T data_type;
 	typedef R response_type;
 
-	const field < response_type > predict(data_type const& data,	sgl::sparse_matrix_field const& parameters) const;
+	const field < response_type > predict(data_type const& data, sgl::sparse_matrix_field const& parameters) const;
 
-	const field < response_type > predict(data_type const& data,	sgl::parameter const& parameters) const;
+	const field < response_type > predict(data_type const& data, sgl::parameter const& parameters) const;
 }
 
 class linear_response {

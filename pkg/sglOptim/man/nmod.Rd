@@ -1,19 +1,19 @@
 \name{nmod}
 \alias{nmod}
-\title{Generic function for couting the number of models}
+\title{Generic function for counting the number of models}
 \usage{
-  nmod(x, ...)
+  nmod(object, ...)
 }
 \arguments{
-  \item{x}{an object}
+  \item{object}{an object}
 
-  \item{...}{additional paramters (optional)}
+  \item{...}{additional parameters (optional)}
 }
 \value{
-  the number of models contained in \code{x}
+  the number of models contained in the object \code{x}.
 }
 \description{
-  Generic function for couting the number of models
+  Returns the number of models
 }
 \author{
   Martin Vincent

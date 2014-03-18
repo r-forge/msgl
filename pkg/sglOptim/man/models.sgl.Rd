@@ -1,19 +1,23 @@
 \name{models.sgl}
 \alias{models.sgl}
-\title{Exstract the estimated models}
+\title{Returns the estimated models (that is the \eqn{beta} matrices)}
 \usage{
-  \method{models}{sgl} (x, index = 1:nmod(x), ...)
+  \method{models}{sgl} (object, index = 1:nmod(object),
+    ...)
 }
 \arguments{
-  \item{x}{a msgl object}
+  \item{object}{a sgl object}
 
-  \item{index}{the models to be returned}
+  \item{index}{indices of the models to be returned}
+
+  \item{...}{not used}
 }
 \value{
   a list of sparse matrices
 }
 \description{
-  Exstract the estimated models
+  Returns the estimated models (that is the \eqn{beta}
+  matrices)
 }
 \author{
   Martin Vincent

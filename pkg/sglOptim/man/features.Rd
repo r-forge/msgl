@@ -2,19 +2,19 @@
 \alias{features}
 \title{Generic function for extracting nonzero features (or groups)}
 \usage{
-  features(x, ...)
+  features(object, ...)
 }
 \arguments{
-  \item{x}{an object}
+  \item{object}{an object}
 
-  \item{...}{additional paramters (optional)}
+  \item{...}{additional parameters (optional)}
 }
 \value{
-  a list of nonzero features
+  a list of length \code{nmod(x)} containing the nonzero
+  features of the models.
 }
 \description{
-  Generic function for extracting nonzero features (or
-  groups)
+  Extracts nonzero features for each model.
 }
 \author{
   Martin Vincent

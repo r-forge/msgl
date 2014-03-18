@@ -21,154 +21,259 @@
 
 # S3 functions:
 
-#' Generic function for extracting nonzero features (or groups) 
-#' @param x an object
-#' @param ... additional paramters (optional)
-#' @return a list of nonzero features
+#' @title Generic function for computing error rates
+#' 
+#' @description
+#' Compute and returns an error rate for each model contained in \code{x}.
+#' See details for generic use cases.
+#'
+#' @details
+#' The following generic use case should be supported (see for example \pkg{msgl} package for an implementation):
+#' 
+#' \enumerate{
+#' \item With \code{fit} a sgl fit object with models estimated using \code{x} data, the code 
+#' 
+#' \code{Err(fit, x)}
+#' 
+#' should return a vector with the \emph{training errors} of the models.
+#' 
+#' \item With \code{x.new} a new data set with known responses \code{response.new}, the code 
+#' 
+#' \code{Err(fit, x.new, response.new)}
+#' 
+#' should return a vector with the errors of the models when applied to the new data set.
+#
+#' \item With \code{fit.cv} a sgl cross validation object, the code 
+#' 
+#' \code{Err(fit.cv)}
+#' 
+#' should return a vector with estimates of the \emph{expected generalization errors} of the models (i.e. the cross validation errors). 
+#' 
+#' \item If subsampling is supported then, with \code{fit.sub} a sgl subsampling object, the code  
+#' 
+#' \code{Err(fit.sub)}
+#' 
+#' should return a matrix with the test errors (each column corresponding to a model, i.e. rows corresponds to tests).
+#' }
+#'
+#' @seealso compute_error
+#' @param object an object
+#' @param data a data object 
+#' @param response a response object
+#' @param ... additional parameters (optional)
+#' @return 
+#' a vector of length \code{nmod(object)} or a matrix with \code{nmod(object)} columns containing error rates for the models
+#' @author Martin Vincent
+#' @export
+Err <- function(object, data, response, ... ) UseMethod("Err")
+	
+
+#' @title Helper function for computing error rates
+#' @details
+#' This function can be used to compute error rates. 
+#' It is consist with the use cases of the \code{Err} genetic function. 
+#' (see \pkg{msgl} package for an example of how to use this function)
+#' @param object a object containing responses
+#' @param data a data object
+#' @param response.name the name of the response, if \code{response.name = NULL} then \code{x} will be treated as the response.
+#' @param response the response
+#' @param loss the loss function
+#' @return a vector with the computed error rates
 #' 
 #' @author Martin Vincent
 #' @export
-features <- function(x, ...) UseMethod("features")
+compute_error <- function(object, data = NULL, response.name, response, loss) {
+	
+	if(!is.null(data)) {
+		return(compute_error(object = predict(object, data), data = NULL, response.name = response.name, response = response, loss = loss))
+	}
+	
+	if(is.null(response.name) || any(names(object) == response.name)) {
+		
+		if(is.null(response.name)) {
+			r <- object
+		} else {
+			r <- object[[response.name]]
+		}
+		
+		if(is.list(r) && is.list(response)) {
+			return(lapply(1:length(r), function(i) compute_error(object = r[[i]], data = NULL, response.name = NULL, response = response[[i]], loss = loss)))
+			
+		} else if(is.list(r)) {
+			return(sapply(r, function(m) loss(m, response)))	
+			
+		} else if(is.matrix(r)) {
+			return(apply(r, 2, FUN = function(v) loss(v, response)))		
+			
+		} else if(is.vector(r))  {
+			return(loss(r, response))
+			
+		} else {
+			stop("Unknown response type")
+		}
+	}		
 
-#' Generic function for extracting nonzero parameters
-#' @param x an object
-#' @param ... additional paramters (optional)
-#' @return a list of nonzero paramters
+	stop(paste("response '", response.name, "' not found", sep =""))
+
+}
+
+#' @title Generic function for extracting nonzero features (or groups) 
+#' 
+#' @description
+#' Extracts nonzero features for each model.
+#'
+#' @param object an object
+#' @param ... additional parameters (optional)
+#' @return a list of length \code{nmod(x)} containing the nonzero features of the models.
 #' 
 #' @author Martin Vincent
 #' @export
-parameters <- function(x, ...) UseMethod("parameters")
+features <- function(object, ...) UseMethod("features")
 
-
-#' Generic function for couting the number of models
-#' @param x an object
+#' @title Generic function for extracting nonzero parameters
+#' 
+#' @description
+#' Extracts nonzero parameters for each model.
+#'
+#' @param object an object
 #' @param ... additional paramters (optional)
-#' @return the number of models contained in \code{x}
+#' @return a list of length \code{nmod(x)} containing the nonzero parameters of the models.
 #' 
 #' @author Martin Vincent
 #' @export
-nmod <- function(x, ...) UseMethod("nmod")
+parameters <- function(object, ...) UseMethod("parameters")
 
-#' Generic function for extracting the fitted models 
-#' @param x an object
+
+#' @title Generic function for counting the number of models
+#' 
+#' @description
+#' Returns the number of models
+#'
+#' @param object an object
+#' @param ... additional parameters (optional)
+#' @return the number of models contained in the object \code{x}.
+#' 
+#' @author Martin Vincent
+#' @export
+nmod <- function(object, ...) UseMethod("nmod")
+
+#' @title Generic function for extracting the fitted models 
+#' 
+#' @description
+#' Returns the fitted models
+#'
+#' @param object an object
 #' @param index a vector of indices of the models to be returned
-#' @param ... additional paramters (optional)
+#' @param ... additional parameters (optional)
 #' @return a list of length \code{length(index)} containing the models
 #' 
 #' @author Martin Vincent
 #' @export
-models <- function(x, index, ...) UseMethod("models")
+models <- function(object, index, ...) UseMethod("models")
 
 
-#' Generic function for extracting the nonzero coefficients 
-#' @param x an object
-#' @param index a vector of indices of the models 
-#' @param ... additional paramters (optional)
-#' @return a list of length \code{length(index)} containing the nonzero paramters of the models
+#' @title Extracting nonzero features
+#' 
+#' @param object a sgl object 
+#' @param ... not used
+#' @return a list of vectors containing the nonzero features (that is nonzero columns of the \eqn{beta} matrices)
 #' 
 #' @author Martin Vincent
-#' @export
-coef <- function(x, index, ...) UseMethod("coef")
-
-
-#' todo
-#' @param x 
-#' @param ... 
-#' @return a list of nonzero features (that is nonzero colums of the beta matrices)
-#' 
-#' @author martin
 #' @method features sgl
 #' @S3method features sgl
 #' @export
-features.sgl <- function(x, ...) {
+features.sgl <- function(object, ...) {
 	
-	if(is.null(x$beta)) {
+	if(is.null(object$beta)) {
 		stop("object contains no models")
 	}
 	
-	if(is.null(colnames(x$beta[[1]]))) {
-		res <- lapply(x$beta, function(beta) which(colSums(beta != 0) != 0))
+	if(is.null(colnames(object$beta[[1]]))) {
+		res <- lapply(object$beta, function(beta) which(colSums(beta != 0) != 0))
 	} else {
-		res <- lapply(x$beta, function(beta) colnames(beta)[colSums(beta != 0) != 0])
+		res <- lapply(object$beta, function(beta) colnames(beta)[colSums(beta != 0) != 0])
 	}
 	
 	return(res)
 }
 
-#' todo
-#' @param x 
-#' @param ... 
-#' @return todo
+#' @title Extracting nonzero parameters
+#'
+#' @param object a sgl object
+#' @param ... not used
+#' @return a list of vectors containing the nonzero parameters (that is nonzero entries of the \eqn{beta} matrices)
 #' 
-#' @author martin
+#' @author Martin Vincent
 #' @method parameters sgl
 #' @S3method parameters sgl
 #' @export
-parameters.sgl <- function(x, ...) {
+parameters.sgl <- function(object, ...) {
 	
-	if(is.null(x$beta)) {
+	if(is.null(object$beta)) {
 		stop("object contains no models")
 	}
 	
-	tmp <- features(x)
-	res <- sapply(1:length(x$beta), function(i) x$beta[[i]][,tmp[[i]]] != 0)
+	tmp <- features(object)
+	res <- sapply(1:length(object$beta), function(i) object$beta[[i]][,tmp[[i]]] != 0)
 		
 	return(res)
 }
 
-#' todo
-#' @param x 
-#' @param ... 
-#' @return todo
+#' @title Returns the number of models in a sgl object
+#'
+#' @param object a sgl object
+#' @param ... not used
+#' @return the number of models in \code{x}
 #' 
-#' @author martin
+#' @author Martin Vincent
 #' @method nmod sgl
 #' @S3method nmod sgl
 #' @export
-nmod.sgl <- function(x, ...) {
+nmod.sgl <- function(object, ...) {
 	
-	if(is.null(x$beta)) {
+	if(is.null(object$beta)) {
 		return (0)
 	}
 	
-	return(length(x$beta))
+	return(length(object$beta))
 }
 
-#' Exstract the estimated models
+#' @title Returns the estimated models (that is the \eqn{beta} matrices)
 #' 
-#' @param x a msgl object 
-#' @param index the models to be returned
+#' @param object a sgl object
+#' @param index indices of the models to be returned
+#' @param ... not used
 #' @return a list of sparse matrices
 #' 
 #' @author Martin Vincent
 #' @method models sgl
 #' @S3method models sgl
 #' @export
-models.sgl <- function(x, index = 1:nmod(x), ...) {
+models.sgl <- function(object, index = 1:nmod(object), ...) {
 	
-	if(is.null(x$beta)) {
+	if(is.null(object$beta)) {
 		stop("object contains no models")
 	}
 	
-	return(x$beta[index])
+	return(object$beta[index])
 }
 
-#' todo
-#' @param x 
-#' @param index 
-#' @param ... 
-#' @return todo
+#' @title Extracting the nonzero coefficients 
+#'
+#' @param object a sgl object
+#' @param index indices of the models
+#' @param ... not used
+#' @return a list of with nonzero coefficients of the models
 #' 
-#' @author martin
+#' @author Martin Vincent
 #' @method coef sgl
 #' @S3method coef sgl
 #' @export
-coef.sgl <- function(x, index = 1:nmod(x), ...) {
+coef.sgl <- function(object, index = 1:nmod(object), ...) {
 	
-	if(is.null(x$beta)) {
+	if(is.null(object$beta)) {
 		stop("object contains no models")
 	}
 	
-	return(lapply(x$beta[index], function(beta) beta[,colSums(beta != 0) != 0]))
+	return(lapply(object$beta[index], function(beta) beta[,colSums(beta != 0) != 0]))
 }
-

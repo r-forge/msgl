@@ -38,7 +38,7 @@
 #' @param verbose If \code{TRUE} some information, regarding the status of the algorithm, will be printed in the R terminal.
 #' @return A configuration.
 #' @examples
-#' config.verbose <- sgl.algorithm.config(verbose = TRUE)
+#' config.no_progressbar <- sgl.algorithm.config(verbose = FALSE)
 #' @author Martin Vincent
 #' @export
 sgl.algorithm.config <- function(tolerance_penalized_main_equation_loop = 1e-10, 

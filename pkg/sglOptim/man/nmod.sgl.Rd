@@ -1,21 +1,21 @@
 \name{nmod.sgl}
 \alias{nmod.sgl}
-\title{todo}
+\title{Returns the number of models in a sgl object}
 \usage{
-  \method{nmod}{sgl} (x, ...)
+  \method{nmod}{sgl} (object, ...)
 }
 \arguments{
-  \item{x}{}
+  \item{object}{a sgl object}
 
-  \item{...}{}
+  \item{...}{not used}
 }
 \value{
-  todo
+  the number of models in \code{x}
 }
 \description{
-  todo
+  Returns the number of models in a sgl object
 }
 \author{
-  martin
+  Martin Vincent
 }
 

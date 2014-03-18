@@ -1,23 +1,23 @@
 \name{coef.sgl}
 \alias{coef.sgl}
-\title{todo}
+\title{Extracting the nonzero coefficients}
 \usage{
-  \method{coef}{sgl} (x, index = 1:nmod(x), ...)
+  \method{coef}{sgl} (object, index = 1:nmod(object), ...)
 }
 \arguments{
-  \item{x}{}
+  \item{object}{a sgl object}
 
-  \item{index}{}
+  \item{index}{indices of the models}
 
-  \item{...}{}
+  \item{...}{not used}
 }
 \value{
-  todo
+  a list of with nonzero coefficients of the models
 }
 \description{
-  todo
+  Extracting the nonzero coefficients
 }
 \author{
-  martin
+  Martin Vincent
 }
 

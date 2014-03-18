@@ -108,7 +108,7 @@ lsgl <- function(x, y, intercept = TRUE,
 	}
 	
 	# create data
-	data <- create.sgldata(x, y, sampleGrouping = 1:ncol(y)) #FIXME sampleGrouping hack
+	data <- create.sgldata(x, y, sampleGrouping = 1:ncol(y)) #TODO fix sampleGrouping hack
 	
 	# call SglOptimizer function
 	if(data$sparseX) {

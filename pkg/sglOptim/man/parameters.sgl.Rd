@@ -1,21 +1,22 @@
 \name{parameters.sgl}
 \alias{parameters.sgl}
-\title{todo}
+\title{Extracting nonzero parameters}
 \usage{
-  \method{parameters}{sgl} (x, ...)
+  \method{parameters}{sgl} (object, ...)
 }
 \arguments{
-  \item{x}{}
+  \item{object}{a sgl object}
 
-  \item{...}{}
+  \item{...}{not used}
 }
 \value{
-  todo
+  a list of vectors containing the nonzero parameters (that
+  is nonzero entries of the \eqn{beta} matrices)
 }
 \description{
-  todo
+  Extracting nonzero parameters
 }
 \author{
-  martin
+  Martin Vincent
 }
 

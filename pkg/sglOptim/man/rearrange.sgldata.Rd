@@ -2,7 +2,7 @@
 \alias{rearrange.sgldata}
 \title{Rearrange sgldata}
 \usage{
-  rearrange.sgldata(data, covariate.order, ...)
+  \method{rearrange}{sgldata} (data, covariate.order, ...)
 }
 \arguments{
   \item{data}{sgldata object}
@@ -19,5 +19,9 @@
 }
 \author{
   Martin Vincent
+}
+\seealso{
+  Other sgldata: \code{\link{create.sgldata}},
+  \code{\link{prepare.args.sgldata}}
 }
 

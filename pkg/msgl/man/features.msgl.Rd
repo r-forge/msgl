@@ -5,9 +5,9 @@
   \method{features}{msgl} (x, ...)
 }
 \arguments{
-  \item{x}{}
+  \item{x}{a msgl object}
 
-  \item{...}{}
+  \item{...}{not used}
 }
 \value{
   a list of nonzero features (that is nonzero colums of the

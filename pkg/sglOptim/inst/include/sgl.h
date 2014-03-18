@@ -53,6 +53,13 @@
 #include <Backtrace.h>
 #endif
 
+// Openmp currently not supported on sparc
+#ifdef __sparc
+#ifdef _OPENMP
+#undef _OPENMP
+#endif
+#endif
+
 //Should openmp be used
 #ifndef _OPENMP
 //No openmp

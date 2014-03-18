@@ -29,4 +29,4 @@ Collate:
     'msgl_cv.R'
     'msgl_subsampling.R'
     'msgl_predict.R'
-    'msgl_summary.R'
+    'msgl_navigate.R'
