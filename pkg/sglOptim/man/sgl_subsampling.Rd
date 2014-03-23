@@ -5,7 +5,7 @@
   sgl_subsampling(module_name, PACKAGE, data,
     parameterGrouping, groupWeights, parameterWeights,
     alpha, lambda, training, test, collapse = FALSE,
-    max.threads = 2L,
+    max.threads = 2,
     algorithm.config = sgl.standard.config)
 }
 \arguments{
@@ -59,7 +59,10 @@
   used.}
 }
 \value{
-  sgl object content will depend on the C++ response class
+  \item{responses}{content will depend on the C++ response
+  class} \item{features}{number of features used in the
+  models} \item{parameters}{number of parameters used in
+  the models} \item{lambda}{the lambda sequence used.}
 }
 \description{
   Support the use of multiple processors.

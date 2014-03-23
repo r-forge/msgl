@@ -2,23 +2,57 @@
 \alias{predict.lsgl}
 \title{Predict}
 \usage{
-  predict.lsgl(object, x, ...)
+  \method{predict}{lsgl} (object, x,
+    sparse.data = is(x, "sparseMatrix"), ...)
 }
 \arguments{
-  \item{object}{}
+  \item{object}{an object of class lsgl, produced with
+  \code{lsgl}.}
 
-  \item{x}{}
+  \item{x}{a data matrix of size \eqn{N_\textrm{new} \times
+  p}.}
 
-  \item{...}{}
+  \item{sparse.data}{if TRUE \code{x} will be treated as
+  sparse, if \code{x} is a sparse matrix it will be treated
+  as sparse by default.}
+
+  \item{...}{ignored.}
 }
 \value{
-  \item{Yhat}{the linear predictors -- a list of length
-  \code{length(fit$beta)} one item for each model, with
-  each item a matrix of size \eqn{N_\textrm{new} \times K}
-  containing the linear predictors.}
+  \item{Yhat}{the predicted response matrix (of size
+  \eqn{N_\textrm{new} \times K})}
 }
 \description{
-  Predict
+  Compute the predicted response matrix for a new data set.
+}
+\examples{
+set.seed(100) # This may be removed, it ensures consistency of the daily tests
+
+## Simulate from Y=XB+E, the dimension of Y is N x K, X is N x p, B is p x K
+
+N <- 100 #number of samples
+p <- 50 #number of features
+K <- 25  #number of groups
+
+B<-matrix(sample(c(rep(1,p*K*0.1),rep(0, p*K-as.integer(p*K*0.1)))),nrow=p,ncol=K)
+X1<-matrix(rnorm(N*p,1,1),nrow=N,ncol=p)
+Y1 <-X1\%*\%B+matrix(rnorm(N*K,0,1),N,K)
+
+X2<-matrix(rnorm(N*p,1,1),nrow=N,ncol=p)
+Y2 <-X2\%*\%B+matrix(rnorm(N*K,0,1),N,K)
+
+#### Fit models using X1
+lambda <- lsgl.lambda(X1, Y1, alpha = 1, d = 25L, lambda.min = 0.5, intercept = FALSE)
+fit <- lsgl(X1, Y1, alpha = 1, lambda = lambda, intercept = FALSE)
+
+# Predict Y2 using the estimated models and X2
+res <- predict(fit, X2)
+
+ # Frobenius norm \\|Y2hat - Y2\\|_F
+sapply(res$Yhat, function(y) sqrt(sum((y - Y2)^2)))
+
+# This is proportional to the errors compute with Err:
+Err(fit, X2, Y2)*length(Y2)
 }
 \author{
   Martin Vincent

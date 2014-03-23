@@ -1,23 +1,27 @@
 \name{rearrange}
 \alias{rearrange}
-\title{todo}
+\title{Generic rearrange function}
 \usage{
   rearrange(data, covariate.order, ...)
 }
 \arguments{
   \item{data}{a data object}
 
-  \item{covariate.order}{the new order of the covarites}
+  \item{covariate.order}{the new order of the covariates}
 
-  \item{...}{additional paramters}
+  \item{...}{additional parameters}
 }
 \value{
-  rearranged sgl data
+  a rearranged data object of same class as \code{data}
 }
 \description{
-  todo
+  Rearrange the order of the covariates in the \code{data}
+  object.
 }
 \author{
   Martin Vincent
+}
+\seealso{
+  rearrange.sgldata
 }
 

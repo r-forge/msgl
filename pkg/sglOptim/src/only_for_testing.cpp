@@ -16,6 +16,12 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
+//Uncomment to turn on debuging
+//#undef NDEBUG
+
+//Should the timers be activated (only needed for profiling the code)
+//#define SGL_TIMING
+
 //Configuration
 //Debugging
 #ifndef NDEBUG
@@ -33,9 +39,6 @@
 
 //Exception handling
 #define SGL_CATCH_EXCEPTIONS
-
-//Should the timers be activated (only needed for profiling the code)
-//#define SGL_TIMING
 
 //Sgl optimizer
 #include <sgl.h>

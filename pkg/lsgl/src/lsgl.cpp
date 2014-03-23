@@ -1,6 +1,6 @@
-/* Routines for multinomial and logistic sparse group lasso regression.
+/* Routines for linear multiple output using sparse group lasso regression.
  Intended for use with R.
- Copyright (C) 2012 Martin Vincent
+ Copyright (C) 2014 Martin Vincent
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@
 //Objective
 #include "frobenius_norm_objective.h"
 
-#define OBJECTIVE fobenius
+#define OBJECTIVE frobenius
 
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>
@@ -81,7 +81,7 @@
 //Objective
 #include "frobenius_norm_objective.h"
 
-#define OBJECTIVE fobenius_spx
+#define OBJECTIVE frobenius_spx
 
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>

@@ -1,13 +1,13 @@
 \name{Err.msgl}
 \alias{Err.msgl}
-\title{Compute the classification error rate}
+\title{Compute error rates}
 \usage{
-  \method{Err}{msgl} (x, data = NULL,
-    response = x$classes.true, classes = response,
+  \method{Err}{msgl} (object, data = NULL,
+    response = object$classes.true, classes = response,
     type = "rate", ...)
 }
 \arguments{
-  \item{x}{a msgl object}
+  \item{object}{a msgl object}
 
   \item{data}{a matrix of}
 
@@ -18,13 +18,17 @@
   \item{type}{type of error rate \code{rate} or
   \code{count}}
 
-  \item{...}{not used}
+  \item{...}{ignored}
 }
 \value{
   a vector of error rates
 }
 \description{
-  Compute the classification error rate
+  Compute error rates. If \code{type = "rate"} then the
+  misclassification rates will be computed. If \code{type =
+  "count"} then the misclassification counts will be
+  computed. If \code{type = "loglike"} then the negative
+  log likelihood error will be computed.
 }
 \examples{
 data(SimData)
@@ -36,7 +40,7 @@ classes.1 <- sim.data$classes[1:50]
 classes.2 <- sim.data$classes[51:100]
 
 #### Fit models using x.1
-lambda <- msgl.lambda.seq(x.1, classes.1, alpha = .5, d = 25L, lambda.min = 0.03)
+lambda <- msgl.lambda.seq(x.1, classes.1, alpha = .5, d = 50, lambda.min = 0.05)
 fit <- msgl(x.1, classes.1, alpha = .5, lambda = lambda)
 
 #### Training errors:
@@ -68,7 +72,8 @@ Err(fit.cv, type="loglike")
 test <- list(1:20, 21:40)
 train <- lapply(test, function(s) (1:length(classes.all))[-s])
 
-fit.sub <- msgl.subsampling(x.all, classes.all, alpha = .5, lambda = lambda, training = train, test = test)
+fit.sub <- msgl.subsampling(x.all, classes.all, alpha = .5,
+ lambda = lambda, training = train, test = test)
 
 # Mean misclassification error of the tests
 Err(fit.sub)

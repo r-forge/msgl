@@ -1,5 +1,6 @@
-#' Predict
+#' @title Predict
 #'
+#' @description 
 #' Computes the linear predictors, the estimated probabilities and the estimated classes for a new data set.
 #'
 #' @param object an object of class msgl, produced with \code{msgl}.
@@ -12,14 +13,25 @@
 #' \item{classes}{the estimated classes -- a matrix of size \eqn{N_\textrm{new} \times d} with \eqn{d=}\code{length(fit$beta)}.}
 #' @examples
 #' data(SimData)
-#' x <- sim.data$x
-#' classes <- sim.data$classes
-#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 20L, lambda.min = 0.01)
-#' fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+#' 
+#' x.1 <- sim.data$x[1:50,]
+#' x.2 <- sim.data$x[51:100,]
+#' 
+#' classes.1 <- sim.data$classes[1:50]
+#' classes.2 <- sim.data$classes[51:100]
+#' 
+#' lambda <- msgl.lambda.seq(x.1, classes.1, alpha = .5, d = 50, lambda.min = 0.05)
+#' fit <- msgl(x.1, classes.1, alpha = .5, lambda = lambda)
 #'
-#' # Training error
-#' res <- predict(fit, x)
-#' colSums(res$classes != classes)
+#' # Predict classes of new data set x.2
+#' res <- predict(fit, x.2)
+#'
+#' # The error rates of the models
+#' Err(res, classes = classes.2) 
+#' 
+#' # The predicted classes for model 20
+#' res$classes[,20]
+#' 
 #' @author Martin Vincent
 #' @method predict msgl
 #' @S3method predict msgl
@@ -27,7 +39,13 @@
 #' @useDynLib msgl .registration=TRUE
 predict.msgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...) {
 
-        x <- cBind(Intercept = rep(1, nrow(x)), x)
+	# Get call
+	cl <- match.call()
+	
+	if(object$intercept){
+		# add intercept
+		x <- cBind(Intercept = rep(1, nrow(x)), x)
+	}	
 
         data <- list()
 
@@ -62,8 +80,10 @@ predict.msgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...) {
 			res$response <- lapply(X = res$response, FUN = function(x) {rownames(x) <- class.names; x})
 		}
 		
+		# Various 
 		res$msgl_version <- packageVersion("msgl")
-		
-        class(res) <- "msgl"
+		res$call <- cl		
+
+		class(res) <- "msgl"
         return(res)
 }

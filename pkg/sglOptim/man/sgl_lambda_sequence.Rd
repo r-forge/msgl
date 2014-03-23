@@ -4,7 +4,7 @@
 \usage{
   sgl_lambda_sequence(module_name, PACKAGE, data,
     parameterGrouping, groupWeights, parameterWeights,
-    alpha = 0.5, d = 100L, lambda.min,
+    alpha = 0.5, d = 100, lambda.min,
     algorithm.config = sgl.standard.config)
 }
 \arguments{

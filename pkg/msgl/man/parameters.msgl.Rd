@@ -1,21 +1,35 @@
 \name{parameters.msgl}
 \alias{parameters.msgl}
-\title{todo}
+\title{Nonzero parameters}
 \usage{
-  \method{parameters}{msgl} (x, ...)
+  \method{parameters}{msgl} (object, ...)
 }
 \arguments{
-  \item{x}{a msgl object}
+  \item{object}{a msgl object}
 
-  \item{...}{not used}
+  \item{...}{ignored}
 }
 \value{
-  todo
+  a list of length \code{nmod(x)} containing the nonzero
+  parameters of the models.
 }
 \description{
-  todo
+  Extracts the nonzero parameters for each model.
+}
+\examples{
+data(SimData)
+x <- sim.data$x
+classes <- sim.data$classes
+lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 50, lambda.min = 0.05)
+fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+
+# the nonzero parameters of model 1, 10 and 25
+parameters(fit)[c(1,10,25)]
+
+# count the number of nonzero parameters in each model
+sapply(parameters(fit), sum)
 }
 \author{
-  martin
+  Martin Vincent
 }
 

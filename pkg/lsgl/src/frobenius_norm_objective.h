@@ -1,15 +1,26 @@
-/*
- * fobenius_norm_objective.h
- *
- *  Created on: Jun 9, 2013
- *      Author: martin
+/* Routines for linear multiple output using sparse group lasso regression.
+ Intended for use with R.
+ Copyright (C) 2014 Martin Vincent
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 #ifndef FOBENIUS_NORM_OBJECTIVE_H_
 #define FOBENIUS_NORM_OBJECTIVE_H_
 
 template < typename T >
-class FobeniusLoss {
+class FrobeniusLoss {
 
 public:
 
@@ -37,7 +48,7 @@ public:
 
 
 
-	FobeniusLoss()
+	FrobeniusLoss()
 			: 	n_samples(0),
 				n_responses(0),
 				Y(sgl::null_matrix),
@@ -48,7 +59,7 @@ public:
 	{
 	}
 
-	FobeniusLoss(data_type const& data)
+	FrobeniusLoss(data_type const& data)
 			: 	n_samples(data.get_A().n_samples),
 				n_responses(data.get_B().n_groups),
 				Y(data.get_B().response),
@@ -116,11 +127,11 @@ public:
 
 };
 
-typedef sgl::ObjectiveFunctionType < sgl::GenralizedLinearLossDense < FobeniusLoss < sgl::matrix > > ,
-		FobeniusLoss < sgl::matrix >::data_type > fobenius;
+typedef sgl::ObjectiveFunctionType < sgl::GenralizedLinearLossDense < FrobeniusLoss < sgl::matrix > > ,
+		FrobeniusLoss < sgl::matrix >::data_type > frobenius;
 
 typedef sgl::ObjectiveFunctionType <
-		sgl::GenralizedLinearLossSparse < FobeniusLoss < sgl::sparse_matrix > > ,
-		FobeniusLoss < sgl::sparse_matrix >::data_type > fobenius_spx;
+		sgl::GenralizedLinearLossSparse < FrobeniusLoss < sgl::sparse_matrix > > ,
+		FrobeniusLoss < sgl::sparse_matrix >::data_type > frobenius_spx;
 
 #endif /* FOBENIUS_NORM_OBJECTIVE_H_ */

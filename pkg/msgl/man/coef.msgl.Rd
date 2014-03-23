@@ -1,23 +1,34 @@
 \name{coef.msgl}
 \alias{coef.msgl}
-\title{todo}
+\title{Extract nonzero coefficients}
 \usage{
-  \method{coef}{msgl} (x, index = 1:nmod(x), ...)
+  \method{coef}{msgl} (object, index = 1:nmod(object), ...)
 }
 \arguments{
-  \item{x}{}
+  \item{object}{a msgl object}
 
-  \item{index}{}
+  \item{index}{indices of the models}
 
-  \item{...}{}
+  \item{...}{ignored}
 }
 \value{
-  todo
+  a list of length \code{length(index)} with nonzero
+  coefficients of the models
 }
 \description{
-  todo
+  Extract nonzero coefficients
+}
+\examples{
+data(SimData)
+x <- sim.data$x
+classes <- sim.data$classes
+lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 50, lambda.min = 0.05)
+fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+
+# the nonzero coefficients of the models 1, 10 and 20
+coef(fit, index = c(1,10,20))
 }
 \author{
-  martin
+  Martin Vincent
 }
 

@@ -19,14 +19,20 @@
 #     along with this program.  If not, see <http://www.gnu.org/licenses/>
 #
 
-#' Compute the classification error rate 
+#' @title Compute error rates 
 #' 
-#' @param x a msgl object
+#' @description
+#' Compute error rates. 
+#' If \code{type = "rate"} then the misclassification rates will be computed.
+#' If \code{type = "count"} then the misclassification counts will be computed.
+#' If \code{type = "loglike"} then the negative log likelihood error will be computed.
+#'
+#' @param object a msgl object
 #' @param data a matrix of 
 #' @param response a vector of classes
 #' @param classes a vector of classes
 #' @param type type of error rate \code{rate} or \code{count}
-#' @param ... not used
+#' @param ... ignored
 #' @return a vector of error rates
 #' 
 #' @author Martin Vincent
@@ -40,7 +46,7 @@
 #' classes.2 <- sim.data$classes[51:100]
 #' 
 #' #### Fit models using x.1
-#' lambda <- msgl.lambda.seq(x.1, classes.1, alpha = .5, d = 25L, lambda.min = 0.03)
+#' lambda <- msgl.lambda.seq(x.1, classes.1, alpha = .5, d = 50, lambda.min = 0.05)
 #' fit <- msgl(x.1, classes.1, alpha = .5, lambda = lambda)
 #' 
 #' #### Training errors:
@@ -72,7 +78,8 @@
 #' test <- list(1:20, 21:40)
 #' train <- lapply(test, function(s) (1:length(classes.all))[-s])
 #'
-#' fit.sub <- msgl.subsampling(x.all, classes.all, alpha = .5, lambda = lambda, training = train, test = test)
+#' fit.sub <- msgl.subsampling(x.all, classes.all, alpha = .5, 
+#'  lambda = lambda, training = train, test = test)
 #' 
 #' # Mean misclassification error of the tests
 #' Err(fit.sub)
@@ -84,100 +91,160 @@
 #' @S3method Err msgl
 #' @import sglOptim
 #' @export
-Err.msgl <- function(x, data = NULL, response = x$classes.true, classes = response, type = "rate", ... ) {
+Err.msgl <- function(object, data = NULL, response = object$classes.true, classes = response, type = "rate", ... ) {
 	
 	if(type=="rate") {
-		return(compute_error(x, data = data, response.name = "classes", response = response, loss = function(x,y) mean(x != y)))
+		return(compute_error(object, data = data, response.name = "classes", response = classes, loss = function(x,y) mean(x != y)))
 	}
 	
 	if(type=="count") {
-		return(compute_error(x, data = data, response.name = "classes", response = response, loss = function(x,y) sum(x != y)))
+		return(compute_error(object, data = data, response.name = "classes", response = classes, loss = function(x,y) sum(x != y)))
 	}
 	
 	if(type=="loglike") {
 		loss <- function(x,y) -mean(log(sapply(1:length(y), function(i) x[as.integer(y[i]),i])))
-		return(compute_error(x, data = data, response.name = "response", response = response, loss = loss))
+		return(compute_error(object, data = data, response.name = "response", response = classes, loss = loss))
 	}
 	
 	stop("Unknown type")
 	
 }
 
-#' todo
-#' @param x a msgl object
-#' @param ... not used
-#' @return a list of nonzero features (that is nonzero colums of the beta matrices)
+#' @title Nonzero features
 #' 
-#' @author martin
+#' @description
+#' Extracts the nonzero features for each model.
+#'
+#' @param object a msgl object
+#' @param ... ignored
+#' @return a list of of length \code{nmod(x)} containing the nonzero features (that is nonzero colums of the beta matrices)
+#' 
+#' @examples
+#' data(SimData)
+#' x <- sim.data$x
+#' classes <- sim.data$classes
+#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 50, lambda.min = 0.05)
+#' fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+#'
+#' # the nonzero features of model 1, 10 and 25
+#' features(fit)[c(1,10,25)]
+#'
+#' # count the number of nonzero features in each model
+#' sapply(features(fit), length)
+#'
+#' @author Martin Vincent
 #' @method features msgl
 #' @S3method features msgl
 #' @import sglOptim
 #' @export
-features.msgl <- function(x, ...) {
-	class(x) <- "sgl" # Use std function
-	return(features(x))
+features.msgl <- function(object, ...) {
+	class(object) <- "sgl" # Use std function
+	return(features(object))
 }
 
-#' todo
-#' @param x a msgl object
-#' @param ... not used
-#' @return todo
+#' @title Nonzero parameters
 #' 
-#' @author martin
+#' @description
+#' Extracts the nonzero parameters for each model.
+#'
+#' @param object a msgl object
+#' @param ... ignored
+#' @return a list of length \code{nmod(x)} containing the nonzero parameters of the models.
+#' 
+#' @examples
+#' data(SimData)
+#' x <- sim.data$x
+#' classes <- sim.data$classes
+#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 50, lambda.min = 0.05)
+#' fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+#'
+#' # the nonzero parameters of model 1, 10 and 25
+#' parameters(fit)[c(1,10,25)]
+#'
+#' # count the number of nonzero parameters in each model
+#' sapply(parameters(fit), sum)
+#'
+#' @author Martin Vincent
 #' @method parameters msgl
 #' @S3method parameters msgl
 #' @import sglOptim
 #' @export
-parameters.msgl <- function(x, ...) {
-	class(x) <- "sgl" # Use std function
-	return(parameters(x))
+parameters.msgl <- function(object, ...) {
+	class(object) <- "sgl" # Use std function
+	return(parameters(object))
 }
 
-#' todo
-#' @param x a msgl object
+#' @title Returns the number of models in a msgl object
+#'
+#' @param object a msgl object
 #' @param ... not used
-#' @return todo
+#' @return the number of models in \code{object}
 #' 
-#' @author martin
+#' @examples
+#' data(SimData)
+#' x <- sim.data$x
+#' classes <- sim.data$classes
+#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 50, lambda.min = 0.05)
+#' fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+#'
+#' # the number of models
+#' nmod(fit)
+#'
+#' @author Martin Vincent
 #' @method nmod msgl
 #' @S3method nmod msgl
 #' @import sglOptim
 #' @export
-nmod.msgl <- function(x, ...) {
-	class(x) <- "sgl" # Use std function
-	return(nmod(x))
+nmod.msgl <- function(object, ...) {
+	class(object) <- "sgl" # Use std function
+	return(nmod(object, ...))
 }
 
-#' Exstract the estimated models
+#' @title Exstract the fitted models 
 #' 
-#' @param x a msgl object 
-#' @param index the models to be returned
-#' @return a list of sparse matrices
+#' @description
+#' Returns the fitted models, that is the estimated \eqn{\beta} matrices.
+#' 
+#' @param object a msgl object 
+#' @param index indices of the models to be returned
+#' @param ... ignored
+#' @return a list of \eqn{\beta} matrices.
 #' 
 #' @author Martin Vincent
 #' @method models msgl
 #' @S3method models msgl
 #' @import sglOptim
 #' @export
-models.msgl <- function(x, index = 1:nmod(x), ...) {
-	class(x) <- "sgl" # Use std function
-	return(models(x))
+models.msgl <- function(object, index = 1:nmod(object), ...) {
+	class(object) <- "sgl" # Use std function
+	return(models(object, ...))
 }
 
-#' todo
-#' @param x 
-#' @param index 
-#' @param ... 
-#' @return todo
-#' 
-#' @author martin
+#' @title Extract nonzero coefficients 
+#'
+#' @param object a msgl object
+#' @param index indices of the models
+#' @param ... ignored
+#' @return a list of length \code{length(index)} with nonzero coefficients of the models
+#'
+#' @examples
+#' data(SimData)
+#' x <- sim.data$x
+#' classes <- sim.data$classes
+#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 50, lambda.min = 0.05)
+#' fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+#'
+#' # the nonzero coefficients of the models 1, 10 and 20
+#' coef(fit, index = c(1,10,20))
+#'
+#' @author Martin Vincent
 #' @method coef msgl
 #' @S3method coef msgl
 #' @import sglOptim
 #' @export
-coef.msgl <- function(x, index = 1:nmod(x), ...) {
-	class(x) <- "sgl" # Use std function
-	return(coef(x))
+coef.msgl <- function(object, index = 1:nmod(object), ...) {
+	class(object) <- "sgl" # Use std function
+	return(coef(object, index = index, ...))
 }
 
 
@@ -186,7 +253,35 @@ coef.msgl <- function(x, index = 1:nmod(x), ...) {
 #' This funtion will print some general information about the msgl object
 #'  
 #' @param x msgl object
-#' @param ... not used
+#' @param ... ignored
+#' 
+#' @examples
+#' data(SimData)
+#' x <- sim.data$x
+#' classes <- sim.data$classes
+#' 
+#' ### Estimation
+#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 50, lambda.min = 0.05)
+#' fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+#'
+#' # Print some information about the estimated models
+#' fit
+#'
+#' ### Cross validation
+#' fit.cv <- msgl.cv(x, classes, alpha = .5, lambda = lambda)
+#' 
+#' # Print some information
+#' fit.cv
+#' 
+#' ### Subsampling
+#' test <- list(1:20, 21:40)
+#' train <- lapply(test, function(s) (1:length(classes))[-s])
+#'
+#' lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 50, lambda.min = 0.05)
+#' fit.sub <- msgl.subsampling(x, classes, alpha = .5, lambda = lambda, training = train, test = test)
+#' 
+#' # Print some information
+#' fit.sub
 #' 
 #' @method print msgl
 #' @S3method print msgl
@@ -194,15 +289,5 @@ coef.msgl <- function(x, index = 1:nmod(x), ...) {
 #' @import sglOptim
 #' @export
 print.msgl <- function(x, ...) {
-
-	#FIXME check that  object$msgl_version exsists
-
-        message(paste("High dimensional Multinomial logistic regression models (estimated by msgl version ", x$msgl_version, ")", sep=""))
-	message()
-        message(paste("  This object contains ", length(models(x)), " sparse models with ", nrow(x$beta[[1]]), " classes.", sep=""))
-        message(paste("   The models contain between ", min(features(x)), " - ", max(features(x)), " nonzero features and ", min(parameters(x)), " - ", max(parameters(x)), " nonzero parameters.", sep =""))
-	message()
-	classnames <- paste(rownames(x$beta[[1]])[1:3], collapse=", ") #FIXME what if less than 3 classes + handle long class names
-	message(paste("  The first three classes are: ", classnames, sep=""))
-
+	sgl_print(x)
 }

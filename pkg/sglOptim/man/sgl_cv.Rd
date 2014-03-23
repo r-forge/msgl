@@ -4,7 +4,7 @@
 \usage{
   sgl_cv(module_name, PACKAGE, data, parameterGrouping,
     groupWeights, parameterWeights, alpha, lambda,
-    fold = 2L, cv.indices = list(), max.threads = 2L,
+    fold = 2, cv.indices = list(), max.threads = 2,
     algorithm.config = sgl.standard.config)
 }
 \arguments{
@@ -56,7 +56,11 @@
   used.}
 }
 \value{
-  sgl object content will depend on the C++ response class.
+  \item{responses}{content will depend on the C++ response
+  class} \item{cv.indices}{the cross validation splitting
+  used} \item{features}{number of features used in the
+  models} \item{parameters}{number of parameters used in
+  the models} \item{lambda}{the lambda sequence used.}
 }
 \description{
   Generic sparse group lasso cross validation using

@@ -97,7 +97,7 @@ compute_error <- function(object, data = NULL, response.name, response, loss) {
 		}
 		
 		if(is.list(r) && is.list(response)) {
-			return(lapply(1:length(r), function(i) compute_error(object = r[[i]], data = NULL, response.name = NULL, response = response[[i]], loss = loss)))
+			return(t(sapply(1:length(r), function(i) compute_error(object = r[[i]], data = NULL, response.name = NULL, response = response[[i]], loss = loss))))
 			
 		} else if(is.list(r)) {
 			return(sapply(r, function(m) loss(m, response)))	
@@ -214,7 +214,7 @@ parameters.sgl <- function(object, ...) {
 	}
 	
 	tmp <- features(object)
-	res <- sapply(1:length(object$beta), function(i) object$beta[[i]][,tmp[[i]]] != 0)
+	res <- sapply(1:length(object$beta), function(i) object$beta[[i]][,tmp[[i]], drop = FALSE] != 0)
 		
 	return(res)
 }
@@ -223,19 +223,14 @@ parameters.sgl <- function(object, ...) {
 #'
 #' @param object a sgl object
 #' @param ... not used
-#' @return the number of models in \code{x}
+#' @return the number of models in \code{object}
 #' 
 #' @author Martin Vincent
 #' @method nmod sgl
 #' @S3method nmod sgl
 #' @export
 nmod.sgl <- function(object, ...) {
-	
-	if(is.null(object$beta)) {
-		return (0)
-	}
-	
-	return(length(object$beta))
+	return(length(object$lambda))
 }
 
 #' @title Returns the estimated models (that is the \eqn{beta} matrices)
@@ -275,5 +270,102 @@ coef.sgl <- function(object, index = 1:nmod(object), ...) {
 		stop("object contains no models")
 	}
 	
-	return(lapply(object$beta[index], function(beta) beta[,colSums(beta != 0) != 0]))
+	return(lapply(object$beta[index], function(beta) beta[,colSums(beta != 0) != 0, drop = FALSE]))
+}
+
+
+#' @title Print information about sgl object
+#' 
+#' @param x a object of sgl family class 
+#'  
+#' @author Martin Vincent
+#' @export
+sgl_print <- function(x) {
+	
+	cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"), 
+			"\n", sep = "")
+	
+	if(x$type == "fit") {
+		
+		cat("\nModels:\n\n")
+		sel <- 1:5*floor(nmod(x)/5)
+		
+		feat <- sapply(features(x), length)
+		para <- sapply(parameters(x), sum)
+		
+		print(data.frame('Index: ' = sel, 
+						'Lambda: ' = x$lambda[sel], 
+						'Features: ' = feat[sel], 
+						'Parameters: ' = para[sel], check.names = FALSE), 
+				row.names = FALSE, digits = 2, right = TRUE)
+		
+		cat("\n")
+		#TODO classes
+		#cat("\nClasses:\n", paste(rownames(x$beta[[1]]), sep = ", "))
+		
+	} else if(x$type == "cv") {
+		
+		cat("\nModels:\n\n")
+		sel <- 1:5*floor(nmod(x)/5)
+		
+		err <- Err(x)
+		feat <- colMeans(x$features)
+		para <- colMeans(x$parameters)
+		
+		print(data.frame('Index: ' = sel, 
+						'Lambda: ' = x$lambda[sel], 
+						'Features: ' = feat[sel], 
+						'Parameters: ' = para[sel], 
+						'Error: ' = err[sel], check.names = FALSE),
+				row.names = FALSE, digits = 2, right = TRUE)
+		
+		cat("\nBest model:\n\n")
+		
+		sel <- which(err == min(err))[1]
+		
+		print(data.frame('Index: ' = sel, 
+						'Lambda: ' = x$lambda[sel], 
+						'Features: ' = feat[sel], 
+						'Parameters: ' = para[sel], 
+						'Error: ' = err[sel], check.names = FALSE),
+				row.names = FALSE, digits = 2, right = TRUE)
+		
+		cat("\n")
+		
+		#TODO classes
+		#cat("\nClasses:\n", paste(unique(classes.true), sep = ", "))
+		
+	} else if(x$type == "subsampling") {
+		
+		cat("\nBest models:\n\n")
+		
+		err <- Err(x)
+		
+		if(nrow(err) <= 5) {
+			sel <- 1:nrow(err)
+		} else {
+			sel <- 1:5*floor(ncol(err)/5)
+		}
+		
+		model.sel <- apply(err, 1, function(y) which(min(y) == y)[1])
+		
+		print(data.frame('Subsample: ' = sel, 
+						'Model index: ' = model.sel,
+						'Lambda: ' = x$lambda[model.sel], 
+						'Features: ' = sapply(1:length(sel), function(i) x$features[sel[i], model.sel[i]]), 
+						'Parameters: ' = sapply(1:length(sel), function(i) x$parameters[sel[i], model.sel[i]]), 
+						'Error: ' = sapply(1:length(sel), function(i) err[sel[i], model.sel[i]]), check.names = FALSE),
+				row.names = FALSE, digits = 2, right = TRUE)
+		
+		cat("\n")
+		
+	} else if(x$type == "predict") {
+		#TODO print some information
+	
+	} else {
+		stop("Unknown type of sgl object")
+	}
+	
+	
+	#TODO msgl version check that  object$msgl_version exists
 }

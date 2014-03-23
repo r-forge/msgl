@@ -89,7 +89,7 @@ public:
     int getIndex(std::string const& name) const
 	{
 
-        for (int index = 0; index < objects.size(); ++index)
+        for (unsigned int index = 0; index < objects.size(); ++index)
 		{
 			if (name.compare(names[index]) == 0)
 			{

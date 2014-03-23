@@ -1,21 +1,31 @@
 \name{nmod.msgl}
 \alias{nmod.msgl}
-\title{todo}
+\title{Returns the number of models in a msgl object}
 \usage{
-  \method{nmod}{msgl} (x, ...)
+  \method{nmod}{msgl} (object, ...)
 }
 \arguments{
-  \item{x}{a msgl object}
+  \item{object}{a msgl object}
 
   \item{...}{not used}
 }
 \value{
-  todo
+  the number of models in \code{object}
 }
 \description{
-  todo
+  Returns the number of models in a msgl object
+}
+\examples{
+data(SimData)
+x <- sim.data$x
+classes <- sim.data$classes
+lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 50, lambda.min = 0.05)
+fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+
+# the number of models
+nmod(fit)
 }
 \author{
-  martin
+  Martin Vincent
 }
 

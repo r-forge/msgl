@@ -6,7 +6,7 @@
     groupWeights, parameterWeights, alpha, ...)
 }
 \arguments{
-  \item{data}{sgldata object}
+  \item{data}{a sgldata object}
 
   \item{parameterGrouping}{grouping of parameters, a vector
   of length \eqn{p}. Each element of the vector specifying
@@ -18,7 +18,7 @@
   groups).}
 
   \item{parameterWeights}{a matrix of size \eqn{q \times
-  p}.}
+  p}, that is the same dimension as \eqn{\beta}.}
 
   \item{alpha}{the \eqn{\alpha} value 0 for group lasso, 1
   for lasso, between 0 and 1 gives a sparse group lasso
@@ -27,13 +27,14 @@
   \item{...}{not used}
 }
 \description{
-  Prepare sgl function arguments
+  Prepare sgl function arguments using sgldata.
 }
 \author{
   Martin Vincent
 }
 \seealso{
   Other sgldata: \code{\link{create.sgldata}},
+  \code{\link{prepare.args}},
   \code{\link{rearrange.sgldata}}
 }
 

@@ -1,0 +1,16 @@
+\name{sgl_print}
+\alias{sgl_print}
+\title{Print information about sgl object}
+\usage{
+  sgl_print(x)
+}
+\arguments{
+  \item{x}{a object of sgl family class}
+}
+\description{
+  Print information about sgl object
+}
+\author{
+  Martin Vincent
+}
+

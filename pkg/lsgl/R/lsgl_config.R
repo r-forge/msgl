@@ -38,7 +38,26 @@
 #' @param verbose If \code{TRUE} some information, regarding the status of the algorithm, will be printed in the R terminal.
 #' @return A configuration.
 #' @examples
-#' config.no_progressbar <- lsgl.algorithm.config(verbose = FALSE)
+#' 
+#' set.seed(100) # This may be removed, it ensures consistency of the daily tests
+#'
+#' ## Simulate from Y=XB+E, the dimension of Y is N x K, X is N x p, B is p x K 
+#' 
+#' N <- 100 #number of samples
+#' p <- 50 #number of features
+#' K <- 25  #number of groups
+#' 
+#' B<-matrix(sample(c(rep(1,p*K*0.1),rep(0, p*K-as.integer(p*K*0.1)))),nrow=p,ncol=K) 
+#' 
+#' X<-matrix(rnorm(N*p,1,1),nrow=N,ncol=p)
+#' Y<-X%*%B+matrix(rnorm(N*K,0,1),N,K)	
+#' 
+#' # Create configuration
+#' config <- lsgl.algorithm.config(verbose = FALSE)
+#'
+#' lambda<-lsgl.lambda(X,Y, alpha=1, lambda.min=.5, intercept=FALSE, algorithm.config = config)
+#' 
+#' fit <-lsgl(X,Y, alpha=1, lambda = lambda, intercept=FALSE, algorithm.config = config)
 #' @author Martin Vincent
 #' @export
 lsgl.algorithm.config <- function(tolerance_penalized_main_equation_loop = 1e-10, 

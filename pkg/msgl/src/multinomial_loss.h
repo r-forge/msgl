@@ -44,6 +44,7 @@ public:
 			sgl::Data<sgl::vector, 'W'> > data_type;
 
 	mutable sgl::matrix_field hessian_matrices;
+
 	mutable bool hessians_computed;
 
 
@@ -91,7 +92,7 @@ public:
 	}
 
     const sgl::matrix& hessians(sgl::natural i) const {
-		return hessian_matrices(i);
+		return  hessian_matrices(i);
 	}
 
 	const sgl::matrix& probabilities() const {

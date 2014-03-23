@@ -3,28 +3,30 @@
 \title{Compute a lambda sequence for the regularization path}
 \usage{
   lsgl.lambda(x, y, intercept = TRUE,
-    covariateGrouping = factor(1:ncol(x)),
-    groupWeights = c(sqrt(ncol(y) * table(covariateGrouping))),
+    grouping = factor(1:ncol(x)),
+    groupWeights = c(sqrt(ncol(y) * table(grouping))),
     parameterWeights = matrix(1, nrow = ncol(y), ncol = ncol(x)),
-    alpha = 0.5, d = 100L, lambda.min,
+    alpha = 1, d = 100L, lambda.min,
     algorithm.config = lsgl.standard.config)
 }
 \arguments{
-  \item{X}{}
+  \item{x}{design matrix, matrix of size \eqn{N \times p}.}
 
-  \item{Y}{}
+  \item{y}{response matrix, matrix of size \eqn{N \times
+  K}.}
 
-  \item{intercept}{}
+  \item{intercept}{should the model include intercept
+  parameters}
 
-  \item{covariateGrouping}{grouping of covariates, a factor
-  or vector of length \eqn{p}. Each element of the
-  factor/vector specifying the group of the covariate.}
+  \item{grouping}{grouping of features, a factor or vector
+  of length \eqn{p}. Each element of the factor/vector
+  specifying the group of the feature.}
 
   \item{groupWeights}{the group weights, a vector of length
-  \eqn{m+1} (the number of groups).}
+  \eqn{m} (the number of groups).}
 
   \item{parameterWeights}{a matrix of size \eqn{K \times
-  (p+1)}.}
+  p}.}
 
   \item{alpha}{the \eqn{\alpha} value 0 for group lasso, 1
   for lasso, between 0 and 1 gives a sparse group lasso

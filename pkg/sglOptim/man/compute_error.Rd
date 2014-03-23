@@ -19,7 +19,7 @@
   \item{loss}{the loss function}
 }
 \value{
-  a vector with the computed error rate
+  a vector with the computed error rates
 }
 \description{
   Helper function for computing error rates

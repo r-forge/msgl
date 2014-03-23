@@ -26,7 +26,9 @@
 #' @param object a sgl object containing a list of estimated models.
 #' @param data a list of data objects -- will be parsed to the specified module.
 #' @param ... not used.
-#' @return sgl object content will depend on the C++ response class.
+#' @return
+#' \item{responses}{content will depend on the C++ response class}
+#' \item{lambda}{the lambda sequence used.}
 #' @author Martin Vincent
 #' @export
 sgl_predict <- function(module_name, PACKAGE, object, data, ...) {
@@ -48,7 +50,11 @@ sgl_predict <- function(module_name, PACKAGE, object, data, ...) {
 		res$responses <- lapply(res$responses, function(x) .set_sample_names(x, data$sample.names))
 	}
 	
+	res$lambda <- object$lambda
+	
+	# Set version, type and class and return
 	res$sglOptim_version <- packageVersion("sglOptim")
+	res$type <- "predict"
 	class(res) <- "sgl"
 	
 	return(res)

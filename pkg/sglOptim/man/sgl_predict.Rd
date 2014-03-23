@@ -19,7 +19,8 @@
   \item{...}{not used.}
 }
 \value{
-  sgl object content will depend on the C++ response class.
+  \item{responses}{content will depend on the C++ response
+  class} \item{lambda}{the lambda sequence used.}
 }
 \description{
   Sgl predict

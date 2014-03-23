@@ -1,6 +1,8 @@
 export(msgl)
+export(msgl.algorithm.config)
 export(msgl.cv)
 export(msgl.lambda.seq)
+export(msgl.standard.config)
 export(msgl.subsampling)
 import(Matrix)
 import(sglOptim)

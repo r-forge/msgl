@@ -1,22 +1,35 @@
 \name{features.msgl}
 \alias{features.msgl}
-\title{todo}
+\title{Nonzero features}
 \usage{
-  \method{features}{msgl} (x, ...)
+  \method{features}{msgl} (object, ...)
 }
 \arguments{
-  \item{x}{a msgl object}
+  \item{object}{a msgl object}
 
-  \item{...}{not used}
+  \item{...}{ignored}
 }
 \value{
-  a list of nonzero features (that is nonzero colums of the
-  beta matrices)
+  a list of of length \code{nmod(x)} containing the nonzero
+  features (that is nonzero colums of the beta matrices)
 }
 \description{
-  todo
+  Extracts the nonzero features for each model.
+}
+\examples{
+data(SimData)
+x <- sim.data$x
+classes <- sim.data$classes
+lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 50, lambda.min = 0.05)
+fit <- msgl(x, classes, alpha = .5, lambda = lambda)
+
+# the nonzero features of model 1, 10 and 25
+features(fit)[c(1,10,25)]
+
+# count the number of nonzero features in each model
+sapply(features(fit), length)
 }
 \author{
-  martin
+  Martin Vincent
 }
 

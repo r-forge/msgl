@@ -20,37 +20,57 @@
 #
 
 
-#' todo
+#' @title Generic rearrange function
+#'
+#' @description
+#' Rearrange the order of the covariates in the \code{data} object.
+#'
 #' @param data a data object
-#' @param covariate.order the new order of the covarites
-#' @param ... additional paramters
-#' @return rearranged sgl data
+#' @param covariate.order the new order of the covariates
+#' @param ... additional parameters
+#' @return a rearranged data object of same class as \code{data}
 #' 
+#' @seealso rearrange.sgldata
 #' @author Martin Vincent
 #' @export
 rearrange <- function(data, covariate.order, ...) UseMethod("rearrange")
 
-#' todo
+#' @title Generic function for preparing the sgl call arguments
+#' 
+#' @description
+#' Compute and prepare the sgl call arguments for the objective function
+#' \deqn{\mathrm{loss}(\mathrm{data})(\beta) + \lambda \left( (1-\alpha) \sum_{J=1}^m \gamma_J \|\beta^{(J)}\|_2 + \alpha \sum_{i=1}^{n} \xi_i |\beta_i| \right)}
+#' where \eqn{\mathrm{loss}} is a loss/objective function.
+#' The \eqn{n} parameters are organized in the parameter matrix \eqn{\beta} with dimension \eqn{q\times p}.
+#' The vector \eqn{\beta^{(J)}} denotes the \eqn{J} parameter group, the dimension of \eqn{\beta^{(J)}} is denote by \eqn{d_J}.
+#' The dimensions \eqn{d_J} must be multiple of \eqn{q}, and \eqn{\beta = (\beta^{(1)} \cdots \beta^{(m)})}.
+#' The group weights \eqn{\gamma \in [0,\infty)^m} and the parameter weights \eqn{\xi \in [0,\infty)^{qp}}.
 #' @param data a data object
-#' @param ... additional paramters
+#' @param ... additional parameters
 #' @return 
-#' \item{block.dim}{a vector}
-#' \item{groupWeights}{}
-#' \item{parameterWeights}{}
-#' \item{alpha}{}
-#' \item{data}{}
-#' \item{group.order}{}
+#' \item{block.dim}{a vector of length \eqn{m}, containing the dimensions \eqn{d_J} of the groups (i.e. the number of parameters in the groups)}
+#' \item{groupWeights}{a vector of length \eqn{m}, containing the group weights}
+#' \item{parameterWeights}{a matrix of dimension \eqn{q \times p}, containing the parameter weights}
+#' \item{alpha}{the \eqn{\alpha} value}
+#' \item{data}{the data parsed to the loss module}
+#' \item{group.order}{original order of the columns of \eqn{\beta}. Before sgl routines return \eqn{\beta} will be reorganized according to this order.}
+#'
+#' @seealso prepare.args.sgldata
 #' @author Martin Vincent
 #' @export
+#' @family sgldata
 prepare.args <- function(data, ...) UseMethod("prepare.args")
 	
 
-#' Rearrange sgldata
-#' 
-#' @param data  sgldata object
-#' @param covariate.order the new order of the covarites
+#' @title Rearrange sgldata
+#'
+#' @description
+#' Rearrange the order of the covariates in a sgldata object.
+#'
+#' @param data  a sgldata object
+#' @param covariate.order the new order of the covariates
 #' @param ... not used
-#' @return a sgl data object with the covariates reordered
+#' @return a sgldata object with the covariates reordered
 #' @author Martin Vincent
 #' @method rearrange sgldata
 #' @S3method rearrange sgldata
@@ -65,17 +85,21 @@ rearrange.sgldata <- function(data, covariate.order, ...)
 	return(data)
 }
 
-#' Create sgl data
+#' @title Create a sgldata object
 #'
-#' @param x design matrix, matrix of size \eqn{N \times p}.
-#' @param y responses, vector of length \eqn{N}.
-#' @param weights sample weights, a vector of length \eqn{N}.
-#' @param sampleGrouping grouping of samples, a factor of length \eqn{N}. Default is no grouping (NULL), that is all samples is the same group.
+#' @description
+#' Creates a sgldata object from a design matrix and an optional response vector or matrix.
+#'
+#' @param x the design matrix, a matrix of size \eqn{N \times p} (will be parsed to the loss module as \code{X}).
+#' @param y the responses, \code{NULL}, a vector or a matrix (will be parsed to the loss module as \code{Y})..
+#' @param weights sample weights, a vector of length \eqn{N} (will be parsed to the loss module as \code{W}).
+#' @param sampleGrouping grouping of samples, a factor of length \eqn{N} (will be parsed to the loss module as \code{G}). Default is no grouping (NULL), that is all samples is the same group.
+#' @param group.names a vector with the names of the parameter groups (the length must equal the number of rows in the \eqn{\beta} matrix). 
 #' @param sparseX if TRUE \code{x} will be treated as sparse, if FALSE \code{x} will be treated as dens.
 #' @author Martin Vincent
 #' @export
 #' @family sgldata
-create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGrouping = NULL, sparseX = is(x, "sparseMatrix")) {
+create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGrouping = NULL, group.names = NULL, sparseX = is(x, "sparseMatrix")) {
 	
 	#TODO dim checks
 	
@@ -104,7 +128,6 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 	data$W <- as.numeric(weights)
 	
 	# sample grouping
-	
 	if(is.null(sampleGrouping)) {
 		sampleGrouping <- rep(1, nrow(x))
 	}
@@ -112,14 +135,20 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 	sampleGrouping <- factor(sampleGrouping)
 	data$G <- as.integer(factor(sampleGrouping))-1L
 	
+	# group names 
+	if(is.null(group.names)) {
+		data$group.names <- levels(sampleGrouping)
+	} else {
+		data$group.names <- group.names
+	}
+	
 	# dimensions
 	data$n.covariate <- ncol(x)
-	data$n.groups <- length(levels(sampleGrouping))
-	
+	data$n.groups <- as.integer(length(data$group.names))
+		
 	# names
 	data$sample.names <- rownames(x)
 	data$covariate.names <- colnames(x)
-	data$group.names <- levels(sampleGrouping)
 
 	# sparse X format
 	if(data$sparseX) {
@@ -130,12 +159,15 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 	return(data)
 }
 
-#' Prepare sgl function arguments 
+#' @title Prepare sgl function arguments 
 #' 
-#' @param data sgldata object
+#' @description
+#' Prepare sgl function arguments using sgldata.
+#'
+#' @param data a sgldata object
 #' @param parameterGrouping grouping of parameters, a vector of length \eqn{p}. Each element of the vector specifying the group of the parameters in the corresponding column of \eqn{\beta}. 
 #' @param groupWeights the group weights, a vector of length \code{length(unique(parameterGrouping))} (the number of groups). 
-#' @param parameterWeights a matrix of size \eqn{q \times p}. 
+#' @param parameterWeights a matrix of size \eqn{q \times p}, that is the same dimension as \eqn{\beta}. 
 #' @param alpha the \eqn{\alpha} value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
 #' @param ... not used
 #' @method prepare.args sgldata

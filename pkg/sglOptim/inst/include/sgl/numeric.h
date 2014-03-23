@@ -51,16 +51,17 @@ typedef arma::sp_mat sparse_matrix;
 typedef arma::field<sparse_matrix> sparse_matrix_field;
 typedef arma::sp_vec sparse_vector;
 
-//typedef BlockVector<vector> block_vector;
+//typedef BlockVector<sparse_matrix, sparse_vector> block_vector;
+//typedef sparse_vector parameter_block_vector;
+
 typedef BlockVector<sparse_matrix, vector> block_vector;
+typedef vector parameter_block_vector;
+
 typedef arma::field<block_vector> block_vector_field;
 
-//typedef sparse_vector parameter_block;
 typedef sparse_vector parameter_block;
 typedef block_vector parameter;
 typedef block_vector_field parameter_field;
-
-typedef vector parameter_block_vector;
 
 //Null vectors
 

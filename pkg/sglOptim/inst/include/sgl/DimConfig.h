@@ -74,12 +74,22 @@ public:
 			throw std::logic_error("L2 weights dimension mismatch");
 		}
 
+		//block_dim
+		for(sgl::natural i = 1; i < block_dim.n_elem; ++i) {
+			if(block_dim(i) == 0) {
+				throw std::logic_error("dimension of a block is zero");
+			}
+
+			if(block_dim(i) % block_unit_dim != 0) {
+				throw std::logic_error("dimension of a block is not a multiple of unit block size");
+			}
+		}
+
 		//Initialise index
 		index(0) = 0;
 		for (sgl::natural i = 1; i < index.n_elem; i++) {
-			index(i) = index(i - 1) + block_dim(i - 1);
+			index(i) = index(i - 1) + block_dim(i-1);
 		}
-
 	}
 
 	sgl::natural block_start_index(sgl::natural block_index) const;

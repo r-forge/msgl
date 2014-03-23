@@ -40,55 +40,66 @@
 #' @param collapse if \code{TRUE} the results for each subsample will be collapse into one result (this is useful if the subsamples are not overlapping)
 #' @param max.threads the maximal number of threads to be used.
 #' @param algorithm.config the algorithm configuration to be used. 
-#' @return sgl object content will depend on the C++ response class
+#' @return
+#' \item{responses}{content will depend on the C++ response class}
+#' \item{features}{number of features used in the models}
+#' \item{parameters}{number of parameters used in the models}
+#' \item{lambda}{the lambda sequence used.}
 #' @author Martin Vincent
 #' @export
-sgl_subsampling <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, collapse = FALSE, max.threads = 2L, algorithm.config = sgl.standard.config) {
-
-		#Check training and test consistency:
-		if(!is.list(training) | !is.list(test)) {
-			stop("The arguments traning and test should be lists")
-		}
-		
-		if(length(training) != length(test)) {
-			stop("The length of the lists traning and test should be equal")
-		}
-
-		# Prapare arguments
-		args <- prepare.args(data, parameterGrouping, groupWeights, parameterWeights, alpha)
-		
-		training <- lapply(training, sort)
-		test <- lapply(test, sort)
-		
-		training.0 <- lapply(training, function(x) as.integer(x - 1))
-		test.0 <- lapply(test, function(x) as.integer(x - 1))
-		
-		call_sym <- paste(module_name, "sgl_subsampling", sep="_")
-        res <- .Call(call_sym, PACKAGE = PACKAGE, args$data, args$block.dim, args$groupWeights, args$parameterWeights, args$alpha, lambda, training.0, test.0, collapse, max.threads, algorithm.config)
-
-		# Sample names
-		sample.names <- data$sample.names
-		
-		if(collapse == TRUE) {
-			# Reorder responses and set sample names
-			sample.order <- order(unlist(test))
-			res$responses <- lapply(res$responses, function(x) .order_response(x, sample.order))
-			res$responses <- lapply(res$responses, function(x) .set_sample_names(x, sample.names))
-		} else {
-			#Set sample names
-			res$responses <- lapply(res$responses, function(x) lapply(1:length(x), function(i) .set_sample_names(x[[i]], sample.names[test[[i]]])))
-		}
-		
-		# Names
-		rownames(res$features) <- paste("subsample", 1:length(training))
-		rownames(res$parameters) <- paste("subsample", 1:length(training))
-		
-		
-		res$sglOptim_version <- packageVersion("sglOptim")
-		class(res) <- "sgl"
-		return(res)
+sgl_subsampling <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, training, test, collapse = FALSE, max.threads = 2, algorithm.config = sgl.standard.config) {
+	
+	# cast
+	max.threads <- as.integer(max.threads)
+	
+	#Check training and test consistency:
+	if(!is.list(training) | !is.list(test)) {
+		stop("The arguments traning and test should be lists")
 	}
 	
+	if(length(training) != length(test)) {
+		stop("The length of the lists traning and test should be equal")
+	}
+	
+	# Prapare arguments
+	args <- prepare.args(data, parameterGrouping, groupWeights, parameterWeights, alpha)
+	
+	training <- lapply(training, sort)
+	test <- lapply(test, sort)
+	
+	training.0 <- lapply(training, function(x) as.integer(x - 1))
+	test.0 <- lapply(test, function(x) as.integer(x - 1))
+	
+	call_sym <- paste(module_name, "sgl_subsampling", sep="_")
+	res <- .Call(call_sym, PACKAGE = PACKAGE, args$data, args$block.dim, args$groupWeights, args$parameterWeights, args$alpha, lambda, training.0, test.0, collapse, max.threads, algorithm.config)
+	
+	# Sample names
+	sample.names <- data$sample.names
+	
+	if(collapse == TRUE) {
+		# Reorder responses and set sample names
+		sample.order <- order(unlist(test))
+		res$responses <- lapply(res$responses, function(x) .order_response(x, sample.order))
+		res$responses <- lapply(res$responses, function(x) .set_sample_names(x, sample.names))
+	} else {
+		#Set sample names
+		res$responses <- lapply(res$responses, function(x) lapply(1:length(x), function(i) .set_sample_names(x[[i]], sample.names[test[[i]]])))
+	}
+	
+	# Names
+	rownames(res$features) <- paste("subsample", 1:length(training))
+	rownames(res$parameters) <- paste("subsample", 1:length(training))
+	
+	res$lambda <- lambda
+	
+	# Set version, type and class and return
+	res$sglOptim_version <- packageVersion("sglOptim")
+	res$type <- "subsampling"
+	class(res) <- "sgl"
+	
+	return(res)
+}
+
 .set_sample_names <- function(response, sample.names) {
 	
 	if(is.list(response)) {
@@ -103,7 +114,7 @@ sgl_subsampling <- function(module_name, PACKAGE, data, parameterGrouping, group
 	stop("Unknown response type")
 	
 }
-	
+
 .order_response <- function(response, sample.order) {
 	
 	if(is.list(response)) {

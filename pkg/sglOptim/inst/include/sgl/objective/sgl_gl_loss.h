@@ -19,8 +19,27 @@
 #ifndef MSGL_MG_LOSS_H_
 #define MSGL_MG_LOSS_H_
 
+template<bool constant = false>
 class hessian_diagonal {
-	//TODO
+
+public:
+
+	static const bool is_constant = constant;
+
+	typedef sgl::vector representation;
+
+	static void diag(sgl::matrix & x, sgl::natural j, sgl::natural k, sgl::natural n_groups, sgl::vector const& H) {
+		x.submat(j * n_groups, k * n_groups,
+					(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += diagmat(H);
+	}
+
+	static sgl::vector const update(sgl::vector const& H, sgl::vector const& V, double s) {
+		return s * H % V;
+	}
+
+	static representation zero_representation(sgl::natural n_groups) {
+		return sgl::vector(n_groups, arma::fill::zeros);
+	}
 };
 
 template<bool constant = false>
@@ -32,9 +51,17 @@ public:
 
 	typedef double representation;
 
-	static void add(sgl::matrix & x, sgl::natural j, sgl::natural k, sgl::natural n_groups, double v, double H) {
+	static void diag(sgl::matrix & x, sgl::natural j, sgl::natural k, sgl::natural n_groups, double H) {
 		x.submat(j * n_groups, k * n_groups,
-					(j + 1) * n_groups - 1, (k + 1) * n_groups - 1).diag() += v * H;
+					(j + 1) * n_groups - 1, (k + 1) * n_groups - 1).diag() += H;
+	}
+
+	static sgl::vector update(double const& H, sgl::vector const& V, double s) {
+		return s * H * V;
+	}
+
+	static representation zero_representation(sgl::natural n_groups) {
+		return 0;
 	}
 
 };
@@ -48,9 +75,17 @@ public:
 
 	typedef sgl::matrix representation;
 
-	static void add(sgl::matrix & x, sgl::natural j, sgl::natural k, sgl::natural n_groups, double v, sgl::matrix const& H) {
+	static void diag(sgl::matrix & x, sgl::natural j, sgl::natural k, sgl::natural n_groups, sgl::matrix const& H) {
 		x.submat(j * n_groups, k * n_groups,
-					(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += v * H;
+					(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += H;
+	}
+
+	static sgl::vector update(sgl::matrix const& H, sgl::vector const& V, double s) {
+		return s * H * V;
+	}
+
+	static representation zero_representation(sgl::natural n_groups) {
+		return sgl::matrix(n_groups, n_groups, arma::fill::zeros);
 	}
 
 };
@@ -69,7 +104,7 @@ public:
 
 protected:
 
-	E const& X; //design matrix - n_features x n_samples
+	E const& X; //design matrix - n_samples x n_features
 
 	sgl::natural const n_samples;
 	sgl::natural const n_groups;
@@ -355,7 +390,7 @@ inline sgl::matrix const GenralizedLinearLossDense < T >::hessian_diag(
 				J += (*j_col) * (*k_col) * T::hessians(i);
 			}
 
-			hessian_type::add(hessian_diag_mat(block_index), j, k, n_groups, 1, J);
+			hessian_type::diag(hessian_diag_mat(block_index), j, k, n_groups, J);
 
 		}
 	}
@@ -388,7 +423,7 @@ void GenralizedLinearLossDense < T >::hessian_update(sgl::natural block_index,
 	//		partial_hessian.col(i) += T::hessians(i) * (tmp2 * trans(tmp1.row(i)));
 	//	}
 
-	sgl::parameter_block_vector tmp2(z - current_parameters.block(block_index));
+	sgl::matrix tmp2(z - current_parameters.block(block_index));
 	tmp2.reshape(n_groups, dim_config.block_dim(block_index) / n_groups);
 
 	if(hessian_type::is_constant) {
@@ -405,7 +440,9 @@ void GenralizedLinearLossDense < T >::hessian_update(sgl::natural block_index,
 
 		for (sgl::natural i = 0; i < n_samples; ++i)
 		{
-			partial_hessian.col(i) += T::hessians(i) * tmp1.col(i);
+
+			partial_hessian.col(i) += hessian_type::update(T::hessians(i), tmp1.col(i), 1.0);
+			//partial_hessian.col(i) += T::hessians(i) * tmp1.col(i);
 		}
 
 	}
@@ -493,7 +530,8 @@ void GenralizedLinearLossSparse < T >::hessian_update(sgl::natural block_index,
 
 			sgl::natural row = X.row_indices[j];
 
-			partial_hessian.col(row) += T::hessians(row) * tmp2 * X.values[j];
+			partial_hessian.col(row) += hessian_type::update(T::hessians(row), tmp2, X.values[j]);
+			//partial_hessian.col(row) += T::hessians(row) * tmp2 * X.values[j];
 		}
 	}
 
@@ -507,8 +545,6 @@ template < typename T >
 inline sgl::matrix const GenralizedLinearLossSparse < T >::hessian_diag(
 		sgl::natural block_index) const
 {
-
-	//TODO optimize see DENSE
 
 	TIMER_START;
 
@@ -530,6 +566,9 @@ inline sgl::matrix const GenralizedLinearLossSparse < T >::hessian_diag(
 	{
 		for (sgl::natural k = j; k < tmp.n_cols; ++k)
 		{
+
+			typename hessian_type::representation J(hessian_type::zero_representation(n_groups));
+
 			for (sgl::natural i1 = tmp.col_ptrs[j]; i1 < tmp.col_ptrs[j + 1]; ++i1)
 			{
 
@@ -552,13 +591,15 @@ inline sgl::matrix const GenralizedLinearLossSparse < T >::hessian_diag(
 
 				if (vi2 != 0)
 				{
-					hessian_type::add(hessian_diag_mat(block_index), j, k, n_groups, vi2 * tmp.values[i1], T::hessians(row1));
+					J += vi2 * tmp.values[i1]*T::hessians(row1);
 
 //					hessian_diag_mat(block_index).submat(j * n_groups, k * n_groups,
 //							(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += vi2 * tmp.values[i1]
 //							* T::hessians(row1);
 				}
 			}
+
+			hessian_type::diag(hessian_diag_mat(block_index), j, k, n_groups, J);
 		}
 	}
 

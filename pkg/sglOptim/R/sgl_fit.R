@@ -67,7 +67,11 @@ sgl_fit <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights,
 	# Dim names
 	res$beta <- lapply(res$beta, function(x) { dimnames(x) <- list(data$group.names, data$covariate.names); x })
 	
+	res$nmod <- length(res$beta)
+	
+	# Set version, type and class and return
 	res$sglOptim_version <- packageVersion("sglOptim")
+	res$type <- "fit"
 	class(res) <- "sgl"
 	
 	return(res)

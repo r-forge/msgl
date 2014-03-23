@@ -37,11 +37,19 @@
 #' If \code{cv.indices = NULL} then a random splitting will be generated using the \code{fold} argument.
 #' @param max.threads the maximal number of threads to be used.
 #' @param algorithm.config the algorithm configuration to be used. 
-#' @return sgl object content will depend on the C++ response class.
+#' @return
+#' \item{responses}{content will depend on the C++ response class}
+#' \item{cv.indices}{the cross validation splitting used}
+#' \item{features}{number of features used in the models}
+#' \item{parameters}{number of parameters used in the models}
+#' \item{lambda}{the lambda sequence used.}
 #' @author Martin Vincent
 #' @export
-sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, fold = 2L, cv.indices = list(), max.threads = 2L, algorithm.config = sgl.standard.config) {
+sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, lambda, fold = 2, cv.indices = list(), max.threads = 2, algorithm.config = sgl.standard.config) {
 	
+	# cast
+	fold <- as.integer(fold)
+		
 	if(length(cv.indices) == 0) {
 		
 		# Check fold
@@ -53,11 +61,10 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
 			stop("fold must be equal to or less than the number of samples")
 		}
 		
-		if(fold > max(table(data$G))) {
+		if(fold > min(table(data$G)) || length(unique(data$G)) == 1) {
 			# use random sample indices
 			use.cv.indices <- TRUE
 			cv.indices <- split(sample(1:(length(data$G))), 1:fold)
-			
 			# TODO need to ensure that each split has one sample from each class
 			
 		} else {
@@ -67,11 +74,20 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
 			cv.indices <- lapply(1:fold, function(i) sort(unlist(lapply(cv.indices, function(x) x[[i]]))))
 		}
 		
+		# Chek consistency of cv.indices
+		if(length(unlist(cv.indices)) != length(data$G) || sum(duplicated(unlist(cv.indices))) > 0) {
+			stop("Internal error computing the cross validation splitting (this is a bug)")
+		}
+		
 	} else {
-		# use user suplied cv splitting
+		# use user supplied cv splitting
+		# Chek consistency of cv.indices
+		if(length(unlist(cv.indices)) != length(data$G) || sum(duplicated(unlist(cv.indices))) > 0) {
+			stop("User supplied cv.indices are invalid (the cv.indices does not represent a cross validation splitting, use subsampling for general subsampling)")
+		}
 	}
-	
-	samples <- 1:max(unlist(cv.indices)) #TODO we should get the number of samples form somewhere else and chek consistency of cv.indices and samples
+
+	samples <- 1:max(unlist(cv.indices)) 
 	training <- lapply(cv.indices, function(x) samples[-x])
 	test <- cv.indices
 	
@@ -80,7 +96,9 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
 	# Add cv.indices
 	res$cv.indices <- cv.indices
 	
-	# Set class and return
+	# Set version, type and class and return
+	res$sglOptim_version <- packageVersion("sglOptim")
+	res$type <- "cv"
 	class(res) <- "sgl"
 	return(res)
 }
@@ -91,9 +109,6 @@ sgl_cv <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, 
 		stop("fold large than length of indices vector")
 	}
 	
-	tmp <- (1:fold)*round(length(indices)/fold)
-	tmp[length(tmp)] <- length(indices)
-	tmp <- c(0,tmp)
-	
-	return(lapply(2:length(tmp), function(i) indices[(tmp[i-1]+1):tmp[i]]))
+	tmp <- sapply(0:(length(indices)-1), function(i) (i %% fold)+1)	
+	return(lapply(1:fold, function(i) indices[tmp == i]))
 }

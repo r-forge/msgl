@@ -37,14 +37,24 @@
 }
 \examples{
 data(SimData)
-x <- sim.data$x
-classes <- sim.data$classes
-lambda <- msgl.lambda.seq(x, classes, alpha = .5, d = 20L, lambda.min = 0.01)
-fit <- msgl(x, classes, alpha = .5, lambda = lambda)
 
-# Training error
-res <- predict(fit, x)
-colSums(res$classes != classes)
+x.1 <- sim.data$x[1:50,]
+x.2 <- sim.data$x[51:100,]
+
+classes.1 <- sim.data$classes[1:50]
+classes.2 <- sim.data$classes[51:100]
+
+lambda <- msgl.lambda.seq(x.1, classes.1, alpha = .5, d = 50, lambda.min = 0.05)
+fit <- msgl(x.1, classes.1, alpha = .5, lambda = lambda)
+
+# Predict classes of new data set x.2
+res <- predict(fit, x.2)
+
+# The error rates of the models
+Err(res, classes = classes.2)
+
+# The predicted classes for model 20
+res$classes[,20]
 }
 \author{
   Martin Vincent

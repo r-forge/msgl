@@ -1,19 +1,23 @@
 \name{models.msgl}
 \alias{models.msgl}
-\title{Exstract the estimated models}
+\title{Exstract the fitted models}
 \usage{
-  \method{models}{msgl} (x, index = 1:nmod(x), ...)
+  \method{models}{msgl} (object, index = 1:nmod(object),
+    ...)
 }
 \arguments{
-  \item{x}{a msgl object}
+  \item{object}{a msgl object}
 
-  \item{index}{the models to be returned}
+  \item{index}{indices of the models to be returned}
+
+  \item{...}{ignored}
 }
 \value{
-  a list of sparse matrices
+  a list of \eqn{\beta} matrices.
 }
 \description{
-  Exstract the estimated models
+  Returns the fitted models, that is the estimated
+  \eqn{\beta} matrices.
 }
 \author{
   Martin Vincent

@@ -39,8 +39,11 @@
 #' @author Martin Vincent
 #' @export
 #' @import Matrix
-sgl_lambda_sequence <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha = 0.5, d = 100L, lambda.min, algorithm.config = sgl.standard.config) {
+sgl_lambda_sequence <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha = 0.5, d = 100, lambda.min, algorithm.config = sgl.standard.config) {
 	
+	# cast
+	d <- as.integer(d)
+		
 	args <- prepare.args(data, parameterGrouping, groupWeights, parameterWeights, alpha)
 	
 	call_sym <- paste(module_name, "sgl_lambda", sep="_")

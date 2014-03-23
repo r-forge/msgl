@@ -10,7 +10,7 @@
   \item{...}{not used}
 }
 \value{
-  the number of models in \code{x}
+  the number of models in \code{object}
 }
 \description{
   Returns the number of models in a sgl object
