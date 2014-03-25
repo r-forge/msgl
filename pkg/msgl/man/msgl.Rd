@@ -108,7 +108,7 @@ parameters(fit)[[10]]
 
 # The training errors of the models.
 Err(fit, x)
-# Warning: For high dimensional models the training errors are almost always over optimistic,
+# Note: For high dimensional models the training errors are almost always over optimistic,
 # instead use msgl.cv to estimate the expected errors by cross validation
 }
 \author{

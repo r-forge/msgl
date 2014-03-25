@@ -93,7 +93,7 @@ public:
 		{
 			if (name.compare(names[index]) == 0)
 			{
-				return index;
+				return static_cast<int>(index);
 			}
 		}
 

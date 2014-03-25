@@ -128,6 +128,7 @@ lsgl <- function(x, y, intercept = TRUE,
 	
 	res$intercept <- intercept
 	res$lsgl_version <- packageVersion("lsgl")
+	res$call <- cl
 	
 	class(res) <- "lsgl"
 	return(res)

@@ -34,9 +34,6 @@ private:
 
 	sgl::matrix lp; //linear predictors - matrix of size n_samples x n_responses
 
-	mutable sgl::matrix_field hessian_matrices; //TODO remove
-	mutable bool hessians_computed; //TODO remove
-
 public:
 
 	typedef sgl::hessian_identity<true> hessian_type; //constant hessians of type double * Id
@@ -53,10 +50,7 @@ public:
 				n_responses(0),
 				Y(sgl::null_matrix),
 				W(sgl::null_vector),
-				lp(n_samples, n_responses),
-				hessian_matrices(static_cast < sgl::natural >(0)),
-				hessians_computed(false)
-	{
+				lp(n_samples, n_responses)	{
 	}
 
 	FrobeniusLoss(data_type const& data)
@@ -64,24 +58,17 @@ public:
 				n_responses(data.get_B().n_groups),
 				Y(data.get_B().response),
 				W(data.get_C().data),
-				lp(n_samples, n_responses),
-				hessian_matrices(n_samples),
-				hessians_computed(false)
-	{
+				lp(n_samples, n_responses) {
 	}
 
 	void set_lp(sgl::matrix const& lp)
 	{
 		this->lp = lp;
-
-		//hessians_computed = false;
 	}
 
 	void set_lp_zero()
 	{
 		lp.zeros(n_samples, n_responses);
-
-		//hessians_computed = false;
 	}
 
 	const sgl::matrix gradients() const
@@ -91,29 +78,8 @@ public:
 
 	void compute_hessians() const
 	{
-
-		if (hessians_computed)
-		{
-			return;
-		}
-
-		sgl::vector tmp(n_responses);
-		tmp.fill(static_cast<double>(2)/static_cast<double>(n_samples));
-
-		//This only need to been done once
-		for (sgl::natural i = 0; i < n_samples; ++i)
-		{
-			hessian_matrices(i).zeros(n_responses, n_responses);
-			hessian_matrices(i).diag() = tmp;
-		}
-
-		hessians_computed = true;
+		return;
 	}
-
-//    const sgl::matrix& hessians(sgl::natural i) const
-//	{
-//		return hessian_matrices(i);
-//	}
 
     const double hessians(sgl::natural i) const
 	{

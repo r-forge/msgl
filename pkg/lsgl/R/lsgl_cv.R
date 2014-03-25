@@ -108,6 +108,7 @@ lsgl.cv <- function(x, y, intercept = TRUE,
 	
 	res$lsgl_version <- packageVersion("lsgl")
 	res$intercept <- intercept
+	res$call <- cl
 	
 	class(res) <- "lsgl"
 	return(res)

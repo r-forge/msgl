@@ -98,6 +98,7 @@ predict.lsgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...)
 	
 	res$Yhat <- lapply(res$responses$link, t)
 	res$responses <- NULL
+	res$call <- cl
 	
 	return(res)
 }
