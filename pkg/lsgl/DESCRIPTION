@@ -1,8 +1,8 @@
 Package: lsgl
 Type: Package
 Title: Linear sparse group lasso
-Version: 1.0.123.0
-Date: 2014-23-03
+Version: 1.1.124.0
+Date: 2014-26-06
 Author: Martin Vincent
 Maintainer: Martin Vincent <vincent@math.ku.dk>
 Description: Linear multiple output using sparse group lasso

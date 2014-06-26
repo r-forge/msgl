@@ -57,8 +57,14 @@ private:
 
 		arma::field < response_type > response(n_samples);
 
-		sgl::matrix lp(X);
-		lp = beta * trans(lp);
+//		sgl::matrix lp(X);
+//		lp = beta * trans(lp);
+
+//		sgl::matrix tmp(beta);
+//		sgl::matrix lp(tmp*trans(X));
+
+		sgl::matrix lp(X * trans(beta));
+		lp = trans(lp);
 
 		for (sgl::natural i = 0; i < n_samples; ++i)
 		{

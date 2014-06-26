@@ -84,13 +84,13 @@ predict.lsgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...)
 		x <- as(x, "CsparseMatrix")
 		data$X <- list(dim(x), x@p, x@i, x@x)
 		
-		res <- sgl_predict("lsgl_sparse", "lsgl", object, data)
+		res <- sgl_predict("lsgl_xs_yd", "lsgl", object, data)
 		
 	} else {
 		
 		data$X <- as.matrix(x)
 		
-		res <- sgl_predict("lsgl_dense", "lsgl", object, data)
+		res <- sgl_predict("lsgl_xd_yd", "lsgl", object, data)
 		
 	}
 	

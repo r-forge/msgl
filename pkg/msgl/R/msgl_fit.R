@@ -90,6 +90,11 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 	# Get call
 	cl <- match.call()
 	
+	#Check dimensions 
+	if(nrow(x) != length(classes)) {
+		stop("the number of rows in x must match the length of classes")
+	}
+	
 	# Default values
 	if(is.null(grouping)) {
 		covariateGrouping <- factor(1:ncol(x))
@@ -112,9 +117,16 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 	
 	# Standardize
 	if(standardize) {
-		x <- scale(x, if(sparse.data) FALSE else TRUE, TRUE)
-		x.scale <- attr(x, "scaled:scale")
-		x.center <- if(sparse.data) rep(0, length(x.scale)) else attr(x, "scaled:center")
+		
+		if(sparse.data) {
+			x.scale <- sqrt(colMeans(x*x) - colMeans(x)^2)
+			x.center <- rep(0, length(x.scale))
+			x <- x%*%Diagonal(x=1/x.scale)
+		} else {
+			x <- scale(x, if(sparse.data) FALSE else TRUE, TRUE)
+			x.scale <- attr(x, "scaled:scale")
+			x.center <- if(sparse.data) rep(0, length(x.scale)) else attr(x, "scaled:center")
+		}
 	}
 	
 	if(intercept) {
@@ -218,6 +230,11 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 #' @useDynLib msgl .registration=TRUE
 msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), length(classes)), grouping = NULL, groupWeights = NULL, parameterWeights = NULL, alpha = 0.5, d = 100L, standardize = TRUE, lambda.min, intercept = TRUE, sparse.data = is(x, "sparseMatrix"), algorithm.config = sgl.standard.config) {
 
+		#Check dimensions 
+		if(nrow(x) != length(classes)) {
+			stop("the number of rows in x must match the length of classes")
+		}
+	
         # cast
         classes <- factor(classes)
 
@@ -237,11 +254,18 @@ msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), l
                 parameterWeights <-  matrix(1, nrow = length(levels(classes)), ncol = ncol(x))
         }
 
-        # Standardize
+	    # Standardize
         if(standardize) {
-                x <- scale(x, if(sparse.data) FALSE else TRUE, TRUE)
+			
+			if(sparse.data) {
+				x.scale <- sqrt(colMeans(x*x) - colMeans(x)^2)
+				x.center <- rep(0, length(x.scale))
+				x <- x%*%Diagonal(x=1/x.scale)
+			} else {
+				x <- scale(x, if(sparse.data) FALSE else TRUE, TRUE)
                 x.scale <- attr(x, "scaled:scale")
                 x.center <- if(sparse.data) rep(0, length(x.scale)) else attr(x, "scaled:center")
+			}
         }
 
 		if(intercept) {
@@ -251,7 +275,7 @@ msgl.lambda.seq <- function(x, classes, sampleWeights = rep(1/length(classes), l
 			parameterWeights <- cbind(rep(0, length(levels(classes))), parameterWeights)
 			covariateGrouping <- factor(c("Intercept", as.character(covariateGrouping)), levels = c("Intercept", levels(covariateGrouping)))
 		}
-		
+					
         # create data
         data <- create.sgldata(x, y = NULL, sampleWeights, classes, sparseX = sparse.data)
 

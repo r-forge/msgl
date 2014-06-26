@@ -19,6 +19,9 @@
 //Uncomment to turn on debuging
 //#undef NDEBUG
 
+//FIXME remove
+//#define PRINT_BACKTRACE
+
 //Should the timers be activated (only needed for profiling the code)
 //#define SGL_TIMING
 

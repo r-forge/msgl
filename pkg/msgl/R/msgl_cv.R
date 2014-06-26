@@ -82,6 +82,11 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 	# Get call
 	cl <- match.call()
 	
+	#Check dimensions 
+	if(nrow(x) != length(classes)) {
+		stop("the number of rows in x must match the length of classes")
+	}
+	
 	if(!is.null(seed)) {
 		set.seed(seed)
 		warning("seed argument deprecated use set.seed")
@@ -127,9 +132,16 @@ msgl.cv <- function(x, classes, sampleWeights = NULL, grouping = NULL, groupWeig
 	
 	# Standardize
 	if(standardize) {
-		x <- scale(x, if(sparse.data) FALSE else TRUE, TRUE)
-		x.scale <- attr(x, "scaled:scale")
-		x.center <- if(sparse.data) rep(0, length(x.scale)) else attr(x, "scaled:center")
+		
+		if(sparse.data) {
+			x.scale <- sqrt(colMeans(x*x) - colMeans(x)^2)
+			x.center <- rep(0, length(x.scale))
+			x <- x%*%Diagonal(x=1/x.scale)
+		} else {
+			x <- scale(x, if(sparse.data) FALSE else TRUE, TRUE)
+			x.scale <- attr(x, "scaled:scale")
+			x.center <- if(sparse.data) rep(0, length(x.scale)) else attr(x, "scaled:center")
+		}
 	}
 	
 	if(intercept) {

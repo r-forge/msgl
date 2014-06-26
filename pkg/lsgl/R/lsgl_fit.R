@@ -115,12 +115,9 @@ lsgl <- function(x, y, intercept = TRUE,
 	data <- create.sgldata(x, y, group.names = group.names)
 	
 	# call SglOptimizer function
-	if(data$sparseX) {
-		res <- sgl_fit("lsgl_sparse", "lsgl", data, grouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
-	} else {
-		res <- sgl_fit("lsgl_dense", "lsgl", data, grouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
-	}
-	
+	callsym <- paste("lsgl_", if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+	res <- sgl_fit(callsym, "lsgl", data, grouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
+
 	# Add true response
 	res$Y.true <- y
 	
@@ -180,11 +177,8 @@ lsgl.lambda <- function(x, y, intercept = TRUE,
 	data <- create.sgldata(x, y, group.names = group.names)
 	
 	# call SglOptimizer function
-	if(data$sparseX) {
-		lambda <- sgl_lambda_sequence("lsgl_sparse", "lsgl", data, grouping, groupWeights, parameterWeights, alpha = alpha, d = d, lambda.min, algorithm.config)
-	} else {
-		lambda <- sgl_lambda_sequence("lsgl_dense", "lsgl", data, grouping, groupWeights, parameterWeights, alpha = alpha, d = d, lambda.min, algorithm.config)
-	}
+	callsym <- paste("lsgl_", if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+	lambda <- sgl_lambda_sequence(callsym, "lsgl", data, grouping, groupWeights, parameterWeights, alpha = alpha, d = d, lambda.min, algorithm.config)
 	
 	return(lambda)
 }

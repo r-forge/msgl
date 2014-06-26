@@ -45,12 +45,12 @@
 
 /**********************************
  *
- *  lsgl dense module
+ *  lsgl X dense Y dense module
  *
  *********************************/
 
 // Module name
-#define MODULE_NAME lsgl_dense
+#define MODULE_NAME lsgl_xd_yd
 
 //Objective
 #include "frobenius_norm_objective.h"
@@ -67,7 +67,7 @@
 
 /*********************************
  *
- *  lsgl sparse module
+ *  lsgl X sparse Y dense module
  *
  *********************************/
 // Reset macros
@@ -76,12 +76,64 @@
 #undef PREDICTOR
 
 // Module name
-#define MODULE_NAME lsgl_sparse
+#define MODULE_NAME lsgl_xs_yd
 
 //Objective
 #include "frobenius_norm_objective.h"
 
 #define OBJECTIVE frobenius_spx
+
+#include <sgl/RInterface/sgl_lambda_seq.h>
+#include <sgl/RInterface/sgl_fit.h>
+
+#define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , sgl::LinearResponse >
+
+#include <sgl/RInterface/sgl_predict.h>
+#include <sgl/RInterface/sgl_subsampling.h>
+
+/*********************************
+ *
+ *  lsgl X dense Y sparse module
+ *
+ *********************************/
+// Reset macros
+#undef MODULE_NAME
+#undef OBJECTIVE
+#undef PREDICTOR
+
+// Module name
+#define MODULE_NAME lsgl_xd_ys
+
+//Objective
+#include "frobenius_norm_objective.h"
+
+#define OBJECTIVE frobenius_spy
+
+#include <sgl/RInterface/sgl_lambda_seq.h>
+#include <sgl/RInterface/sgl_fit.h>
+
+#define PREDICTOR sgl::LinearPredictor < sgl::matrix , sgl::LinearResponse >
+
+#include <sgl/RInterface/sgl_predict.h>
+#include <sgl/RInterface/sgl_subsampling.h>
+
+/*********************************
+ *
+ *  lsgl X dense Y sparse module
+ *
+ *********************************/
+// Reset macros
+#undef MODULE_NAME
+#undef OBJECTIVE
+#undef PREDICTOR
+
+// Module name
+#define MODULE_NAME lsgl_xs_ys
+
+//Objective
+#include "frobenius_norm_objective.h"
+
+#define OBJECTIVE frobenius_spx_spy
 
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>
@@ -100,10 +152,14 @@
 #include <R_ext/Rdynload.h>
 
 static const R_CallMethodDef sglCallMethods[] = {
-		SGL_LAMBDA(lsgl_dense), SGL_LAMBDA(lsgl_sparse),
-		SGL_FIT(lsgl_dense), SGL_FIT(lsgl_sparse),
-		SGL_PREDICT(lsgl_dense), SGL_PREDICT(lsgl_sparse),
-		SGL_SUBSAMPLING(lsgl_dense), SGL_SUBSAMPLING(lsgl_sparse),
+		SGL_LAMBDA(lsgl_xd_yd), SGL_LAMBDA(lsgl_xs_yd),
+		SGL_LAMBDA(lsgl_xd_ys), SGL_LAMBDA(lsgl_xs_ys),
+		SGL_FIT(lsgl_xd_yd), SGL_FIT(lsgl_xs_yd),
+		SGL_FIT(lsgl_xd_ys), SGL_FIT(lsgl_xs_ys),
+		SGL_PREDICT(lsgl_xd_yd), SGL_PREDICT(lsgl_xs_yd),
+		SGL_PREDICT(lsgl_xd_ys), SGL_PREDICT(lsgl_xs_ys),
+		SGL_SUBSAMPLING(lsgl_xd_yd), SGL_SUBSAMPLING(lsgl_xs_yd),
+		SGL_SUBSAMPLING(lsgl_xd_ys), SGL_SUBSAMPLING(lsgl_xs_ys),
 		NULL};
 
 extern "C" {

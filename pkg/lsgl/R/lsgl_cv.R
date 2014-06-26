@@ -89,15 +89,8 @@ lsgl.cv <- function(x, y, intercept = TRUE,
 	data <- create.sgldata(x, y, group.names = group.names)
 	
 	# call SglOptimizer function
-	if(data$sparseX) {
-		
-		res <- sgl_cv("lsgl_sparse", "lsgl", data, grouping, groupWeights, parameterWeights, alpha, lambda, fold, cv.indices, max.threads, algorithm.config)
-		
-	} else {
-		
-		res <- sgl_cv("lsgl_dense", "lsgl", data, grouping, groupWeights, parameterWeights, alpha, lambda, fold, cv.indices, max.threads, algorithm.config)
-		
-	}
+	callsym <- paste("lsgl_", if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+	res <- sgl_cv(callsym, "lsgl", data, grouping, groupWeights, parameterWeights, alpha, lambda, fold, cv.indices, max.threads, algorithm.config)
 	
 	# Add true response
 	res$Y.true <- y

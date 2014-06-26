@@ -19,7 +19,10 @@
 #ifndef FOBENIUS_NORM_OBJECTIVE_H_
 #define FOBENIUS_NORM_OBJECTIVE_H_
 
-template < typename T >
+//type_X : sgl::matrix or sgl::sparse_matrix
+//type_Y : sgl::matrix or sgl::sparse_matrix
+
+template < typename type_X, typename type_Y >
 class FrobeniusLoss {
 
 public:
@@ -29,7 +32,7 @@ public:
 
 private:
 
-	sgl::matrix const& Y; //response - matrix of size n_samples x n_responses
+	type_Y const& Y; //response - matrix of size n_samples x n_responses
 	sgl::vector const& W; //vector of size n_samples
 
 	sgl::matrix lp; //linear predictors - matrix of size n_samples x n_responses
@@ -39,8 +42,8 @@ public:
 	typedef sgl::hessian_identity<true> hessian_type; //constant hessians of type double * Id
 	//typedef sgl::hessian_full hessian_type;
 
-	typedef sgl::DataPackage_3< sgl::MatrixData<T>,
-				sgl::MultiResponse<'Y'>,
+	typedef sgl::DataPackage_3< sgl::MatrixData<type_X>,
+				sgl::MultiResponse<type_Y, 'Y'>,
 				sgl::Data<sgl::vector, 'W'> > data_type;
 
 
@@ -93,11 +96,19 @@ public:
 
 };
 
-typedef sgl::ObjectiveFunctionType < sgl::GenralizedLinearLossDense < FrobeniusLoss < sgl::matrix > > ,
-		FrobeniusLoss < sgl::matrix >::data_type > frobenius;
+typedef sgl::ObjectiveFunctionType < sgl::GenralizedLinearLossDense < FrobeniusLoss < sgl::matrix, sgl::matrix > > ,
+		FrobeniusLoss < sgl::matrix, sgl::matrix >::data_type > frobenius;
 
 typedef sgl::ObjectiveFunctionType <
-		sgl::GenralizedLinearLossSparse < FrobeniusLoss < sgl::sparse_matrix > > ,
-		FrobeniusLoss < sgl::sparse_matrix >::data_type > frobenius_spx;
+		sgl::GenralizedLinearLossSparse < FrobeniusLoss < sgl::sparse_matrix, sgl::matrix > > ,
+		FrobeniusLoss < sgl::sparse_matrix, sgl::matrix >::data_type > frobenius_spx;
+
+typedef sgl::ObjectiveFunctionType <
+		sgl::GenralizedLinearLossDense < FrobeniusLoss < sgl::matrix, sgl::sparse_matrix > > ,
+		FrobeniusLoss < sgl::matrix, sgl::sparse_matrix >::data_type > frobenius_spy;
+
+typedef sgl::ObjectiveFunctionType <
+		sgl::GenralizedLinearLossSparse < FrobeniusLoss < sgl::sparse_matrix, sgl::sparse_matrix > > ,
+		FrobeniusLoss < sgl::sparse_matrix, sgl::sparse_matrix >::data_type > frobenius_spx_spy;
 
 #endif /* FOBENIUS_NORM_OBJECTIVE_H_ */

@@ -40,7 +40,7 @@
 //#define SGL_DEBUG_SIMPLE
 //#define SGL_DEBUG_COMPLEX
 //#define SGL_DEBUG_INFO_ALL
-//#define PRINT_BACKTRACE //FIXME
+//#define PRINT_BACKTRACE
 //#define SGL_DEBUG_INFO_STEPSIZE
 #else
 // Do no debugging
@@ -50,7 +50,7 @@
 
 //Backtrace will only work if install on system
 #ifdef PRINT_BACKTRACE
-#include <Backtrace.h>
+#include "sgl/Backtrace.h"
 #endif
 
 // Openmp currently not supported on sparc

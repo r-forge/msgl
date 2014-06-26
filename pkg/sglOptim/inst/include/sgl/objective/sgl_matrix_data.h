@@ -166,30 +166,30 @@ public:
     }
 };
 
-template<char symbol>
+template<typename T, char symbol>
 class MultiResponse {
 
 public:
 
-	sgl::matrix const response; // data matrix rows -> samples, cols -> features
+	T const response; // data matrix n_samples x n_responses
 	sgl::natural const n_groups; // responses per sample
 
 	MultiResponse() : response(), n_groups(0) {
 	}
 
-	MultiResponse(sgl::matrix const& response) :
+	MultiResponse(T const& response) :
 		response(response), n_groups(response.n_cols) {
 	}
 
-	MultiResponse(MultiResponse<symbol> const& data) :
+	MultiResponse(MultiResponse<T, symbol> const& data) :
 		response(data.response), n_groups(data.n_groups) {
 	}
 
-	MultiResponse(rList const& rdata) : response(getData<sgl::matrix>(rdata, symbol)), n_groups(response.n_cols) {
+	MultiResponse(rList const& rdata) : response(getData<T>(rdata, symbol)), n_groups(response.n_cols) {
 	}
 
 
-	MultiResponse<symbol> & operator =(MultiResponse<symbol> const& source) {
+	MultiResponse<T, symbol> & operator =(MultiResponse<T, symbol> const& source) {
 
     	if (this != &source) {
     		set_matrix(source.response);
@@ -198,12 +198,12 @@ public:
     	return *this;
     }
 
-    const MultiResponse<symbol> subdata(sgl::natural_vector const& samples) const {
-        return MultiResponse<symbol>(submatrix<sgl::matrix>(response, samples));
+    const MultiResponse<T, symbol> subdata(sgl::natural_vector const& samples) const {
+        return MultiResponse<T, symbol>(submatrix<T>(response, samples));
     }
 
-	void set_matrix(sgl::matrix const& response) {
-		const_cast<sgl::matrix&>(this->response) = response;
+	void set_matrix(T const& response) {
+		const_cast<T&>(this->response) = response;
 		const_cast<sgl::natural&>(this->n_groups) = response.n_cols;
 	}
 };

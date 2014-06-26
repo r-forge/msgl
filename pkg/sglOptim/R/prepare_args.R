@@ -99,7 +99,7 @@ rearrange.sgldata <- function(data, covariate.order, ...)
 #' @author Martin Vincent
 #' @export
 #' @family sgldata
-create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGrouping = NULL, group.names = NULL, sparseX = is(x, "sparseMatrix")) {
+create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGrouping = NULL, group.names = NULL, sparseX = is(x, "sparseMatrix"), sparseY = is(y, "sparseMatrix")) {
 	
 	#TODO dim checks
 	
@@ -107,6 +107,7 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 	
 	# Is X sparse
 	data$sparseX <- sparseX
+	data$sparseY <- sparseY
 
 	if(data$sparseX) {
 		data$X <- as(x, "CsparseMatrix")
@@ -120,6 +121,8 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 		data$Y <- as.numeric(y)
 	} else if(is.matrix(y)) {
 		data$Y <- apply(y, 2, as.numeric)
+	} else if(sparseY) {
+		data$Y <- as(y, "CsparseMatrix")
 	} else {
 		stop("y is of unknown type")
 	}
@@ -155,6 +158,11 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 		data$X <- list(dim(data$X), data$X@p, data$X@i, data$X@x)
 	}
 		
+	# sparse Y format
+	if(data$sparseY) {
+		data$Y <- list(dim(data$Y), data$Y@p, data$Y@i, data$Y@x)
+	}
+	
 	class(data) <- "sgldata"
 	return(data)
 }
