@@ -48,7 +48,7 @@ SEXP FUN_NAME(sgl_lambda, MODULE_NAME) (SEXP r_data, SEXP r_block_dim, SEXP r_bl
 
 	sgl::DimConfig dim_config = sgl::createDimConfig(block_dim, blockWeights, parameterWeights);
 
-	sgl::Interface < sgl::AlgorithmConfiguration, OBJECTIVE > sgl_optimizer(obj_type, dim_config, alpha, config);
+	sgl::Interface < OBJECTIVE > sgl_optimizer(obj_type, dim_config, alpha, config);
 	sgl::vector result = sgl_optimizer.lambda_sequence(sgl_optimizer.lambda_max(), get_value < sgl::numeric > (r_lambdaMin),
 			get_value < sgl::natural > (r_numberOfModels));
 

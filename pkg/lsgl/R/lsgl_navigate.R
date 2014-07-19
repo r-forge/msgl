@@ -68,7 +68,6 @@
 #' Err(fit.cv)
 #' 
 #' @method Err lsgl
-#' @S3method Err lsgl
 #' @import sglOptim
 #' @export
 Err.lsgl <- function(object, data = NULL, response = object$Y.true, y = response, ... ) {
@@ -110,11 +109,17 @@ Err.lsgl <- function(object, data = NULL, response = object$Y.true, y = response
 #'
 #' @author Martin Vincent
 #' @method features lsgl
-#' @S3method features lsgl
 #' @import sglOptim
 #' @export
 features.lsgl <- function(object, ...) {
+	
 	class(object) <- "sgl" # Use std function
+
+	if(!is.null(object$beta)) {
+		# sgl uses t(beta)
+		object$beta <- lapply(object$beta, t)
+	}
+	
 	return(features(object))
 }
 
@@ -153,11 +158,17 @@ features.lsgl <- function(object, ...) {
 #'
 #' @author Martin Vincent
 #' @method parameters lsgl
-#' @S3method parameters lsgl
 #' @import sglOptim
 #' @export
 parameters.lsgl <- function(object, ...) {
+	
 	class(object) <- "sgl" # Use std function
+	
+	if(!is.null(object$beta)) {
+		# sgl uses t(beta)
+		object$beta <- lapply(object$beta, t)
+	}
+	
 	return(parameters(object))
 }
 
@@ -190,7 +201,6 @@ parameters.lsgl <- function(object, ...) {
 #'
 #' @author Martin Vincent
 #' @method nmod lsgl
-#' @S3method nmod lsgl
 #' @import sglOptim
 #' @export
 nmod.lsgl <- function(object, ...) {
@@ -210,11 +220,11 @@ nmod.lsgl <- function(object, ...) {
 #' 
 #' @author Martin Vincent
 #' @method models lsgl
-#' @S3method models lsgl
 #' @import sglOptim
 #' @export
 models.lsgl <- function(object, index = 1:nmod(object), ...) {
 	class(object) <- "sgl" # Use std function
+	
 	return(models(object, ...))
 }
 
@@ -248,11 +258,17 @@ models.lsgl <- function(object, index = 1:nmod(object), ...) {
 #'
 #' @author Martin Vincent
 #' @method coef lsgl
-#' @S3method coef lsgl
 #' @import sglOptim
 #' @export
 coef.lsgl <- function(object, index = 1:nmod(object), ...) {
+	
 	class(object) <- "sgl" # Use std function
+	
+	if(!is.null(object$beta)) {
+		# sgl uses t(beta)
+		object$beta <- lapply(object$beta, t)
+	}
+	
 	return(coef(object, index = index, ...))
 }
 
@@ -292,16 +308,9 @@ coef.lsgl <- function(object, index = 1:nmod(object), ...) {
 #' fit.cv
 #' 
 #' @method print lsgl
-#' @S3method print lsgl
 #' @author Martin Vincent
 #' @import sglOptim
 #' @export
 print.lsgl <- function(x, ...) {
-	
-	if(!is.null(x$beta)) {
-		# sgl uses t(beta)
-		x$beta <- lapply(x$beta, t)
-	}
-	
 	sgl_print(x)
 }

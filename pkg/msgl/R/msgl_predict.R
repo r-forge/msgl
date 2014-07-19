@@ -34,7 +34,6 @@
 #' 
 #' @author Martin Vincent
 #' @method predict msgl
-#' @S3method predict msgl
 #' @export
 #' @useDynLib msgl .registration=TRUE
 predict.msgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...) {

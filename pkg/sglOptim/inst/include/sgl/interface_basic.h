@@ -19,15 +19,15 @@
 #ifndef INTERFACE_BASIC_H_
 #define INTERFACE_BASIC_H_
 
-template<typename CONFIG, typename ObjectiveFunctionType>
+template<typename ObjectiveFunctionType>
 class Interface {
 
 public:
 
 	const sgl::numeric alpha;
 
-	sgl::SglProblem<CONFIG> const sgl;
-	sgl::SglOptimizer<sgl::SglProblem<CONFIG> > const optimizer;
+	sgl::SglProblem const sgl;
+	sgl::SglOptimizer const optimizer;
 	ObjectiveFunctionType const& objective_type;
 
 	/**
@@ -40,7 +40,7 @@ public:
 	 */
 	Interface(ObjectiveFunctionType const& objective_type,
 			sgl::DimConfig const& dim_config, sgl::numeric alpha,
-			CONFIG const& config) :
+			AlgorithmConfiguration const& config) :
 			alpha(alpha), sgl(dim_config, config), optimizer(sgl, alpha), objective_type(
 					objective_type) {
 
@@ -75,8 +75,7 @@ public:
 	 *
 	 * @return
 	 */
-	sgl::numeric
-	lambda_max() const;
+	sgl::numeric lambda_max() const;
 
 	/**
 	 *
@@ -85,29 +84,41 @@ public:
 	 * @param n
 	 * @return
 	 */
-	sgl::vector
-	lambda_sequence(sgl::numeric lambda_max, sgl::numeric lambda_min,
+	sgl::vector	lambda_sequence(sgl::numeric lambda_max, sgl::numeric lambda_min,
 			sgl::natural n) const;
 };
 
 //TODO this interface is dangerous as a call changes the state of the objective
-template<typename CONFIG, typename ObjectiveFunctionType>
-sgl::numeric Interface<CONFIG, ObjectiveFunctionType>::lambda_max() const {
+template<typename ObjectiveFunctionType>
+sgl::numeric Interface<ObjectiveFunctionType>::lambda_max() const {
 
 	sgl::vector gradient(sgl.setup.dim);
 
-	typename ObjectiveFunctionType::instance_type objective_function =
-			objective_type.create_instance(sgl.setup);
+	typename ObjectiveFunctionType::instance_type objective = objective_type.create_instance(sgl.setup);
 
-	objective_function.at_zero();
-	gradient = objective_function.gradient();
+	objective.at_zero();
+	gradient = objective.gradient();
+
+	//Fit non penalized parameters
+	sgl::parameter_field x_field(1);
+	sgl::natural_vector needed_solutions(1, arma::fill::zeros);
+	sgl::vector object_value(1);
+	sgl::vector function_value(1);
+	sgl::vector lambda_sequence(1);
+
+	lambda_sequence(0) =  std::numeric_limits<double>::max();
+	optimizer.optimize(x_field, needed_solutions, object_value, function_value,
+			objective, lambda_sequence, true, false);
+
+	//Compute lambda max
+	gradient = objective.gradient();
 
 	return sgl.compute_critical_lambda(gradient, alpha);
 
 }
 
-template<typename CONFIG, typename ObjectiveFunctionType>
-sgl::vector Interface<CONFIG, ObjectiveFunctionType>::lambda_sequence(
+template<typename ObjectiveFunctionType>
+sgl::vector Interface<ObjectiveFunctionType>::lambda_sequence(
 		sgl::numeric lambda_max, sgl::numeric lambda_min,
 		sgl::natural n) const {
 	sgl::vector lambda_sequence(n);
@@ -123,8 +134,8 @@ sgl::vector Interface<CONFIG, ObjectiveFunctionType>::lambda_sequence(
 	return lambda_sequence;
 }
 
-template<typename CONFIG, typename ObjectiveFunctionType>
-inline sgl::natural Interface<CONFIG, ObjectiveFunctionType>::optimize(
+template<typename ObjectiveFunctionType>
+inline sgl::natural Interface<ObjectiveFunctionType>::optimize(
 		sgl::parameter_field & x_field, sgl::natural_vector needed_solutions,
 		sgl::vector & object_value, sgl::vector & function_value,
 		const sgl::vector & lambda_sequence) const {
@@ -138,18 +149,16 @@ inline sgl::natural Interface<CONFIG, ObjectiveFunctionType>::optimize(
 
 	//TODO check that all elements of needed_solutions are unique and less than the length of lambda_sequence
 
-	typename ObjectiveFunctionType::instance_type objective =
-			objective_type.create_instance(sgl.setup);
+	typename ObjectiveFunctionType::instance_type objective = objective_type.create_instance(sgl.setup);
 
 	return optimizer.optimize(x_field, needed_solutions, object_value, function_value,
 			objective, lambda_sequence, true);
 }
 
-template<typename CONFIG, typename ObjectiveFunctionType>
+template<typename ObjectiveFunctionType>
 template<typename Predictor>
 inline boost::tuple<arma::field<arma::field<typename Predictor::response_type> >,
-		sgl::natural_matrix, sgl::natural_matrix> Interface<CONFIG,
-		ObjectiveFunctionType>::subsampling(Predictor const& predictor,
+		sgl::natural_matrix, sgl::natural_matrix> Interface<ObjectiveFunctionType>::subsampling(Predictor const& predictor,
 		sgl::vector const& lambda_sequence,
         natural_vector_field const& training_samples,
         natural_vector_field const& test_samples,

@@ -24,10 +24,3 @@ Depends:
     Matrix,
     sglOptim (>= 1.0.122.0)
 LinkingTo: Rcpp, RcppProgress, RcppArmadillo, BH, sglOptim
-Collate:
-    'msgl_fit.R'
-    'msgl_cv.R'
-    'msgl_subsampling.R'
-    'msgl_predict.R'
-    'msgl_navigate.R'
-    'msgl_config.R'

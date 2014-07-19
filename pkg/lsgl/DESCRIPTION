@@ -13,9 +13,4 @@ Depends:
     sglOptim (>= 1.0.122.0),
     Matrix
 LinkingTo: sglOptim, Rcpp, RcppProgress, RcppArmadillo, BH
-Collate:
-    'lsgl_fit.R'
-    'lsgl_cv.R'
-    'lsgl_predict.R'
-    'lsgl_config.R'
-    'lsgl_navigate.R'
+Packaged: 2014-07-16 07:12:09 UTC; martin

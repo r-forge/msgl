@@ -88,9 +88,8 @@
 #' Err(fit.sub, type="loglike")
 #'  
 #' @method Err msgl
-#' @S3method Err msgl
-#' @import sglOptim
 #' @export
+#' @import sglOptim
 Err.msgl <- function(object, data = NULL, response = object$classes.true, classes = response, type = "rate", ... ) {
 	
 	if(type=="rate") {
@@ -134,7 +133,6 @@ Err.msgl <- function(object, data = NULL, response = object$classes.true, classe
 #'
 #' @author Martin Vincent
 #' @method features msgl
-#' @S3method features msgl
 #' @import sglOptim
 #' @export
 features.msgl <- function(object, ...) {
@@ -166,7 +164,6 @@ features.msgl <- function(object, ...) {
 #'
 #' @author Martin Vincent
 #' @method parameters msgl
-#' @S3method parameters msgl
 #' @import sglOptim
 #' @export
 parameters.msgl <- function(object, ...) {
@@ -192,7 +189,6 @@ parameters.msgl <- function(object, ...) {
 #'
 #' @author Martin Vincent
 #' @method nmod msgl
-#' @S3method nmod msgl
 #' @import sglOptim
 #' @export
 nmod.msgl <- function(object, ...) {
@@ -212,7 +208,6 @@ nmod.msgl <- function(object, ...) {
 #' 
 #' @author Martin Vincent
 #' @method models msgl
-#' @S3method models msgl
 #' @import sglOptim
 #' @export
 models.msgl <- function(object, index = 1:nmod(object), ...) {
@@ -239,7 +234,6 @@ models.msgl <- function(object, index = 1:nmod(object), ...) {
 #'
 #' @author Martin Vincent
 #' @method coef msgl
-#' @S3method coef msgl
 #' @import sglOptim
 #' @export
 coef.msgl <- function(object, index = 1:nmod(object), ...) {
@@ -284,7 +278,6 @@ coef.msgl <- function(object, index = 1:nmod(object), ...) {
 #' fit.sub
 #' 
 #' @method print msgl
-#' @S3method print msgl
 #' @author Martin Vincent
 #' @import sglOptim
 #' @export

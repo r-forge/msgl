@@ -23,12 +23,3 @@ Depends:
     R (>= 3.0.0),
     Matrix,
 LinkingTo: Rcpp, RcppProgress, RcppArmadillo, BH
-Collate:
-    'lambda_sequence.R'
-    'prepare_args.R'
-    'sgl_fit.R'
-    'sgl_config.R'
-    'sgl_predict.R'
-    'sgl_cv.R'
-    'sgl_subsampling.R'
-    'sgl_navigate.R'

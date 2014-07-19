@@ -57,6 +57,8 @@ public:
 	sgl::numeric const stepsize_opt_penalized_a;
 	sgl::numeric const stepsize_opt_penalized_b;
 
+	sgl::natural const inner_loop_convergence_limit;
+
 	bool const verbose;
 
 	AlgorithmConfiguration(rList const& config) :
@@ -109,7 +111,35 @@ public:
 					getConfigAttribute<sgl::numeric>(config,
 							"stepsize_opt_penalized_b")),
 
+			inner_loop_convergence_limit(
+					getConfigAttribute<sgl::natural>(config,
+							"inner_loop_convergence_limit")),
+
 			verbose(getConfigAttribute<bool>(config, "verbose")) {
+	}
+
+	AlgorithmConfiguration() :
+		tolerance_penalized_main_equation_loop(1e-10),
+
+		tolerance_penalized_inner_loop_alpha(1e-4),
+		tolerance_penalized_inner_loop_beta(0),
+
+		tolerance_penalized_middel_loop_alpha(0.01),
+
+		tolerance_penalized_outer_loop_alpha(0.01),
+		tolerance_penalized_outer_loop_beta(0),
+		tolerance_penalized_outer_loop_gamma(5e-4),
+
+		use_bound_optimization(true),
+
+		use_stepsize_optimization_in_penalizeed_loop(true),
+		stepsize_opt_penalized_initial_t(1),
+		stepsize_opt_penalized_a(0.1),
+		stepsize_opt_penalized_b(0.5),
+
+		inner_loop_convergence_limit(1e5),
+
+		verbose(true) {
 	}
 };
 

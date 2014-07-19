@@ -75,7 +75,7 @@ Err <- function(object, data, response, ... ) UseMethod("Err")
 #' (see \pkg{msgl} package for an example of how to use this function)
 #' @param object a object containing responses
 #' @param data a data object
-#' @param response.name the name of the response, if \code{response.name = NULL} then \code{x} will be treated as the response.
+#' @param response.name the name of the response, if \code{response.name = NULL} then \code{object} will be treated as the response.
 #' @param response the response
 #' @param loss the loss function
 #' @return a vector with the computed error rates
@@ -180,7 +180,6 @@ models <- function(object, index, ...) UseMethod("models")
 #' 
 #' @author Martin Vincent
 #' @method features sgl
-#' @S3method features sgl
 #' @export
 features.sgl <- function(object, ...) {
 	
@@ -205,7 +204,6 @@ features.sgl <- function(object, ...) {
 #' 
 #' @author Martin Vincent
 #' @method parameters sgl
-#' @S3method parameters sgl
 #' @export
 parameters.sgl <- function(object, ...) {
 	
@@ -227,7 +225,6 @@ parameters.sgl <- function(object, ...) {
 #' 
 #' @author Martin Vincent
 #' @method nmod sgl
-#' @S3method nmod sgl
 #' @export
 nmod.sgl <- function(object, ...) {
 	return(length(object$lambda))
@@ -242,7 +239,6 @@ nmod.sgl <- function(object, ...) {
 #' 
 #' @author Martin Vincent
 #' @method models sgl
-#' @S3method models sgl
 #' @export
 models.sgl <- function(object, index = 1:nmod(object), ...) {
 	
@@ -262,7 +258,6 @@ models.sgl <- function(object, index = 1:nmod(object), ...) {
 #' 
 #' @author Martin Vincent
 #' @method coef sgl
-#' @S3method coef sgl
 #' @export
 coef.sgl <- function(object, index = 1:nmod(object), ...) {
 	
@@ -295,8 +290,8 @@ sgl_print <- function(x) {
 		
 		print(data.frame('Index: ' = sel, 
 						'Lambda: ' = x$lambda[sel], 
-						'Features: ' = feat[sel], 
-						'Parameters: ' = para[sel], check.names = FALSE), 
+						'Features: ' = print_with_metric_prefix(feat[sel]), 
+						'Parameters: ' = print_with_metric_prefix(para[sel]), check.names = FALSE), 
 				row.names = FALSE, digits = 2, right = TRUE)
 		
 		cat("\n")
@@ -314,8 +309,8 @@ sgl_print <- function(x) {
 		
 		print(data.frame('Index: ' = sel, 
 						'Lambda: ' = x$lambda[sel], 
-						'Features: ' = feat[sel], 
-						'Parameters: ' = para[sel], 
+						'Features: ' = print_with_metric_prefix(feat[sel]), 
+						'Parameters: ' = print_with_metric_prefix(para[sel]), 
 						'Error: ' = err[sel], check.names = FALSE),
 				row.names = FALSE, digits = 2, right = TRUE)
 		
@@ -325,8 +320,8 @@ sgl_print <- function(x) {
 		
 		print(data.frame('Index: ' = sel, 
 						'Lambda: ' = x$lambda[sel], 
-						'Features: ' = feat[sel], 
-						'Parameters: ' = para[sel], 
+						'Features: ' = print_with_metric_prefix(feat[sel]), 
+						'Parameters: ' = print_with_metric_prefix(para[sel]), 
 						'Error: ' = err[sel], check.names = FALSE),
 				row.names = FALSE, digits = 2, right = TRUE)
 		
@@ -352,10 +347,10 @@ sgl_print <- function(x) {
 		print(data.frame('Subsample: ' = sel, 
 						'Model index: ' = model.sel,
 						'Lambda: ' = x$lambda[model.sel], 
-						'Features: ' = sapply(1:length(sel), function(i) x$features[sel[i], model.sel[i]]), 
-						'Parameters: ' = sapply(1:length(sel), function(i) x$parameters[sel[i], model.sel[i]]), 
+						'Features: ' = print_with_metric_prefix((sapply(1:length(sel), function(i) x$features[sel[i], model.sel[i]])), 
+						'Parameters: ' = print_with_metric_prefix(sapply(1:length(sel), function(i) x$parameters[sel[i], model.sel[i]])), 
 						'Error: ' = sapply(1:length(sel), function(i) err[sel[i], model.sel[i]]), check.names = FALSE),
-				row.names = FALSE, digits = 2, right = TRUE)
+				row.names = FALSE, digits = 2, right = TRUE))
 		
 		cat("\n")
 		
@@ -368,4 +363,31 @@ sgl_print <- function(x) {
 	
 	
 	#TODO msgl version check that  object$msgl_version exists
+}
+
+
+#' Print a numeric with metric prefix
+#' 
+#' @param x numeric to be printed 
+#' @param digits number of significant digits 
+#' 
+#' @return a string 
+#' 
+#' @author Martin Vincent
+#' @export
+print_with_metric_prefix <- function(x, digits = 3) {
+	
+	if(length(x) > 1) {
+		return(sapply(x, function(y) print_with_metric_prefix(y, digits = digits)))
+	}
+	
+	metric_factor <-  c(1e+00, 1e+03, 1e+06, 1e+09)
+	
+	prefix <- c("", "k", "M", "G")
+
+	sel <- max(which(x >= metric_factor))
+	
+	txt <- paste(round(x/metric_factor[sel], digits = digits), prefix[sel], sep="")
+	
+	return(txt)
 }

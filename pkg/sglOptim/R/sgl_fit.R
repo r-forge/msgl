@@ -62,7 +62,7 @@ sgl_fit <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights,
 	res$beta <- lapply(1:length(res$beta), function(i) sparseMatrix(p = res$beta[[i]][[2]], i = res$beta[[i]][[3]], x = res$beta[[i]][[4]], dims = res$beta[[i]][[1]], index1 = FALSE))
 	
 	# Restore org order
-	res$beta <- lapply(res$beta, function(x) x[, order(args$group.order)])
+	res$beta <- lapply(res$beta, function(x) x[, order(args$group.order), drop = FALSE])
 
 	# Dim names
 	res$beta <- lapply(res$beta, function(x) { dimnames(x) <- list(data$group.names, data$covariate.names); x })

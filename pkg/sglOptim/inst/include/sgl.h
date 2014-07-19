@@ -40,7 +40,7 @@
 //#define SGL_DEBUG_SIMPLE
 //#define SGL_DEBUG_COMPLEX
 //#define SGL_DEBUG_INFO_ALL
-//#define PRINT_BACKTRACE
+#define PRINT_BACKTRACE
 //#define SGL_DEBUG_INFO_STEPSIZE
 #else
 // Do no debugging
@@ -97,17 +97,20 @@ using boost::tuple;
 namespace sgl {
 #include "sgl/numeric.h"
 #include "sgl/config.h"
-#include "sgl/AlgorithmConfigurationDefault.h"
+#include "sgl/algorithm_config.h"
 #include "sgl/DimConfig.h"
 #include "sgl/BlockVector.h"
+#include "sgl/kron_prod.h"
 #include "sgl/SglProblem.h"
 #include "sgl/SglOptimizer.h"
 #include "sgl/ObjectiveFunction.h"
 #include "sgl/ObjectiveFunctionExpressionType.h"
 #include "sgl/interface_basic.h"
 #include "sgl/objective/sgl_matrix_data.h"
-#include "sgl/objective/sgl_gl_loss.h"
-#include "sgl/objective/sgl_algorithm_config.h"
+#include "sgl/objective/sgl_gl_loss_base.h"
+#include "sgl/objective/sgl_gl_loss_dense.h"
+#include "sgl/objective/sgl_gl_loss_sparse.h"
+#include "sgl/objective/sgl_gl_loss_kron.h"
 #include "sgl/objective/simplifier.h"
 #include "sgl/objective/linear_response.h"
 #include "sgl/objective/linear_predictor.h"

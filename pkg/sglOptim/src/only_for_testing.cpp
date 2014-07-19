@@ -48,7 +48,7 @@
 
 /**********************************
  *
- *  lsgl dense module
+ *  Dense test module
  *
  *********************************/
 
@@ -67,7 +67,7 @@
 
 /*********************************
  *
- *  lsgl sparse module
+ *  Sparse test module
  *
  *********************************/
 // Reset macros
@@ -88,6 +88,52 @@
 #include <sgl/RInterface/sgl_predict.h>
 #include <sgl/RInterface/sgl_subsampling.h>
 
+/*********************************
+ *
+ *  Dual kronecker test module
+ *
+ *********************************/
+// Reset macros
+//#undef MODULE_NAME
+//#undef OBJECTIVE
+//#undef PREDICTOR
+
+// Module name
+//#define MODULE_NAME sgl_test_kronecker_dual
+
+//#define OBJECTIVE linear_test_kronecker_dual
+
+//#include <sgl/RInterface/sgl_lambda_seq.h>
+//#include <sgl/RInterface/sgl_fit.h>
+
+//#define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , sgl::LinearResponse >
+//
+//#include <sgl/RInterface/sgl_predict.h>
+//#include <sgl/RInterface/sgl_subsampling.h>
+
+/*********************************
+ *
+ *  Triple kronecker test module
+ *
+ *********************************/
+// Reset macros
+//#undef MODULE_NAME
+//#undef OBJECTIVE
+//#undef PREDICTOR
+
+// Module name
+//#define MODULE_NAME sgl_test_kronecker_triple
+
+//#define OBJECTIVE linear_test_kronecker_triple
+
+//#include <sgl/RInterface/sgl_lambda_seq.h>
+//#include <sgl/RInterface/sgl_fit.h>
+
+//#define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , sgl::LinearResponse >
+//
+//#include <sgl/RInterface/sgl_predict.h>
+//#include <sgl/RInterface/sgl_subsampling.h>
+
 /* **********************************
  *
  *  Registration of methods
@@ -96,6 +142,7 @@
 
 #include <R_ext/Rdynload.h>
 
+//TODO sgl_test_kronecker_triple, sgl_test_kronecker_dual
 static const R_CallMethodDef sglCallMethods[] = {
 		SGL_LAMBDA(sgl_test_dense), SGL_LAMBDA(sgl_test_sparse),
 		SGL_FIT(sgl_test_dense), SGL_FIT(sgl_test_sparse),

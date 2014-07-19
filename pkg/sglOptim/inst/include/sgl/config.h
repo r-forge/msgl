@@ -19,9 +19,9 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-//FIXME Error msg
-std::string numerical_error_msg("The algorithm has encountered a numerical problem\n   Try/check the following:\n   (1) Check the lambda sequence and try with a longer sequence (the length d should be larger than 100) \n   (2) try with a larger lambda.min\n   (3) Ensure minimum one sample from each classes present in all subsample/cross validation sets used \n");
-std::string convege_error_msg("The algorithm has encountered a convergence problem\n   Try/check the following:\n   (1) Check the lambda sequence and try with a longer sequence (the length d should be larger than 100) \n   (2) try with a larger lambda.min\n   (3) Ensure minimum one sample from each classes present in all subsample/cross validation sets used \n");
+//Error msg
+std::string numerical_error_msg("The algorithm has encountered a numerical problem\n   Try/check the following:\n   (1) Check the lambda sequence and try with a longer sequence (the length d should be larger than 100) \n   (2) try with a larger lambda.min\n   (3) Ensure minimum one sample from each group/class present in all subsample (or cross validation) sets used \n");
+std::string convege_error_msg("The algorithm has encountered a convergence problem\n   Try/check the following:\n   (1) Check the lambda sequence and try with a longer sequence (the length d should be larger than 100) \n   (2) try with a larger lambda.min\n   (3) Ensure minimum one sample from each group/class present in all subsample (or cross validation) sets used \n");
 
 
 #ifdef SGL_CONVERGENCE_CHECK

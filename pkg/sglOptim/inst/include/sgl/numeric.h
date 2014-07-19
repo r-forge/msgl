@@ -24,6 +24,12 @@
 template<typename MATRIX, typename VECTOR>
   class BlockVector;
 
+template<typename E, typename F>
+class kron_prod;
+
+template<typename E1, typename E2, typename E3>
+class triple_kron_prod;
+
 //Natural types
 typedef arma::uword natural;
 typedef arma::Col<natural> natural_vector;
@@ -62,6 +68,10 @@ typedef arma::field<block_vector> block_vector_field;
 typedef sparse_vector parameter_block;
 typedef block_vector parameter;
 typedef block_vector_field parameter_field;
+
+//Kronecker product types
+typedef kron_prod<sgl::matrix, sgl::matrix> dual_kronecker_matrix;
+typedef triple_kron_prod<sgl::matrix, sgl::matrix, sgl::matrix> triple_kronecker_matrix;
 
 //Null vectors
 
@@ -250,6 +260,26 @@ template<typename T>
 T seq(natural size, typename T::elem_type start, typename T::elem_type jump_size) {
 	T s(size);
 	return seq(s, start, jump_size);
+}
+
+template<typename T>
+T min(T const& a, T const& b) {
+
+	if(a < b) {
+		return a;
+	}
+
+	return b;
+}
+
+template<typename T>
+T max(T const& a, T const& b) {
+
+	if(a > b) {
+		return a;
+	}
+
+	return b;
 }
 
 #endif /* NUMERIC_H_ */

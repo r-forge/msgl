@@ -40,6 +40,50 @@ template<typename T>
 		}
 	}
 
+template<>
+const sgl::dual_kronecker_matrix getData(rList const& rdata, char const symbol) {
+
+	std::string const name(1, symbol);
+
+	int index;
+	if (index = rdata.getIndex(name), index >= 0) {
+
+		matrix_field kron_elements = get_field < sgl::matrix > (rdata.get(index));
+		//check elements.n_elem == 2
+		return dual_kronecker_matrix(kron_elements(0), kron_elements(1));
+
+	} else {
+
+		std::string msg = "Data invalid - ";
+		throw std::domain_error(msg.append(name).c_str());
+		return dual_kronecker_matrix(); //avoid compiler warnings
+
+	}
+
+}
+
+template<>
+const sgl::triple_kronecker_matrix getData(rList const& rdata, char const symbol) {
+
+	std::string const name(1, symbol);
+
+	int index;
+	if (index = rdata.getIndex(name), index >= 0) {
+
+		matrix_field kron_elements = get_field < sgl::matrix > (rdata.get(index));
+		//check elements.n_elem == 3
+		return triple_kronecker_matrix(kron_elements(0), kron_elements(1), kron_elements(2));
+
+	} else {
+
+		std::string msg = "Data invalid - ";
+		throw std::domain_error(msg.append(name).c_str());
+		return triple_kronecker_matrix(); //avoid compiler warnings
+
+	}
+
+}
+
 template<typename T>
 T submatrix(T const& matrix, sgl::natural_vector const& rows) {
     // no code should go here

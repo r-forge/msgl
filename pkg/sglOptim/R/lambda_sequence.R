@@ -39,7 +39,7 @@
 #' @author Martin Vincent
 #' @export
 #' @import Matrix
-sgl_lambda_sequence <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha = 0.5, d = 100, lambda.min, algorithm.config = sgl.standard.config) {
+sgl_lambda_sequence <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights, parameterWeights, alpha, d, lambda.min, algorithm.config = sgl.standard.config) {
 	
 	# cast
 	d <- as.integer(d)

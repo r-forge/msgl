@@ -100,6 +100,8 @@ public:
 
 	sgl::numeric L2_penalty_weight(sgl::natural block_index) const;
 
+	sgl::vector::const_iterator L1_penalty_weight_block_begin(sgl::natural block_index) const;
+
 };
 
 inline sgl::natural DimConfig::block_start_index(sgl::natural block_index) const {
@@ -112,6 +114,10 @@ inline sgl::natural DimConfig::block_end_index(sgl::natural block_index) const {
 
 inline sgl::vector DimConfig::L1_penalty_weight(sgl::natural block_index) const {
 	return L1_penalty_weights.subvec(block_start_index(block_index), block_end_index(block_index));
+}
+
+inline sgl::vector::const_iterator DimConfig::L1_penalty_weight_block_begin(sgl::natural block_index) const {
+	return L1_penalty_weights.begin_row(block_start_index(block_index));
 }
 
 inline sgl::numeric DimConfig::L2_penalty_weight(sgl::natural block_index) const {

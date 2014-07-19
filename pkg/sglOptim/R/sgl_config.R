@@ -35,6 +35,7 @@
 #' @param stepsize_opt_penalized_initial_t initial step-size.
 #' @param stepsize_opt_penalized_a step-size optimization parameter.
 #' @param stepsize_opt_penalized_b step-size optimization parameter.
+#' @param inner_loop_convergence_limit inner loop convergence limit.
 #' @param verbose If \code{TRUE} some information, regarding the status of the algorithm, will be printed in the R terminal.
 #' @return A configuration.
 #' @examples
@@ -52,7 +53,8 @@ sgl.algorithm.config <- function(tolerance_penalized_main_equation_loop = 1e-10,
 		use_stepsize_optimization_in_penalizeed_loop = TRUE, 
 		stepsize_opt_penalized_initial_t = 1,
 		stepsize_opt_penalized_a = 0.1, 
-		stepsize_opt_penalized_b = 0.1, 
+		stepsize_opt_penalized_b = 0.1,
+		inner_loop_convergence_limit = 1e5,
 		verbose = TRUE) {
 	
 	config <- list()
@@ -74,6 +76,8 @@ sgl.algorithm.config <- function(tolerance_penalized_main_equation_loop = 1e-10,
 	config$stepsize_opt_penalized_initial_t <- stepsize_opt_penalized_initial_t
 	config$stepsize_opt_penalized_a <- stepsize_opt_penalized_a
 	config$stepsize_opt_penalized_b <- stepsize_opt_penalized_b
+	
+	config$inner_loop_convergence_limit <- inner_loop_convergence_limit
 	
 	config$verbose <- verbose
 	

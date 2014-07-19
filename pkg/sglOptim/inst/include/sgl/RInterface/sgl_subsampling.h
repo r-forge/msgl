@@ -59,7 +59,7 @@ SEXP FUN_NAME(sgl_subsampling, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP 
     const sgl::natural_vector_field training_samples = get_field < sgl::natural_vector > (r_training_samples);
     const sgl::natural_vector_field test_samples = get_field < sgl::natural_vector > (r_test_samples);
 
-	sgl::Interface < sgl::AlgorithmConfiguration, OBJECTIVE > sgl_optimizer(obj_type, dim_config, alpha, config);
+	sgl::Interface < OBJECTIVE > sgl_optimizer(obj_type, dim_config, alpha, config);
 
     boost::tuple<arma::field<arma::field<PREDICTOR::response_type> >, sgl::natural_matrix,
 	sgl::natural_matrix> response_field = sgl_optimizer.subsampling(predictor, lambda_seq, training_samples, test_samples,

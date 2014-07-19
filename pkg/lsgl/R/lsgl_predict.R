@@ -62,7 +62,6 @@
 #'
 #' @author Martin Vincent
 #' @method predict lsgl
-#' @S3method predict lsgl
 #' @export
 #' @useDynLib lsgl .registration=TRUE
 predict.lsgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...) 

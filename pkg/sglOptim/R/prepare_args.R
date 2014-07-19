@@ -73,7 +73,6 @@ prepare.args <- function(data, ...) UseMethod("prepare.args")
 #' @return a sgldata object with the covariates reordered
 #' @author Martin Vincent
 #' @method rearrange sgldata
-#' @S3method rearrange sgldata
 #' @export
 #' @family sgldata
 rearrange.sgldata <- function(data, covariate.order, ...) 
@@ -96,6 +95,7 @@ rearrange.sgldata <- function(data, covariate.order, ...)
 #' @param sampleGrouping grouping of samples, a factor of length \eqn{N} (will be parsed to the loss module as \code{G}). Default is no grouping (NULL), that is all samples is the same group.
 #' @param group.names a vector with the names of the parameter groups (the length must equal the number of rows in the \eqn{\beta} matrix). 
 #' @param sparseX if TRUE \code{x} will be treated as sparse, if FALSE \code{x} will be treated as dens.
+#' @param sparseY if TRUE \code{y} will be treated as sparse, if FALSE \code{y} will be treated as dens.
 #' @author Martin Vincent
 #' @export
 #' @family sgldata
@@ -179,7 +179,6 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 #' @param alpha the \eqn{\alpha} value 0 for group lasso, 1 for lasso, between 0 and 1 gives a sparse group lasso penalty.
 #' @param ... not used
 #' @method prepare.args sgldata
-#' @S3method prepare.args sgldata
 #' @export
 #' @family sgldata
 #' @author Martin Vincent

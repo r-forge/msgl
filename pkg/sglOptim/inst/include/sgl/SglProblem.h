@@ -19,17 +19,16 @@
 #ifndef SGLPROBLEM_H_
 #define SGLPROBLEM_H_
 
-template<typename CONFIG>
-  class SglProblem
+class SglProblem
   {
 
   public:
 
     DimConfig const& setup;
 
-    CONFIG const& config;
+    AlgorithmConfiguration const& config;
 
-    SglProblem(DimConfig const& dim_config, CONFIG const& config) :
+    SglProblem(DimConfig const& dim_config, AlgorithmConfiguration const& config) :
         setup(dim_config), config(config)
     {
     }
@@ -68,17 +67,15 @@ template<typename CONFIG>
         sgl::numeric const alpha, sgl::numeric const lambda) const;
   };
 
-template<typename CONFIG>
   sgl::numeric
-  SglProblem<CONFIG>::max_dist(sgl::parameter_block_vector const& x0,
+  SglProblem::max_dist(sgl::parameter_block_vector const& x0,
       sgl::parameter_block_vector const& x1) const
   {
     TIMER_START;
     return arma::as_scalar(max(abs(x0 - x1)));
   }
 
-template<typename CONFIG>
-sgl::numeric SglProblem<CONFIG>::dist(sgl::parameter const& x0, sgl::parameter const& x1) const {
+sgl::numeric SglProblem::dist(sgl::parameter const& x0, sgl::parameter const& x1) const {
 
         sgl::numeric d = 0;
         for (sgl::natural block_index = 0; block_index < setup.n_blocks; block_index++) {
@@ -91,8 +88,7 @@ sgl::numeric SglProblem<CONFIG>::dist(sgl::parameter const& x0, sgl::parameter c
         return d;
 }
 
-template<typename CONFIG>
-sgl::numeric SglProblem<CONFIG>::discrete_dist(sgl::parameter const& x0, sgl::parameter const& x1) const {
+sgl::numeric SglProblem::discrete_dist(sgl::parameter const& x0, sgl::parameter const& x1) const {
 
         TIMER_START;
 
@@ -108,24 +104,25 @@ sgl::numeric SglProblem<CONFIG>::discrete_dist(sgl::parameter const& x0, sgl::pa
 }
 
 
-template<typename CONFIG>
-  inline bool
-  SglProblem<CONFIG>::is_block_active(const sgl::vector & block_gradient,
+inline bool
+  SglProblem::is_block_active(const sgl::vector & block_gradient,
       sgl::natural const block_index, sgl::numeric const alpha,
       sgl::numeric const lambda) const
   {
 
-    double const p = sgl::square(
-        lambda * (1 - alpha) * setup.L2_penalty_weight(block_index));
+    double const p = sgl::square(lambda * (1 - alpha) * setup.L2_penalty_weight(block_index));
 
     double s = 0;
-    for (sgl::natural i = 0; i < block_gradient.n_elem; ++i)
+
+    sgl::vector::const_iterator bg = block_gradient.begin();
+    sgl::vector::const_iterator pw = setup.L1_penalty_weight_block_begin(block_index);
+
+    for (; bg != block_gradient.end(); ++bg, ++pw)
       {
 
-        double c;
+        double c = abs(*bg) - lambda * alpha * (*pw);
 
-        if (c = abs(block_gradient(i))
-            - lambda * alpha * setup.L1_penalty_weight(block_index)(i), c > 0)
+        if (c > 0)
           {
             s += sgl::square(c);
           }
@@ -139,9 +136,8 @@ template<typename CONFIG>
     return false;
   }
 
-template<typename CONFIG>
-  sgl::numeric
-  SglProblem<CONFIG>::penalty(sgl::parameter const& x, sgl::numeric const alpha,
+sgl::numeric
+  SglProblem::penalty(sgl::parameter const& x, sgl::numeric const alpha,
       sgl::numeric const lambda) const
   {
 
@@ -169,8 +165,7 @@ template<typename CONFIG>
     return s;
   }
 
-template<typename CONFIG>
-sgl::vector const SglProblem<CONFIG>::compute_bounds(const sgl::vector & gradient_at_x, sgl::parameter const& x, sgl::numeric const alpha,
+sgl::vector const SglProblem::compute_bounds(const sgl::vector & gradient_at_x, sgl::parameter const& x, sgl::numeric const alpha,
                 sgl::numeric const lambda) const {
 
         TIMER_START;
@@ -200,8 +195,7 @@ sgl::vector const SglProblem<CONFIG>::compute_bounds(const sgl::vector & gradien
 }
 
 
-template<typename CONFIG>
-sgl::numeric SglProblem<CONFIG>::compute_critical_lambda(const sgl::vector & gradient, sgl::numeric const alpha) const {
+sgl::numeric SglProblem::compute_critical_lambda(const sgl::vector & gradient, sgl::numeric const alpha) const {
 
         TIMER_START;
 
@@ -230,8 +224,7 @@ sgl::numeric SglProblem<CONFIG>::compute_critical_lambda(const sgl::vector & gra
 }
 
 
-template<typename CONFIG>
-sgl::numeric SglProblem<CONFIG>::compute_critical_lambda(sgl::vector v, sgl::vector z, sgl::numeric b) const {
+sgl::numeric SglProblem::compute_critical_lambda(sgl::vector v, sgl::vector z, sgl::numeric b) const {
 
         //TODO debug guards
         if (accu(v < 0) > 0 || accu(z < 0) > 0) {
@@ -289,8 +282,7 @@ sgl::numeric SglProblem<CONFIG>::compute_critical_lambda(sgl::vector v, sgl::vec
 }
 
 //a must be ordered in decreasing order
-template<typename CONFIG>
-sgl::numeric SglProblem<CONFIG>::compute_t(sgl::vector const& a, sgl::numeric b) const {
+sgl::numeric SglProblem::compute_t(sgl::vector const& a, sgl::numeric b) const {
 
         sgl::numeric q1 = 0;
         sgl::numeric q2 = 0;

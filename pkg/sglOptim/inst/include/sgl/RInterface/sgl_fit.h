@@ -49,7 +49,7 @@ SEXP FUN_NAME(sgl_fit, MODULE_NAME)(SEXP r_data, SEXP r_block_dim, SEXP r_blockW
 
 	sgl::DimConfig dim_config = sgl::createDimConfig(block_dim, blockWeights, parameterWeights);
 
-	sgl::Interface < sgl::AlgorithmConfiguration, OBJECTIVE > sgl_optimizer(obj_type, dim_config, alpha, config);
+	sgl::Interface < OBJECTIVE > sgl_optimizer(obj_type, dim_config, alpha, config);
 
 	// Solve problem
 	const sgl::natural_vector needed_solutions = get_value < sgl::natural_vector > (r_needed_solutions);
