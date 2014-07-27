@@ -188,18 +188,31 @@ GenralizedLinearLossBase < T , E >::GenralizedLinearLossBase(data_type const& da
 		throw std::runtime_error("GenralizedLinearLossBase - dimension mismatch");
 	}
 
+	if(X.n_rows != n_samples) {
+		throw std::runtime_error("GenralizedLinearLossBase - dimension mismatch");
+	}
+
+	if(X.n_rows == 0 || X.n_cols == 0) {
+		throw std::runtime_error("GenralizedLinearLossBase - no data");
+	}
+
+	sgl::vector css(sqrt(colSumsSquare(X)));
+
 	//Initialize x_norm
 	for (sgl::natural j = 0; j < dim_config.n_blocks; ++j)
 	{
-		//FIXME
-		//throw std::runtime_error("FIXME");
 
-		x_norm(j) = as_scalar(max(sqrt(sum(square(
-				X.cols(dim_config.block_start_index(j) / n_groups,
-						dim_config.block_end_index(j) / n_groups)))), 1));
+		//TODO remove
+//		x_norm(j) = as_scalar(max(sqrt(sum(square(
+//				X.cols(dim_config.block_start_index(j) / n_groups,
+//						dim_config.block_end_index(j) / n_groups)))), 1));
+		x_norm(j) = max(css.subvec(dim_config.block_start_index(j) / n_groups,
+					dim_config.block_end_index(j) / n_groups));
+
 	}
 
 	x_norm_max = x_norm.max();
+
 
 	at_zero();
 }

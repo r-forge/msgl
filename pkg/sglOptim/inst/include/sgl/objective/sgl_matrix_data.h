@@ -49,7 +49,11 @@ const sgl::dual_kronecker_matrix getData(rList const& rdata, char const symbol) 
 	if (index = rdata.getIndex(name), index >= 0) {
 
 		matrix_field kron_elements = get_field < sgl::matrix > (rdata.get(index));
-		//check elements.n_elem == 2
+
+		if(kron_elements.n_elem != 2) {
+			throw std::runtime_error("dual_kronecker_matrix - field must contain exactly two matrices");
+		}
+
 		return dual_kronecker_matrix(kron_elements(0), kron_elements(1));
 
 	} else {
@@ -71,7 +75,11 @@ const sgl::triple_kronecker_matrix getData(rList const& rdata, char const symbol
 	if (index = rdata.getIndex(name), index >= 0) {
 
 		matrix_field kron_elements = get_field < sgl::matrix > (rdata.get(index));
-		//check elements.n_elem == 3
+
+		if(kron_elements.n_elem != 3) {
+			throw std::runtime_error("triple_kronecker_matrix - field must contain exactly three matrices");
+		}
+
 		return triple_kronecker_matrix(kron_elements(0), kron_elements(1), kron_elements(2));
 
 	} else {
@@ -156,6 +164,8 @@ public:
 		const_cast<T&>(this->data_matrix) = data_matrix;
 		const_cast<sgl::natural&>(this->n_samples) = data_matrix.n_rows;
 	}
+
+
 
 private:
 

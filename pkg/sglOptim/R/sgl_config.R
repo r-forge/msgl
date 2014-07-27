@@ -54,7 +54,7 @@ sgl.algorithm.config <- function(tolerance_penalized_main_equation_loop = 1e-10,
 		stepsize_opt_penalized_initial_t = 1,
 		stepsize_opt_penalized_a = 0.1, 
 		stepsize_opt_penalized_b = 0.1,
-		inner_loop_convergence_limit = 1e5,
+		inner_loop_convergence_limit = 1e4,
 		verbose = TRUE) {
 	
 	config <- list()
@@ -77,7 +77,7 @@ sgl.algorithm.config <- function(tolerance_penalized_main_equation_loop = 1e-10,
 	config$stepsize_opt_penalized_a <- stepsize_opt_penalized_a
 	config$stepsize_opt_penalized_b <- stepsize_opt_penalized_b
 	
-	config$inner_loop_convergence_limit <- inner_loop_convergence_limit
+	config$inner_loop_convergence_limit <- as.integer(inner_loop_convergence_limit)
 	
 	config$verbose <- verbose
 	

@@ -119,7 +119,6 @@ public:
 
 	const sgl::numeric sum_values() const
 	{
-
 		sgl::numeric value = 0;
 		for (sgl::natural i = 0; i < n_samples; ++i)
 		{

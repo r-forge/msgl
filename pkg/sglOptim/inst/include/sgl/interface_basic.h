@@ -92,29 +92,29 @@ public:
 template<typename ObjectiveFunctionType>
 sgl::numeric Interface<ObjectiveFunctionType>::lambda_max() const {
 
-	sgl::vector gradient(sgl.setup.dim);
-
 	typename ObjectiveFunctionType::instance_type objective = objective_type.create_instance(sgl.setup);
 
 	objective.at_zero();
-	gradient = objective.gradient();
 
-	//Fit non penalized parameters
-	sgl::parameter_field x_field(1);
-	sgl::natural_vector needed_solutions(1, arma::fill::zeros);
-	sgl::vector object_value(1);
-	sgl::vector function_value(1);
-	sgl::vector lambda_sequence(1);
+	if(sgl.has_unpenalized_paramters(alpha)) {
 
-	lambda_sequence(0) =  std::numeric_limits<double>::max();
-	optimizer.optimize(x_field, needed_solutions, object_value, function_value,
+		//Fit non penalized parameters
+		sgl::parameter_field x_field(1);
+		sgl::natural_vector needed_solutions(1, arma::fill::zeros);
+		sgl::vector object_value(1);
+		sgl::vector function_value(1);
+		sgl::vector lambda_sequence(1);
+
+		lambda_sequence(0) =  1e100; //TODO configable
+
+		//Optimize non penalized paramters
+		optimizer.optimize(x_field, needed_solutions, object_value, function_value,
 			objective, lambda_sequence, true, false);
 
-	//Compute lambda max
-	gradient = objective.gradient();
+	}
 
-	return sgl.compute_critical_lambda(gradient, alpha);
-
+	//Compute and return lambda max
+	return sgl.compute_critical_lambda(objective.gradient(), alpha);
 }
 
 template<typename ObjectiveFunctionType>

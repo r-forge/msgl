@@ -37,6 +37,8 @@ class SglProblem
     penalty(sgl::parameter const& x, sgl::numeric const alpha,
         sgl::numeric const lambda) const;
 
+    bool has_unpenalized_paramters(sgl::numeric const alpha) const;
+
     //lambda max
     sgl::numeric
     compute_critical_lambda(sgl::vector v, sgl::vector z, sgl::numeric b) const;
@@ -164,6 +166,33 @@ sgl::numeric
 
     return s;
   }
+
+bool SglProblem::has_unpenalized_paramters(sgl::numeric const alpha) const {
+
+	for (sgl::natural block_index = 0; block_index < setup.n_blocks; block_index++) {
+
+		if(alpha == 0) {
+			if(setup.L2_penalty_weight(block_index) == 0) {
+				return true;
+			}
+		}
+
+		else if(alpha == 1){
+			if(accu(setup.L1_penalty_weight(block_index) == 0) != 0) {
+				return true;
+			}
+		}
+
+		else {
+			if(setup.L2_penalty_weight(block_index) == 0 || accu(setup.L1_penalty_weight(block_index) == 0) != 0) {
+				return true;
+			}
+		}
+    }
+
+	return false;
+}
+
 
 sgl::vector const SglProblem::compute_bounds(const sgl::vector & gradient_at_x, sgl::parameter const& x, sgl::numeric const alpha,
                 sgl::numeric const lambda) const {

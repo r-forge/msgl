@@ -21,8 +21,10 @@
 #ifndef NUMERIC_H_
 #define NUMERIC_H_
 
+//Forward declarations
+
 template<typename MATRIX, typename VECTOR>
-  class BlockVector;
+class BlockVector;
 
 template<typename E, typename F>
 class kron_prod;
@@ -233,6 +235,44 @@ bool inline is_finite(matrix const& x) {
         return arma::is_finite(x);
 }
 
+//Compute colSums(X^2)
+//template<typename T>
+//inline double colSumSquare(T const& x, sgl::natural col) {
+//	return accu(square(x.col(col)));
+//}
+//
+//template<typename E, typename F>
+//double colSumSquare(kron_prod<E, F> const& x, sgl::natural col) {
+//	return x.colSumsSquare(col);
+//}
+
+template<typename T>
+inline sgl::vector colSumsSquare(T const& x) {
+	sgl::vector r(trans(sum(square(x))));
+	return  r;
+}
+
+template<typename E, typename F>
+sgl::vector colSumsSquare(kron_prod<E, F> const& x) {
+	return x.colSumsSquare();
+}
+
+template<typename E1, typename E2, typename E3>
+sgl::vector colSumsSquare(triple_kron_prod<E1, E2, E3> const& x) {
+	return x.colSumsSquare();
+}
+
+//template<typename T>
+//inline sgl::vector colSumsSquare(T const& x,sgl::natural first_col, sgl::natural last_col) {
+//
+//	sgl::vector r(last_col-first_col+1);
+//
+//	for(sgl::natural i = 0; i < r.n_elem; ++i) {
+//		r(i) = colSumSquare(x, first_col+i);
+//	}
+//
+//	return  r;
+//}
 //Sguare function
 
 natural inline square(natural const& x) {

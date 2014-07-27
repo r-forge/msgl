@@ -99,22 +99,58 @@ rearrange.sgldata <- function(data, covariate.order, ...)
 #' @author Martin Vincent
 #' @export
 #' @family sgldata
-create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGrouping = NULL, group.names = NULL, sparseX = is(x, "sparseMatrix"), sparseY = is(y, "sparseMatrix")) {
+create.sgldata <- function(x, y, weights = NULL, sampleGrouping = NULL, group.names = NULL, sparseX = is(x, "sparseMatrix"), sparseY = is(y, "sparseMatrix")) {
 	
 	#TODO dim checks
+	### Checks
+	if(is.list(x) & sparseX) {
+		stop("Sparse Kronecker products not supported")
+	}
 	
+	### Data 
 	data <- list()
 	
-	# Is X sparse
+	### Dimensions and names
+	if(is.list(x)) {
+		
+		data$n.covariate <-  prod(sapply(x, ncol))
+		data$n.samples <- prod(sapply(x, nrow))		
+		
+		if(data$n.samples < 5e5)
+		{
+			data$sample.names <- .kron_names(x, rownames)
+		} else {
+			warning("discarding Kronecker product row names (sample names) to save memory -- dimension to high")
+		}
+		
+		if(data$n.covariate < 5e5)
+		{
+			data$covariate.names <- .kron_names(x, colnames)
+		} else {
+			warning("discarding Kronecker product col names (covariate names) to save memory -- dimension to high")
+		}
+		
+	} else if(is(x, "matrix") || is(x, "sparseMatrix")) {
+		data$n.covariate <- ncol(x)
+		data$n.samples <- nrow(x)
+		data$sample.names <- rownames(x)
+		data$covariate.names <- colnames(x)
+	}
+	
+	### X data
 	data$sparseX <- sparseX
-	data$sparseY <- sparseY
 
 	if(data$sparseX) {
 		data$X <- as(x, "CsparseMatrix")
+	} else if(is.list(x)){
+		data$X <- x
 	} else {
 		data$X <- as.matrix(x)
 	}
 
+	### Y data
+	data$sparseY <- sparseY
+		
 	if(is.null(y)) {
 		data$Y <- NULL
 	} else if(is.vector(y)) {
@@ -126,45 +162,63 @@ create.sgldata <- function(x, y, weights = rep(1/nrow(x), nrow(x)), sampleGroupi
 	} else {
 		stop("y is of unknown type")
 	}
-	
-	
-	data$W <- as.numeric(weights)
-	
-	# sample grouping
+		
+	### weights
+	if(is.null(weights)) {
+		data$W <- rep(1/data$n.samples, data$n.samples)
+	} else {
+		data$W <- as.numeric(weights)
+	}
+
+	### sample grouping
 	if(is.null(sampleGrouping)) {
-		sampleGrouping <- rep(1, nrow(x))
+		sampleGrouping <- rep(1, data$n.samples)
 	}
 	
 	sampleGrouping <- factor(sampleGrouping)
 	data$G <- as.integer(factor(sampleGrouping))-1L
 	
-	# group names 
+	### group names 
 	if(is.null(group.names)) {
 		data$group.names <- levels(sampleGrouping)
 	} else {
 		data$group.names <- group.names
 	}
 	
-	# dimensions
-	data$n.covariate <- ncol(x)
 	data$n.groups <- as.integer(length(data$group.names))
-		
-	# names
-	data$sample.names <- rownames(x)
-	data$covariate.names <- colnames(x)
+	
 
-	# sparse X format
+	### sparse X format
 	if(data$sparseX) {
 		data$X <- list(dim(data$X), data$X@p, data$X@i, data$X@x)
 	}
 		
-	# sparse Y format
+	### sparse Y format
 	if(data$sparseY) {
 		data$Y <- list(dim(data$Y), data$Y@p, data$Y@i, data$Y@x)
 	}
 	
 	class(data) <- "sgldata"
 	return(data)
+}
+
+.kron_names <- function(x, .funnames) {
+	
+	if(is(x, "matrix") || is(x, "sparseMatrix")) {
+		return(.funnames(x))
+	} 
+	
+	if(!is.list(x)) {
+		stop("Unsupported type")
+	}
+	
+	if(length(x) == 1) {
+		return(.funnames(x[[1]]))
+	}
+	
+	tmp <- .kron_names(x[2:length(x)], .funnames)
+	
+	return(as.vector(sapply(.funnames(x[[1]]), function(name) paste(name, tmp, sep = " * "))))
 }
 
 #' @title Prepare sgl function arguments 

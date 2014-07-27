@@ -94,22 +94,23 @@
  *
  *********************************/
 // Reset macros
-//#undef MODULE_NAME
-//#undef OBJECTIVE
-//#undef PREDICTOR
+#undef MODULE_NAME
+#undef OBJECTIVE
+#undef PREDICTOR
 
 // Module name
-//#define MODULE_NAME sgl_test_kronecker_dual
+#define MODULE_NAME sgl_test_kronecker_dual
 
-//#define OBJECTIVE linear_test_kronecker_dual
+#define OBJECTIVE linear_test_kronecker_dual
 
-//#include <sgl/RInterface/sgl_lambda_seq.h>
-//#include <sgl/RInterface/sgl_fit.h>
+#include <sgl/RInterface/sgl_lambda_seq.h>
+#include <sgl/RInterface/sgl_fit.h>
 
-//#define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , sgl::LinearResponse >
-//
-//#include <sgl/RInterface/sgl_predict.h>
+#define PREDICTOR sgl::LinearPredictor < sgl::dual_kronecker_matrix , sgl::LinearResponse >
+
+#include <sgl/RInterface/sgl_predict.h>
 //#include <sgl/RInterface/sgl_subsampling.h>
+
 
 /*********************************
  *
@@ -117,21 +118,21 @@
  *
  *********************************/
 // Reset macros
-//#undef MODULE_NAME
-//#undef OBJECTIVE
-//#undef PREDICTOR
+#undef MODULE_NAME
+#undef OBJECTIVE
+#undef PREDICTOR
 
-// Module name
-//#define MODULE_NAME sgl_test_kronecker_triple
+//Module name
+#define MODULE_NAME sgl_test_kronecker_triple
 
-//#define OBJECTIVE linear_test_kronecker_triple
+#define OBJECTIVE linear_test_kronecker_triple
 
-//#include <sgl/RInterface/sgl_lambda_seq.h>
-//#include <sgl/RInterface/sgl_fit.h>
+#include <sgl/RInterface/sgl_lambda_seq.h>
+#include <sgl/RInterface/sgl_fit.h>
 
-//#define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , sgl::LinearResponse >
-//
-//#include <sgl/RInterface/sgl_predict.h>
+#define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , sgl::LinearResponse >
+
+#include <sgl/RInterface/sgl_predict.h>
 //#include <sgl/RInterface/sgl_subsampling.h>
 
 /* **********************************
@@ -142,11 +143,13 @@
 
 #include <R_ext/Rdynload.h>
 
-//TODO sgl_test_kronecker_triple, sgl_test_kronecker_dual
 static const R_CallMethodDef sglCallMethods[] = {
 		SGL_LAMBDA(sgl_test_dense), SGL_LAMBDA(sgl_test_sparse),
+		SGL_LAMBDA(sgl_test_kronecker_dual), SGL_LAMBDA(sgl_test_kronecker_triple),
 		SGL_FIT(sgl_test_dense), SGL_FIT(sgl_test_sparse),
+		SGL_FIT(sgl_test_kronecker_dual), SGL_FIT(sgl_test_kronecker_triple),
 		SGL_PREDICT(sgl_test_dense), SGL_PREDICT(sgl_test_sparse),
+		SGL_PREDICT(sgl_test_kronecker_dual), SGL_PREDICT(sgl_test_kronecker_triple),
         SGL_SUBSAMPLING(sgl_test_dense), SGL_SUBSAMPLING(sgl_test_sparse),
 		{NULL}};
 
