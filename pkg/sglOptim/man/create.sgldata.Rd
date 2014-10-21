@@ -3,9 +3,9 @@
 \alias{create.sgldata}
 \title{Create a sgldata object}
 \usage{
-create.sgldata(x, y, weights = rep(1/nrow(x), nrow(x)),
-  sampleGrouping = NULL, group.names = NULL, sparseX = is(x,
-  "sparseMatrix"), sparseY = is(y, "sparseMatrix"))
+create.sgldata(x, y, weights = NULL, sampleGrouping = NULL,
+  group.names = NULL, sparseX = is(x, "sparseMatrix"), sparseY = is(y,
+  "sparseMatrix"))
 }
 \arguments{
 \item{x}{the design matrix, a matrix of size \eqn{N \times p} (will be parsed to the loss module as \code{X}).}

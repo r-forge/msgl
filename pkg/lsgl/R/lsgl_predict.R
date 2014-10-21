@@ -78,7 +78,20 @@ predict.lsgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...)
 	
 	data <- list()
 	
-	if(sparse.data) {
+	if(is(x, "kron")) {
+		
+		if(length(x) == 2) {
+			callsym <- "lsgl_kdx"
+		} else if(length(x) == 3) {
+			callsym <- "lsgl_ktx"
+		} else {
+			stop("unsupported kron")
+		}
+		
+		data$X <- x
+		res <- sgl_predict(callsym, "lsgl", object, data)
+				
+	} else if(sparse.data) {
 		
 		x <- as(x, "CsparseMatrix")
 		data$X <- list(dim(x), x@p, x@i, x@x)

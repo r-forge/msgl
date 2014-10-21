@@ -113,8 +113,8 @@ arma::sp_mat get_value(SEXP exp) {
 	}
 
     arma::uword* new_row_indices = arma::memory::acquire_chunked < arma::uword > (n_nonzero + 1);
-	double* new_values = arma::memory::acquire_chunked<double>(n_nonzero + 1);
 
+   	double* new_values = arma::memory::acquire_chunked<double>(n_nonzero + 1);
 	arma::arrayops::copy(new_values, REAL(values), n_nonzero);
 
 	int * row_ptr = INTEGER(row_idx);
@@ -137,7 +137,7 @@ arma::sp_mat get_value(SEXP exp) {
 	arma::access::rw(m.values) = new_values;
 	arma::access::rw(m.row_indices) = new_row_indices;
 
-	// Update counts and such.
+	// Update n
 	arma::access::rw(m.n_nonzero) = n_nonzero;
 
 	return m;
@@ -160,5 +160,29 @@ arma::field<type> get_field(SEXP exp) {
 
 	return res;
 }
+
+#ifdef ARMA_64BIT_WORD
+
+template<>
+arma::Col<arma::u64> get_value(SEXP exp) {
+
+	int *ptr = INTEGER(exp);
+
+	return arma::conv_to< arma::Col<arma::u64> >::from(arma::Col<int>(ptr, Rf_length(exp), false, true));
+}
+
+template<>
+arma::Col<arma::s64> get_value(SEXP exp) {
+
+	int *ptr = INTEGER(exp);
+
+	return arma::conv_to< arma::Col<arma::s64> >::from(arma::Col<int>(ptr, Rf_length(exp), false, true));
+}
+
+template<>
+arma::u64 get_value(SEXP exp) {
+	return static_cast<arma::u64>(*INTEGER(exp));
+}
+#endif
 
 #endif /* GET_VALUE_H_ */

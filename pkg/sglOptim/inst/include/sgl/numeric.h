@@ -32,6 +32,9 @@ class kron_prod;
 template<typename E1, typename E2, typename E3>
 class triple_kron_prod;
 
+//index
+typedef arma::uword index;
+
 //Natural types
 typedef arma::uword natural;
 typedef arma::Col<natural> natural_vector;

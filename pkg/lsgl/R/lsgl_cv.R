@@ -64,12 +64,28 @@
 #' @useDynLib lsgl .registration=TRUE
 #' @export
 lsgl.cv <- function(x, y, intercept = TRUE,
+		weights = NULL,
 		grouping = factor(1:ncol(x)), 
 		groupWeights = c(sqrt(ncol(y)*table(grouping))),
 		parameterWeights =  matrix(1, nrow = ncol(y), ncol = ncol(x)), 
 		alpha = 1, lambda, fold = 10L, cv.indices = list(), max.threads = 2L,
 		algorithm.config = lsgl.standard.config) 
 {
+	
+	if(is(x, "kron")) {
+		stop("cv not yet implemented for kron")
+	}
+	
+	if(nrow(x) != nrow(y)) {
+		stop("x and y must have the same number of rows")
+	}
+	
+	if(!is.null(weights)) {
+		if(!all(dim(y) == dim(weights))) {
+			stop("w and y must have the same dimensions")
+		}
+	}
+	
 	# Get call
 	cl <- match.call()
 	
@@ -86,11 +102,50 @@ lsgl.cv <- function(x, y, intercept = TRUE,
 	
 	# create data
 	group.names <- if(is.null(colnames(y))) 1:ncol(y) else colnames(y)
-	data <- create.sgldata(x, y, group.names = group.names)
+	data <- create.sgldata(x, y, weights = weights, group.names = group.names)
+	
+	# Print info
+	if(algorithm.config$verbose) {
+		
+		n_fold <- if(length(cv.indices) == 0) fold else length(cv.indices)
+		
+		cat("\nRunning lsgl", n_fold, "fold cross validation ")
+		if(data$sparseX & data$sparseY) {
+			cat("(sparse design and response matrices)")
+		}
+		if(data$sparseX & !data$sparseY) {
+			cat("(sparse design matrix)")
+		}
+		if(!data$sparseX & data$sparseY) {
+			cat("(sparse response matrix)")
+		}
+		
+		cat("\n\n")
+		
+		print(data.frame('Samples: ' = print_with_metric_prefix(nrow(x)), 
+						'Features: ' = print_with_metric_prefix(data$n.covariate), 
+						'Models: ' = print_with_metric_prefix(ncol(y)), 
+						'Groups: ' = print_with_metric_prefix(length(unique(grouping))), 
+						'Parameters: ' = print_with_metric_prefix(length(parameterWeights)),
+						check.names = FALSE), 
+				row.names = FALSE, digits = 2, right = TRUE)
+		cat("\n")
+	}
+	
 	
 	# call SglOptimizer function
-	callsym <- paste("lsgl_", if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+	if(!is.null(weights)) {
+		obj <- "lsgl_w_"
+	} else {
+		obj <- "lsgl_"
+	}
+	
+	callsym <- paste(obj, if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+	
 	res <- sgl_cv(callsym, "lsgl", data, grouping, groupWeights, parameterWeights, alpha, lambda, fold, cv.indices, max.threads, algorithm.config)
+	
+	# Add weights
+	res$weights <- weights
 	
 	# Add true response
 	res$Y.true <- y

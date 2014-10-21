@@ -145,14 +145,14 @@ void GenralizedLinearLossKron < T, S >::hessian_update(sgl::natural block_index,
 
 	if(hessian_type::is_constant) {
 
-		partial_hessian += T::hessians(0)*tmp2*trans(X.cols(dim_config.block_start_index(block_index) / n_groups,
+		partial_hessian += T::hessians(0)*tmp2*trans(X.cols_matrix(dim_config.block_start_index(block_index) / n_groups,
 				dim_config.block_end_index(block_index) / n_groups));
 
 	}
 
 	else {
 
-		sgl::matrix tmp1(tmp2*trans(X.cols(dim_config.block_start_index(block_index) / n_groups,
+		sgl::matrix tmp1(tmp2*trans(X.cols_matrix(dim_config.block_start_index(block_index) / n_groups,
 				dim_config.block_end_index(block_index) / n_groups)));
 
 		for (sgl::natural i = 0; i < n_samples; ++i)

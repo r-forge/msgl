@@ -89,12 +89,10 @@ void GenralizedLinearLossSparse < T >::hessian_update(sgl::natural block_index,
 	for (sgl::natural i = dim_config.block_start_index(block_index) / n_groups;
 			i < dim_config.block_end_index(block_index) / n_groups + 1; ++i)
 	{
-
 		tmp2 = tmp.col(i - dim_config.block_start_index(block_index) / n_groups);
 
 		for (sgl::natural j = X.col_ptrs[i]; j < X.col_ptrs[i + 1]; ++j)
 		{
-
 			sgl::natural row = X.row_indices[j];
 
 			partial_hessian.col(row) += hessian_type::update(T::hessians(row), tmp2, X.values[j]);
@@ -131,9 +129,11 @@ inline sgl::matrix const GenralizedLinearLossSparse < T >::hessian_diag(
 
 	for (sgl::natural j = 0; j < tmp.n_cols; ++j)
 	{
+
 		for (sgl::natural k = j; k < tmp.n_cols; ++k)
 		{
 
+			bool J_non_zero = false;
 			typename hessian_type::representation J(hessian_type::zero_representation(n_groups));
 
 			for (sgl::natural i1 = tmp.col_ptrs[j]; i1 < tmp.col_ptrs[j + 1]; ++i1)
@@ -143,30 +143,40 @@ inline sgl::matrix const GenralizedLinearLossSparse < T >::hessian_diag(
 
 				sgl::numeric vi2 = 0;
 
-				for (sgl::natural i2 = tmp.col_ptrs[k]; i2 < tmp.col_ptrs[k + 1]; ++i2)
-				{
+				if(k == j) {
 
-					sgl::natural row2 = tmp.row_indices[i2];
+					vi2 = tmp.values[i1];
 
-					if (row1 != row2)
+				} else {
+
+
+					for (sgl::natural i2 = tmp.col_ptrs[k]; i2 < tmp.col_ptrs[k + 1]; ++i2)
 					{
-						continue;
+
+						sgl::natural row2 = tmp.row_indices[i2];
+
+						if(row1 == row2) {
+							vi2 = tmp.values[i2];
+						}
+
+						if(row1 <= row2) { //assumes row indices are ordered
+							break;
+						}
+
 					}
 
-					vi2 += tmp.values[i2];
 				}
 
 				if (vi2 != 0)
 				{
-					J += vi2 * tmp.values[i1]*T::hessians(row1);
-
-//					hessian_diag_mat(block_index).submat(j * n_groups, k * n_groups,
-//							(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += vi2 * tmp.values[i1]
-//							* T::hessians(row1);
+					J_non_zero = true;
+					J += vi2 * tmp.values[i1] * T::hessians(row1);
 				}
 			}
 
-			hessian_type::diag(hessian_diag_mat(block_index), j, k, n_groups, J);
+			if(J_non_zero) {
+				hessian_type::diag(hessian_diag_mat(block_index), j, k, n_groups, J);
+			}
 		}
 	}
 

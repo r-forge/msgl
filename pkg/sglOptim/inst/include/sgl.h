@@ -48,6 +48,9 @@
 #define NDEBUG
 #endif
 
+//Support for xl matrices
+//#define ARMA_64BIT_WORD
+
 //Backtrace will only work if install on system
 #ifdef PRINT_BACKTRACE
 #include "sgl/Backtrace.h"
@@ -103,8 +106,7 @@ namespace sgl {
 #include "sgl/kron_prod.h"
 #include "sgl/SglProblem.h"
 #include "sgl/SglOptimizer.h"
-#include "sgl/ObjectiveFunction.h"
-#include "sgl/ObjectiveFunctionExpressionType.h"
+#include "sgl/ObjectiveFunctionType.h"
 #include "sgl/interface_basic.h"
 #include "sgl/objective/sgl_matrix_data.h"
 #include "sgl/objective/sgl_gl_loss_base.h"

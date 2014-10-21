@@ -68,6 +68,7 @@ private:
 
 		for (sgl::natural i = 0; i < n_samples; ++i)
 		{
+			//TODO compute cols one at a time, to save mem use
 			response(i) = response_type(static_cast < sgl::vector >(lp.col(i)));
 		}
 

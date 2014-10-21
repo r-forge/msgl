@@ -70,8 +70,8 @@
 #' @method Err lsgl
 #' @import sglOptim
 #' @export
-Err.lsgl <- function(object, data = NULL, response = object$Y.true, y = response, ... ) {
-	return(compute_error(object, data = data, response.name = "Yhat", response = y, loss = function(x,y) 1/length(x)*sqrt(sum((x - y)^2))))
+Err.lsgl <- function(object, data = NULL, response = object$Y.true, y = response, loss = function(x,y) mean(sqrt(colMeans((x - y)^2))), ... ) {
+	return(compute_error(object, data = data, response.name = "Yhat", response = y, loss = loss))
 }
 
 #' @title Nonzero features

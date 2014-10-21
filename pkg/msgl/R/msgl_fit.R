@@ -164,7 +164,7 @@ msgl <- function(x, classes, sampleWeights = rep(1/length(classes), length(class
 	} else {
 		
 		if(algorithm.config$verbose) {
-			cat("\nRunning msgl (sparse design matrix)\n\n")
+			cat("\nRunning msgl (dense design matrix) \n\n")
 			print(data.frame('Samples: ' = length(sampleWeights), 
 							'Features: ' = data$n.covariate, 
 							'Classes: ' = length(levels(classes)), 

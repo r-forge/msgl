@@ -130,7 +130,7 @@
 #include <sgl/RInterface/sgl_lambda_seq.h>
 #include <sgl/RInterface/sgl_fit.h>
 
-#define PREDICTOR sgl::LinearPredictor < sgl::sparse_matrix , sgl::LinearResponse >
+#define PREDICTOR sgl::LinearPredictor < sgl::triple_kronecker_matrix , sgl::LinearResponse >
 
 #include <sgl/RInterface/sgl_predict.h>
 //#include <sgl/RInterface/sgl_subsampling.h>

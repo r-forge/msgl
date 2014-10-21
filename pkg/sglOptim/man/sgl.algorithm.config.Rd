@@ -13,7 +13,8 @@ sgl.algorithm.config(tolerance_penalized_main_equation_loop = 1e-10,
   use_bound_optimization = TRUE,
   use_stepsize_optimization_in_penalizeed_loop = TRUE,
   stepsize_opt_penalized_initial_t = 1, stepsize_opt_penalized_a = 0.1,
-  stepsize_opt_penalized_b = 0.1, verbose = TRUE)
+  stepsize_opt_penalized_b = 0.1, inner_loop_convergence_limit = 10000,
+  verbose = TRUE)
 }
 \arguments{
 \item{tolerance_penalized_main_equation_loop}{tolerance threshold.}
@@ -39,6 +40,8 @@ sgl.algorithm.config(tolerance_penalized_main_equation_loop = 1e-10,
 \item{stepsize_opt_penalized_a}{step-size optimization parameter.}
 
 \item{stepsize_opt_penalized_b}{step-size optimization parameter.}
+
+\item{inner_loop_convergence_limit}{inner loop convergence limit.}
 
 \item{verbose}{If \code{TRUE} some information, regarding the status of the algorithm, will be printed in the R terminal.}
 }

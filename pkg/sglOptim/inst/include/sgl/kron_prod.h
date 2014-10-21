@@ -20,6 +20,26 @@
 #define KRON_PROD_H_
 
 template<typename E, typename F>
+class kron_prod;
+
+template<typename E1, typename E2, typename E3>
+class triple_kron_prod;
+
+template<typename T>
+sgl::vector col_vector(T const& x, sgl::natural col) {
+	// no code should go here
+	// Type unsupported => error here
+	const T error_type_not_defined;
+	&error_type_not_defined = 0;
+}
+
+template<>
+sgl::vector col_vector(sgl::matrix const& x, sgl::natural col) {
+	return x.col(col);
+}
+
+
+template<typename E, typename F>
 class kron_const_col_iterator {
 
 	sgl::natural B_row;
@@ -76,6 +96,68 @@ double kron_const_col_iterator<E, F>::operator *() const {
 }
 
 template<typename E, typename F>
+class kron_prod;
+
+//TODO do we use this subview -- maybe remove
+template<typename E, typename F>
+class kron_prod_cols_subview {
+
+	kron_prod<E,F> const& kp;
+
+	sgl::natural const first_col;
+	sgl::natural const last_col;
+
+	sgl::vector do_prod_trans(sgl::matrix const& x) const;
+
+public:
+
+	arma::uword const n_rows;
+	arma::uword const n_cols;
+
+	kron_prod_cols_subview(kron_prod<E,F> const& kp, sgl::natural first_col, sgl::natural last_col) :
+		kp(kp), first_col(first_col), last_col(last_col), n_rows(kp.n_rows), n_cols(last_col - first_col + 1)
+	{}
+
+	template<typename S, typename T>
+	friend sgl::matrix operator*(sgl::matrix const& x, kron_prod_cols_subview<S,T> const& y);
+
+};
+
+// - * (| x |)
+template<typename E, typename F>
+sgl::vector kron_prod_cols_subview<E, F>::do_prod_trans(sgl::matrix const& x) const {
+
+	TIMER_START
+
+	sgl::vector r(n_cols);
+
+	for(sgl::natural i = 0; i < r.n_elem; ++i) {
+//		r(i) = as_scalar(trans(kp.getB().col((first_col+i) % kp.getB().n_cols)) * reshape(x, kp.getB().n_rows, kp.getA().n_rows) * kp.getA().col((first_col+i)/kp.getB().n_cols));
+		r(i) = as_scalar(trans(sgl::col_vector(kp.getB(), (first_col+i) % kp.getB().n_cols))
+				* reshape(x, kp.getB().n_rows, kp.getA().n_rows)
+				* sgl::col_vector(kp.getA(), (first_col+i)/kp.getB().n_cols));
+
+	}
+
+	return r;
+}
+
+template<typename E, typename F>
+sgl::matrix operator*(sgl::matrix const& x, kron_prod_cols_subview<E,F> const& y) {
+
+	TIMER_START
+
+	sgl::matrix r(y.n_cols, x.n_rows);
+
+	for (sgl::natural i = 0; i < x.n_rows; ++i) {
+		r.col(i) = y.do_prod_trans(x.row(i));
+	}
+
+	return trans(r);
+}
+
+
+template<typename E, typename F>
 class kron_prod {
 
 	E const A;
@@ -111,10 +193,18 @@ public:
 
 	double operator()(sgl::natural i, sgl::natural j) const;
 
-	sgl::matrix cols(sgl::natural first_col,
+	//gl::matrix cols(sgl::natural first_col,
+	//		sgl::natural last_col) const;
+
+	kron_prod_cols_subview<E,F> cols(sgl::natural first_col,
 			sgl::natural last_col) const;
 
 	sgl::vector col(sgl::natural col) const;
+
+	sgl::matrix cols_matrix(sgl::natural first_col,
+		sgl::natural last_col) const;
+
+	sgl::vector col_vector(sgl::natural col) const;
 
 	//Compute column sums of the squared matrix
 	sgl::vector colSumsSquare() const;
@@ -128,6 +218,11 @@ public:
 	}
 
 };
+
+template<>
+sgl::vector col_vector(kron_prod<sgl::matrix, sgl::matrix> const& x, sgl::natural col) {
+	return x.col_vector(col);
+}
 
 template<typename E, typename F>
 sgl::vector kron_prod<E, F>::colSumsSquare() const {
@@ -183,7 +278,7 @@ sgl::vector kron_prod<E, F>::do_prod_sparse(sgl::sparse_vector const& x) const {
 
 		sgl::natural row = x.row_indices[i];
 
-		r += x.values[i]*vectorise(B.col(row % B.n_cols)*trans(A.col(row / B.n_cols)));
+		r += x.values[i]*vectorise(sgl::col_vector(B, row % B.n_cols)*trans(sgl::col_vector(A, row / B.n_cols)));
 	}
 
 	return r;
@@ -201,8 +296,8 @@ sgl::matrix operator*(sgl::matrix const& x, kron_prod<E,F> const& y) {
 	return trans(r);
 }
 
-template<typename S, typename T>
-sgl::matrix operator*(kron_prod<S,T> const& x, sgl::sparse_matrix const& y) {
+template<typename E, typename F>
+sgl::matrix operator*(kron_prod<E,F> const& x, sgl::sparse_matrix const& y) {
 
 	sgl::matrix r(x.n_rows, y.n_cols);
 
@@ -226,28 +321,42 @@ double kron_prod<E, F>::operator()(sgl::natural i, sgl::natural j) const {
 }
 
 template<typename E, typename F>
-sgl::matrix kron_prod<E, F>::cols(sgl::natural first_col,
+kron_prod_cols_subview<E,F> kron_prod<E, F>::cols(sgl::natural first_col,
+			sgl::natural last_col) const {
+
+	//return cols_matrix(first_col, last_col);
+	return kron_prod_cols_subview<E,F>(*this, first_col, last_col);
+}
+
+template<typename E, typename F>
+sgl::vector kron_prod<E, F>::col(sgl::natural col) const {
+
+	return col_vector(col);
+	//TODO bounds check
+	//return kron_prod_cols_subview<E,F>(*this, col, col);
+}
+
+template<typename E, typename F>
+sgl::matrix kron_prod<E, F>::cols_matrix(sgl::natural first_col,
 			sgl::natural last_col) const {
 
 	//TODO bounds check
+	TIMER_START;
 
 	sgl::matrix r(n_rows, last_col-first_col + 1);
 
 	for (sgl::natural i = 0; i < r.n_cols; ++i) {
-			r.col(i) = col(first_col + i);
+			r.col(i) = sgl::col_vector(*this, first_col + i);
 		}
 
 	return r;
 }
 
 template<typename E, typename F>
-sgl::vector kron_prod<E, F>::col(sgl::natural col) const {
+sgl::vector kron_prod<E, F>::col_vector(sgl::natural col) const {
+	TIMER_START;
 
-	//TODO bounds check
-
-	sgl::matrix tmp(kron(B.col(col % B.n_cols),A.col(col/B.n_cols)));
-
-	return vectorise(tmp);
+	return vectorise(kron(sgl::col_vector(A, col/B.n_cols), sgl::col_vector(B, col % B.n_cols)));
 }
 
 template<typename E, typename F>
@@ -271,8 +380,13 @@ public:
 
 	const_col_iterator begin_col(sgl::natural col) const;
 
-	sgl::matrix cols(sgl::natural first_col, sgl::natural last_col) const;
+	kron_prod_cols_subview<kron_prod<E1, E2>, E3 > cols(sgl::natural first_col, sgl::natural last_col) const;
 	sgl::vector col(sgl::natural col) const;
+
+	sgl::matrix cols_matrix(sgl::natural first_col,
+				sgl::natural last_col) const;
+
+	sgl::vector col_vector(sgl::natural col) const;
 
 	template<typename F1, typename F2, typename F3>
 	friend sgl::matrix operator*(sgl::matrix const& x, triple_kron_prod<F1,F2,F3> const& y);
@@ -281,6 +395,15 @@ public:
 	friend sgl::matrix operator*(triple_kron_prod<F1,F2,F3> const& x, sgl::sparse_matrix const& y);
 };
 
+template<>
+sgl::vector col_vector(triple_kron_prod<sgl::matrix, sgl::matrix, sgl::matrix> const& x, sgl::natural col) {
+	return x.col_vector(col);
+}
+
+template<>
+sgl::vector col_vector(kron_prod<kron_prod<sgl::matrix, sgl::matrix>, sgl::matrix > const& x, sgl::natural col) {
+	return x.col_vector(col);
+}
 
 template<typename E1, typename E2, typename E3>
 typename triple_kron_prod<E1, E2, E3>::const_col_iterator triple_kron_prod<E1, E2, E3>::begin_col(sgl::natural col) const {
@@ -288,13 +411,23 @@ typename triple_kron_prod<E1, E2, E3>::const_col_iterator triple_kron_prod<E1, E
 }
 
 template<typename E1, typename E2, typename E3>
-sgl::matrix triple_kron_prod<E1, E2, E3>::cols(sgl::natural first_col, sgl::natural last_col) const {
+kron_prod_cols_subview<kron_prod<E1, E2>, E3 > triple_kron_prod<E1, E2, E3>::cols(sgl::natural first_col, sgl::natural last_col) const {
 	return kron_prod<kron_prod<E1, E2>, E3 >::cols(first_col, last_col);
 }
 
 template<typename E1, typename E2, typename E3>
 sgl::vector triple_kron_prod<E1, E2, E3>::col(sgl::natural col) const {
 	return kron_prod<kron_prod<E1, E2>, E3 >::col(col);
+}
+
+template<typename E1, typename E2, typename E3>
+sgl::matrix triple_kron_prod<E1, E2, E3>::cols_matrix(sgl::natural first_col, sgl::natural last_col) const {
+	return kron_prod<kron_prod<E1, E2>, E3 >::cols_matrix(first_col, last_col);
+}
+
+template<typename E1, typename E2, typename E3>
+sgl::vector triple_kron_prod<E1, E2, E3>::col_vector(sgl::natural col) const {
+	return kron_prod<kron_prod<E1, E2>, E3 >::col_vector(col);
 }
 
 template<typename E1, typename E2, typename E3>

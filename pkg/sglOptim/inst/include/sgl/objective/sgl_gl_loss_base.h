@@ -108,7 +108,7 @@ protected:
 	E const& X; //design matrix - n_samples x n_features
 
 	sgl::natural const n_samples;
-	sgl::natural const n_groups;
+	sgl::natural const n_groups; // number groups per feature
 	sgl::natural const n_features;
 
 	mutable sgl::matrix partial_hessian;
@@ -202,10 +202,6 @@ GenralizedLinearLossBase < T , E >::GenralizedLinearLossBase(data_type const& da
 	for (sgl::natural j = 0; j < dim_config.n_blocks; ++j)
 	{
 
-		//TODO remove
-//		x_norm(j) = as_scalar(max(sqrt(sum(square(
-//				X.cols(dim_config.block_start_index(j) / n_groups,
-//						dim_config.block_end_index(j) / n_groups)))), 1));
 		x_norm(j) = max(css.subvec(dim_config.block_start_index(j) / n_groups,
 					dim_config.block_end_index(j) / n_groups));
 
@@ -276,11 +272,10 @@ inline sgl::vector const GenralizedLinearLossBase < T , E >::compute_block_gradi
 
 	TIMER_START;
 
-	return reshape(
-			partial_hessian
-					* X.cols(dim_config.block_start_index(block_index) / n_groups,
-							dim_config.block_end_index(block_index) / n_groups),
-			dim_config.block_dim(block_index), 1);
+	sgl::index start = dim_config.block_start_index(block_index) / n_groups;
+	sgl::index end = dim_config.block_end_index(block_index) / n_groups;
+
+	return reshape(partial_hessian * X.cols(start,end), dim_config.block_dim(block_index), 1);
 }
 
 //TODO rename

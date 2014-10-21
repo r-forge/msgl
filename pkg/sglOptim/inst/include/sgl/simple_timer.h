@@ -24,10 +24,10 @@
 class SimpleTimer {
 
 private:
-	int total;
-	int s;
+	unsigned int total;
+	clock_t s;
 
-	int times;
+	unsigned int times;
 
 	const std::string func;
 	const std::string file;

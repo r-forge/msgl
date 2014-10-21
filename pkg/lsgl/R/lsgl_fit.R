@@ -87,6 +87,7 @@
 #' @import Matrix
 #' @import sglOptim
 lsgl <- function(x, y, intercept = TRUE, 
+		weights = NULL,
 		grouping = factor(1:ncol(x)), 
 		groupWeights = c(sqrt(ncol(y)*table(grouping))), 
 		parameterWeights =  matrix(1, nrow = ncol(y), ncol = ncol(x)), 
@@ -99,9 +100,19 @@ lsgl <- function(x, y, intercept = TRUE,
 		stop("x and y must have the same number of rows")
 	}
 	
+	if(!is.null(weights)) {
+		if(!all(dim(y) == dim(weights))) {
+			stop("w and y must have the same dimensions")
+		}
+	}
+	
 	# cast
 	grouping <- factor(grouping)
 	
+	#FIXME kron intercept
+	if(intercept & is(x, "kron")) {
+		stop("intercept not yet implemented for kron")
+	}
 	if(intercept) {
 		# add intercept
 		x <- cBind(Intercept = rep(1, nrow(x)), x)
@@ -112,12 +123,61 @@ lsgl <- function(x, y, intercept = TRUE,
 	
 	# create data
 	group.names <- if(is.null(colnames(y))) 1:ncol(y) else colnames(y)
-	data <- create.sgldata(x, y, group.names = group.names)
+	data <- create.sgldata(x, y, weights = weights, group.names = group.names)
 	
+	# Print info
+	if(algorithm.config$verbose) {
+		
+		cat("\nRunning lsgl ")
+		if(data$sparseX & data$sparseY) {
+			cat("(sparse design and response matrices)")
+		}
+		if(data$sparseX & !data$sparseY) {
+			cat("(sparse design matrix)")
+		}
+		if(!data$sparseX & data$sparseY) {
+			cat("(sparse response matrix)")
+		}
+		
+		cat("\n\n")
+		
+		print(data.frame('Samples: ' = print_with_metric_prefix(nrow(x)), 
+						'Features: ' = print_with_metric_prefix(data$n.covariate), 
+						'Models: ' = print_with_metric_prefix(ncol(y)), 
+						'Groups: ' = print_with_metric_prefix(length(unique(grouping))), 
+						'Parameters: ' = print_with_metric_prefix(length(parameterWeights)),
+						check.names = FALSE), 
+				row.names = FALSE, digits = 2, right = TRUE)
+		cat("\n")
+	}
+
 	# call SglOptimizer function
-	callsym <- paste("lsgl_", if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+	if(is(x, "kron")) {
+		
+		if(length(x) == 2) {
+			callsym <- "lsgl_kdx"
+		} else if(length(x) == 3) {
+			callsym <- "lsgl_ktx"
+		} else {
+			stop("unsupported kron")
+		}
+		
+	} else {
+		
+		if(!is.null(weights)) {
+			obj <- "lsgl_w_"
+		} else {
+			obj <- "lsgl_"
+		}
+		
+		callsym <- paste(obj, if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+	}
+	
 	res <- sgl_fit(callsym, "lsgl", data, grouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
 
+	# Add weights
+	res$weights <- weights
+	
 	# Add true response
 	res$Y.true <- y
 	
@@ -152,18 +212,30 @@ lsgl <- function(x, y, intercept = TRUE,
 #' @useDynLib lsgl .registration=TRUE
 #' @export
 lsgl.lambda <- function(x, y, intercept = TRUE, 
+		weights = NULL,
 		grouping = factor(1:ncol(x)), 
 		groupWeights = c(sqrt(ncol(y)*table(grouping))), 
 		parameterWeights =  matrix(1, nrow = ncol(y), ncol = ncol(x)), 
 		alpha = 1, d = 100L, lambda.min, algorithm.config = lsgl.standard.config) 
 {
+
 	if(nrow(x) != nrow(y)) {
 		stop("x and y must have the same number of rows")
+	}
+	
+	if(!is.null(weights)) {
+		if(!all(dim(y) == dim(weights))) {
+			stop("w and y must have the same dimensions")
+		}
 	}
 	
 	# cast
 	grouping <- factor(grouping)
 	
+	#FIXME kron intercept
+	if(intercept & is(x, "kron")) {
+		stop("intercept not yet implemented for kron")
+	}
 	# add intercept
 	if(intercept) {
 		x <- cBind(Intercept = rep(1, nrow(x)), x)
@@ -174,11 +246,33 @@ lsgl.lambda <- function(x, y, intercept = TRUE,
 	
 	# create data
 	group.names <- if(is.null(colnames(y))) 1:ncol(y) else colnames(y)
-	data <- create.sgldata(x, y, group.names = group.names)
+	data <- create.sgldata(x, y, weights = weights, group.names = group.names)
 	
 	# call SglOptimizer function
-	callsym <- paste("lsgl_", if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
-	lambda <- sgl_lambda_sequence(callsym, "lsgl", data, grouping, groupWeights, parameterWeights, alpha = alpha, d = d, lambda.min, algorithm.config)
+	if(is(x, "kron")) {
+		
+		if(length(x) == 2) {
+			callsym <- "lsgl_kdx"
+		} else if(length(x) == 3) {
+			callsym <- "lsgl_ktx"
+		} else {
+			stop("unsupported kron")
+		}
+		
+	} else {
+
+		if(!is.null(weights)) {
+			obj <- "lsgl_w_"
+		} else {
+			obj <- "lsgl_"
+		}
+		
+		callsym <- paste(obj, if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+		
+	}
+	
+	lambda <- sgl_lambda_sequence(callsym, "lsgl", data, grouping, groupWeights, parameterWeights, alpha = alpha, d = d, lambda.min, algorithm.config)		
+	
 	
 	return(lambda)
 }

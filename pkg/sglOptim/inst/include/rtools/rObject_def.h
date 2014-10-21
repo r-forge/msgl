@@ -224,6 +224,63 @@ rObject::rObject(rList const& list) :
 
 }
 
+#ifdef ARMA_64BIT_WORD
+rObject::rObject(arma::s64 value) :
+        number_of_protects(1), unprotect_on_destruction(new bool), exp_counter(
+                new int) {
+
+    *this->unprotect_on_destruction = true;
+    *exp_counter = 1;
+
+    PROTECT(exp = Rf_allocVector(REALSXP, 1)); //TODO overflow warning: uses double for s64
+    REAL(exp)[0] = static_cast<double>(value);
+}
+
+rObject::rObject(arma::u64 value) :
+        number_of_protects(1), unprotect_on_destruction(new bool), exp_counter(
+                new int) {
+
+    *this->unprotect_on_destruction = true;
+    *exp_counter = 1;
+
+    PROTECT(exp = Rf_allocVector(REALSXP, 1)); //TODO overflow warning: uses double for u64
+    REAL(exp)[0] = static_cast<double>(value);
+}
+
+rObject::rObject(arma::Col<arma::u64> const& v) :
+		number_of_protects(1), unprotect_on_destruction(new bool), exp_counter(
+				new int) {
+
+	*this->unprotect_on_destruction = true;
+	*exp_counter = 1;
+
+	PROTECT(exp = Rf_allocVector(REALSXP, v.n_elem));
+
+	//Copy data
+	copy_cast(REAL(exp), v.mem, v.n_elem);
+}
+
+rObject::rObject(arma::Mat<arma::u64> const& m) :
+		number_of_protects(2), unprotect_on_destruction(new bool), exp_counter(
+				new int) {
+
+	*this->unprotect_on_destruction = true;
+	*exp_counter = 1;
+
+	SEXP matrixDim;
+	PROTECT(matrixDim = Rf_allocVector(INTSXP, 2));
+	INTEGER(matrixDim)[0] = static_cast<arma::s32>(m.n_rows); //TODO overflow warning
+	INTEGER(matrixDim)[1] = static_cast<arma::s32>(m.n_cols);
+
+	PROTECT(exp = Rf_allocVector(REALSXP, m.n_rows * m.n_cols));
+
+	//Copy data
+	copy_cast(REAL(exp), m.mem, m.n_elem);
+
+	Rf_setAttrib(exp, R_DimSymbol, matrixDim);
+}
+#endif
+
 rObject::~rObject() {
 
 	if (*exp_counter == 1) {

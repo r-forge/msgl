@@ -109,8 +109,7 @@ template<typename MATRIX, typename VECTOR>
 template<typename MATRIX, typename VECTOR>
   inline
   BlockVector<MATRIX, VECTOR>::BlockVector() :
-      matrix(), block_pos(static_cast<arma::u32>(0)), block_sizes(
-          static_cast<arma::u32>(0)), n_blocks(0), n_elem(0), n_nonzero(0), n_nonzero_blocks(
+      matrix(), block_pos(), block_sizes(), n_blocks(0), n_elem(0), n_nonzero(0), n_nonzero_blocks(
           0)
   {
   }
@@ -380,7 +379,9 @@ template<typename MATRIX, typename VECTOR>
   {
     MATRIX tmp(
         matrix.cols(block_pos(block_index), block_pos(block_index + 1) - 1));
+
     tmp.reshape(block_sizes(block_index), 1);
+
     return VECTOR(tmp);
   }
 

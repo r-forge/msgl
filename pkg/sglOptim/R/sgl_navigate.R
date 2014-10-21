@@ -187,7 +187,7 @@ features.sgl <- function(object, ...) {
 		stop("object contains no models")
 	}
 	
-	if(is.null(colnames(object$beta[[1]]))) {
+	if(is.null(colnames(object$beta[[1]])) || any(duplicated(colnames(X)))) {
 		res <- lapply(object$beta, function(beta) which(colSums(beta != 0) != 0))
 	} else {
 		res <- lapply(object$beta, function(beta) colnames(beta)[colSums(beta != 0) != 0])
@@ -343,14 +343,16 @@ sgl_print <- function(x) {
 		}
 		
 		model.sel <- apply(err, 1, function(y) which(min(y) == y)[1])
+		feat <- sapply(1:length(sel), function(i) x$features[sel[i], model.sel[i]])
+		para <- sapply(1:length(sel), function(i) x$parameters[sel[i], model.sel[i]])
 		
 		print(data.frame('Subsample: ' = sel, 
 						'Model index: ' = model.sel,
 						'Lambda: ' = x$lambda[model.sel], 
-						'Features: ' = print_with_metric_prefix((sapply(1:length(sel), function(i) x$features[sel[i], model.sel[i]])), 
-						'Parameters: ' = print_with_metric_prefix(sapply(1:length(sel), function(i) x$parameters[sel[i], model.sel[i]])), 
+						'Features: ' = print_with_metric_prefix(feat), 
+						'Parameters: ' = print_with_metric_prefix(para), 
 						'Error: ' = sapply(1:length(sel), function(i) err[sel[i], model.sel[i]]), check.names = FALSE),
-				row.names = FALSE, digits = 2, right = TRUE))
+				row.names = FALSE, digits = 2, right = TRUE)
 		
 		cat("\n")
 		

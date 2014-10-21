@@ -173,7 +173,7 @@ sgl::parameter SglOptimizer::optimize_single(sgl::parameter & x, sgl::parameter 
 	sgl::numeric f_old;
 
 	//Initialise converges checker
-	CONVERGENCE_CHECK(1e3); //TODO configable convergens checker
+	CONVERGENCE_CHECK(1e4); //TODO configable convergens checker
 
 	sgl::vector critical_bounds(sgl.setup.n_blocks); //TODO this will only be used when use_bound_optimization = true
 
@@ -195,6 +195,10 @@ sgl::parameter SglOptimizer::optimize_single(sgl::parameter & x, sgl::parameter 
 
 		objective.at(x);
 		f = objective.evaluate() + sgl.penalty(x, alpha, lambda);
+
+		//TODO remove
+		//std::cout << x.as_matrix() << std::endl;
+		//std::cout << f_old << " " << f << std::endl;
 
 		// Stepsize optimization
 		//TODO use_stepsize_optimization_in_penalizeed_loop levels - level 0 - never use step size opt - level 1 only when f > f_old - level 2 always
@@ -390,7 +394,7 @@ inline void SglOptimizer::optimize_quadratic(T & objective, sgl::parameter & x,
 {
 
 	//Initialize converges checker
-	CONVERGENCE_CHECK(1e4); //TODO configable converges checker
+	CONVERGENCE_CHECK(1e3); //TODO configable converges checker
 
 	sgl::vector block_gradient;
 	sgl::parameter_block_vector x_new;
@@ -463,14 +467,14 @@ inline void SglOptimizer::optimize_quadratic(T & objective, sgl::parameter & x,
 				if (block_is_active)
 				{
 
-					sgl::parameter_block_vector x_block(x.block(block_index));
+					sgl::parameter_block_vector const x_block(x.block(block_index));
 
 					//Block active (non zero), Optimise
 
 					optimize_inner(block_gradient, objective.hessian_diag(block_index),
 							lambda * (1 - alpha) * sgl.setup.L2_penalty_weight(block_index),
 							lambda * alpha * sgl.setup.L1_penalty_weight(block_index), x_new,
-							x_block);
+							x.block(block_index));
 
 					// Update
 
@@ -510,12 +514,13 @@ inline void SglOptimizer::optimize_quadratic(T & objective, sgl::parameter & x,
 			if (sgl.is_block_active(block_gradient, block_index, alpha, lambda))
 			{
 
-				Rcpp::Rcout << "block = " << block_index << " gab = " << sgl.compute_K(abs(block_gradient) - lambda * alpha * sgl.setup.L1_penalty_weight(block_index), 0) - sgl::square(lambda * (1 - alpha) * sgl.setup.L2_penalty_weight(block_index)) << endl;
+				//TODO update this line with new function names
+				//Rcpp::Rcout << "block = " << block_index << " gab = " << sgl.compute_K(abs(block_gradient) - lambda * alpha * sgl.setup.L1_penalty_weight(block_index), 0) - sgl::square(lambda * (1 - alpha) * sgl.setup.L2_penalty_weight(block_index)) << endl;
 
 				Rcpp::Rcout << "critical bound = " << critical_bounds(block_index) << " hessian level 0 bound = " << objective.hessian_bound_level0()
-				<< " hessian level 1 bound = " << objective.hessian_bound_level1(block_index) << endl;
+				<< " hessian level 1 bound = " << objective.hessian_bound_level1(block_index) << std::endl;
 
-				//throw std::runtime_error("error - hessian bound");
+				throw std::runtime_error("error - hessian bound");
 			}
 #endif
 

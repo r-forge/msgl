@@ -16,8 +16,8 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-#ifndef FOBENIUS_NORM_OBJECTIVE_H_
-#define FOBENIUS_NORM_OBJECTIVE_H_
+#ifndef FOBENIUS_NORM_HPP_
+#define FOBENIUS_NORM_HPP_
 
 //type_X : sgl::matrix or sgl::sparse_matrix
 //type_Y : sgl::matrix or sgl::sparse_matrix
@@ -33,8 +33,6 @@ public:
 private:
 
 	type_Y const& Y; //response - matrix of size n_samples x n_responses
-	sgl::vector const& W; //vector of size n_samples
-
 	sgl::matrix lp; //linear predictors - matrix of size n_samples x n_responses
 
 public:
@@ -42,9 +40,8 @@ public:
 	typedef sgl::hessian_identity<true> hessian_type; //constant hessians of type double * Id
 	//typedef sgl::hessian_full hessian_type;
 
-	typedef sgl::DataPackage_3< sgl::MatrixData<type_X>,
-				sgl::MultiResponse<type_Y, 'Y'>,
-				sgl::Data<sgl::vector, 'W'> > data_type;
+	typedef sgl::DataPackage_2< sgl::MatrixData<type_X>,
+				sgl::MultiResponse<type_Y, 'Y'> > data_type;
 
 
 
@@ -52,7 +49,6 @@ public:
 			: 	n_samples(0),
 				n_responses(0),
 				Y(sgl::null_matrix),
-				W(sgl::null_vector),
 				lp(n_samples, n_responses)	{
 	}
 
@@ -60,7 +56,6 @@ public:
 			: 	n_samples(data.get_A().n_samples),
 				n_responses(data.get_B().n_groups),
 				Y(data.get_B().response),
-				W(data.get_C().data),
 				lp(n_samples, n_responses) {
 	}
 
@@ -96,6 +91,7 @@ public:
 
 };
 
+// Std design matrix
 typedef sgl::ObjectiveFunctionType < sgl::GenralizedLinearLossDense < FrobeniusLoss < sgl::matrix, sgl::matrix > > ,
 		FrobeniusLoss < sgl::matrix, sgl::matrix >::data_type > frobenius;
 
@@ -111,4 +107,15 @@ typedef sgl::ObjectiveFunctionType <
 		sgl::GenralizedLinearLossSparse < FrobeniusLoss < sgl::sparse_matrix, sgl::sparse_matrix > > ,
 		FrobeniusLoss < sgl::sparse_matrix, sgl::sparse_matrix >::data_type > frobenius_spx_spy;
 
-#endif /* FOBENIUS_NORM_OBJECTIVE_H_ */
+// Kron design matrix
+typedef sgl::ObjectiveFunctionType <
+		sgl::GenralizedLinearLossKron < FrobeniusLoss < sgl::dual_kronecker_matrix, sgl::matrix >, sgl::dual_kronecker_matrix > ,
+		FrobeniusLoss < sgl::dual_kronecker_matrix, sgl::matrix >::data_type > frobenius_kdx;
+
+typedef sgl::ObjectiveFunctionType <
+		sgl::GenralizedLinearLossKron < FrobeniusLoss < sgl::triple_kronecker_matrix, sgl::matrix >, sgl::triple_kronecker_matrix > ,
+		FrobeniusLoss < sgl::triple_kronecker_matrix, sgl::matrix >::data_type > frobenius_ktx;
+
+// Inter design matrix
+
+#endif /* FOBENIUS_NORM_HPP_ */

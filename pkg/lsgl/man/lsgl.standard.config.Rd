@@ -3,7 +3,7 @@
 \name{lsgl.standard.config}
 \alias{lsgl.standard.config}
 \title{Standard algorithm configuration}
-\format{\preformatted{List of 13
+\format{\preformatted{List of 14
  $ tolerance_penalized_main_equation_loop      : num 1e-10
  $ tolerance_penalized_inner_loop_alpha        : num 1e-04
  $ tolerance_penalized_inner_loop_beta         : num 1
@@ -16,6 +16,7 @@
  $ stepsize_opt_penalized_initial_t            : num 1
  $ stepsize_opt_penalized_a                    : num 0.1
  $ stepsize_opt_penalized_b                    : num 0.1
+ $ inner_loop_convergence_limit                : int 100000
  $ verbose                                     : logi TRUE
 }}
 \usage{
