@@ -201,35 +201,6 @@ create.sgldata <- function(x, y, weights = NULL, sampleGrouping = NULL, group.na
 	return(data)
 }
 
-#TODO move to kron.R
-.kron_names <- function(x, .funnames) {
-	
-	if(is(x, "matrix") || is(x, "sparseMatrix")) {
-		return(.funnames(x))
-	} 
-	
-	if(!is(x, "kron")) {
-		stop("Unsupported type")
-	}
-	
-	if(length(x) == 1) {
-		return(.funnames(x[[1]]))
-	}
-	
-	if(length(x) == 2) {
-		tmp <- .funnames(x)
-	} else {
-		
-		tmp <- .kron_names(as.kron(x[2:length(x)]), .funnames)
-	}
-	
-	if(is.null(tmp)) {
-		return(NULL)
-	}
-	
-	return(as.vector(sapply(.funnames(x[[1]]), function(name) paste(name, tmp, sep = " * "))))
-}
-
 #' @title Prepare sgl function arguments 
 #' 
 #' @description

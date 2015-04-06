@@ -161,53 +161,6 @@
 #include <sgl/RInterface/sgl_predict.h>
 #include <sgl/RInterface/sgl_subsampling.h>
 
-/*********************************
- *
- *  lsgl x dual kronecker y dense module
- *
- *********************************/
-// Reset macros
-#undef MODULE_NAME
-#undef OBJECTIVE
-#undef PREDICTOR
-
-// Module name
-#define MODULE_NAME lsgl_kdx
-
-#define OBJECTIVE frobenius_kdx
-
-#include <sgl/RInterface/sgl_lambda_seq.h>
-#include <sgl/RInterface/sgl_fit.h>
-
-#define PREDICTOR sgl::LinearPredictor < sgl::dual_kronecker_matrix , sgl::LinearResponse >
-
-#include <sgl/RInterface/sgl_predict.h>
-//#include <sgl/RInterface/sgl_subsampling.h>
-
-
-/*********************************
- *
- *  lsgl x triple kronecker y dense module
- *
- *********************************/
-// Reset macros
-#undef MODULE_NAME
-#undef OBJECTIVE
-#undef PREDICTOR
-
-//Module name
-#define MODULE_NAME lsgl_ktx
-
-#define OBJECTIVE frobenius_ktx
-
-#include <sgl/RInterface/sgl_lambda_seq.h>
-#include <sgl/RInterface/sgl_fit.h>
-
-#define PREDICTOR sgl::LinearPredictor < sgl::triple_kronecker_matrix , sgl::LinearResponse >
-
-#include <sgl/RInterface/sgl_predict.h>
-//#include <sgl/RInterface/sgl_subsampling.h>
-
 
 /* **********************************
  *
@@ -220,15 +173,12 @@
 static const R_CallMethodDef sglCallMethods[] = {
 		SGL_LAMBDA(lsgl_xd_yd), SGL_LAMBDA(lsgl_xs_yd),
 		SGL_LAMBDA(lsgl_xd_ys), SGL_LAMBDA(lsgl_xs_ys),
-		SGL_LAMBDA(lsgl_kdx), SGL_LAMBDA(lsgl_ktx),
 		SGL_LAMBDA(lsgl_w_xd_yd),
 		SGL_FIT(lsgl_xd_yd), SGL_FIT(lsgl_xs_yd),
 		SGL_FIT(lsgl_xd_ys), SGL_FIT(lsgl_xs_ys),
-		SGL_FIT(lsgl_kdx), SGL_FIT(lsgl_ktx),
 		SGL_FIT(lsgl_w_xd_yd),
 		SGL_PREDICT(lsgl_xd_yd), SGL_PREDICT(lsgl_xs_yd),
 		SGL_PREDICT(lsgl_xd_ys), SGL_PREDICT(lsgl_xs_ys),
-		SGL_PREDICT(lsgl_kdx), SGL_PREDICT(lsgl_ktx),
 		SGL_SUBSAMPLING(lsgl_xd_yd), SGL_SUBSAMPLING(lsgl_xs_yd),
 		SGL_SUBSAMPLING(lsgl_xd_ys), SGL_SUBSAMPLING(lsgl_xs_ys),
 		SGL_SUBSAMPLING(lsgl_w_xd_yd),

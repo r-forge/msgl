@@ -111,12 +111,4 @@ typedef sgl::ObjectiveFunctionType <
 		sgl::GenralizedLinearLossSparse < FrobeniusLossWeighted < sgl::sparse_matrix, sgl::sparse_matrix > > ,
 		FrobeniusLossWeighted < sgl::sparse_matrix, sgl::sparse_matrix >::data_type > frobenius_w_spx_spy;
 
-typedef sgl::ObjectiveFunctionType <
-		sgl::GenralizedLinearLossKron < FrobeniusLossWeighted < sgl::dual_kronecker_matrix, sgl::matrix >, sgl::dual_kronecker_matrix > ,
-		FrobeniusLossWeighted < sgl::dual_kronecker_matrix, sgl::matrix >::data_type > frobenius_w_kdx;
-
-typedef sgl::ObjectiveFunctionType <
-		sgl::GenralizedLinearLossKron < FrobeniusLossWeighted < sgl::triple_kronecker_matrix, sgl::matrix >, sgl::triple_kronecker_matrix > ,
-		FrobeniusLossWeighted < sgl::triple_kronecker_matrix, sgl::matrix >::data_type > frobenius_w_ktx;
-
 #endif /* FOBENIUS_NORM_WEIGHTED_HPP_ */

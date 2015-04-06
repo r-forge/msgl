@@ -107,15 +107,4 @@ typedef sgl::ObjectiveFunctionType <
 		sgl::GenralizedLinearLossSparse < FrobeniusLoss < sgl::sparse_matrix, sgl::sparse_matrix > > ,
 		FrobeniusLoss < sgl::sparse_matrix, sgl::sparse_matrix >::data_type > frobenius_spx_spy;
 
-// Kron design matrix
-typedef sgl::ObjectiveFunctionType <
-		sgl::GenralizedLinearLossKron < FrobeniusLoss < sgl::dual_kronecker_matrix, sgl::matrix >, sgl::dual_kronecker_matrix > ,
-		FrobeniusLoss < sgl::dual_kronecker_matrix, sgl::matrix >::data_type > frobenius_kdx;
-
-typedef sgl::ObjectiveFunctionType <
-		sgl::GenralizedLinearLossKron < FrobeniusLoss < sgl::triple_kronecker_matrix, sgl::matrix >, sgl::triple_kronecker_matrix > ,
-		FrobeniusLoss < sgl::triple_kronecker_matrix, sgl::matrix >::data_type > frobenius_ktx;
-
-// Inter design matrix
-
 #endif /* FOBENIUS_NORM_HPP_ */
