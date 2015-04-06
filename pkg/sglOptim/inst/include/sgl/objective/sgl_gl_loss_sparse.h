@@ -111,80 +111,142 @@ inline sgl::matrix const GenralizedLinearLossSparse < T >::hessian_diag(
 		sgl::natural block_index) const
 {
 
-	TIMER_START;
+//	TIMER_START;
+//
+//	if (hessian_diag_mat_computed(block_index) != 0)
+//	{
+//		return hessian_diag_mat(block_index);
+//	}
+//
+//	T::compute_hessians();
+//
+//	hessian_diag_mat(block_index).zeros(dim_config.block_dim(block_index),
+//			dim_config.block_dim(block_index));
+//
+//	sgl::sparse_matrix tmp(
+//			X.cols(dim_config.block_start_index(block_index) / n_groups,
+//					dim_config.block_end_index(block_index) / n_groups));
+//
+//	for (sgl::natural j = 0; j < tmp.n_cols; ++j)
+//	{
+//
+//		for (sgl::natural k = j; k < tmp.n_cols; ++k)
+//		{
+//
+//			bool J_non_zero = false;
+//			typename hessian_type::representation J(hessian_type::zero_representation(n_groups));
+//
+//			for (sgl::natural i1 = tmp.col_ptrs[j]; i1 < tmp.col_ptrs[j + 1]; ++i1)
+//			{
+//
+//				sgl::natural row1 = tmp.row_indices[i1];
+//
+//				sgl::numeric vi2 = 0;
+//
+//				if(k == j) {
+//
+//					vi2 = tmp.values[i1];
+//
+//				} else {
+//
+//
+//					for (sgl::natural i2 = tmp.col_ptrs[k]; i2 < tmp.col_ptrs[k + 1]; ++i2)
+//					{
+//
+//						sgl::natural row2 = tmp.row_indices[i2];
+//
+//						if(row1 == row2) {
+//							vi2 = tmp.values[i2];
+//						}
+//
+//						if(row1 <= row2) { //assumes row indices are ordered
+//							break;
+//						}
+//
+//					}
+//
+//				}
+//
+//				if (vi2 != 0)
+//				{
+//					J_non_zero = true;
+//					J += vi2 * tmp.values[i1] * T::hessians(row1);
+//				}
+//			}
+//
+//			if(J_non_zero) {
+//				hessian_type::diag(hessian_diag_mat(block_index), j, k, n_groups, J);
+//			}
+//		}
+//	}
+//
+//	hessian_diag_mat(block_index) = symmatu(hessian_diag_mat(block_index));
+//
+//	hessian_diag_mat_computed(block_index) = 1;
+//
+//	return hessian_diag_mat(block_index);
 
 	if (hessian_diag_mat_computed(block_index) != 0)
-	{
-		return hessian_diag_mat(block_index);
-	}
-
-	T::compute_hessians();
-
-	hessian_diag_mat(block_index).zeros(dim_config.block_dim(block_index),
-			dim_config.block_dim(block_index));
-
-	sgl::sparse_matrix tmp(
-			X.cols(dim_config.block_start_index(block_index) / n_groups,
-					dim_config.block_end_index(block_index) / n_groups));
-
-	for (sgl::natural j = 0; j < tmp.n_cols; ++j)
-	{
-
-		for (sgl::natural k = j; k < tmp.n_cols; ++k)
 		{
+			return hessian_diag_mat(block_index);
+		}
 
-			bool J_non_zero = false;
-			typename hessian_type::representation J(hessian_type::zero_representation(n_groups));
+		T::compute_hessians();
 
-			for (sgl::natural i1 = tmp.col_ptrs[j]; i1 < tmp.col_ptrs[j + 1]; ++i1)
+		hessian_diag_mat(block_index).zeros(dim_config.block_dim(block_index),
+				dim_config.block_dim(block_index));
+
+		sgl::sparse_matrix tmp(
+				X.cols(dim_config.block_start_index(block_index) / n_groups,
+						dim_config.block_end_index(block_index) / n_groups));
+
+		for (sgl::natural j = 0; j < tmp.n_cols; ++j)
+		{
+			for (sgl::natural k = j; k < tmp.n_cols; ++k)
 			{
 
-				sgl::natural row1 = tmp.row_indices[i1];
+				typename hessian_type::representation J(hessian_type::zero_representation(n_groups));
 
-				sgl::numeric vi2 = 0;
+				for (sgl::natural i1 = tmp.col_ptrs[j]; i1 < tmp.col_ptrs[j + 1]; ++i1)
+				{
 
-				if(k == j) {
+					sgl::natural row1 = tmp.row_indices[i1];
 
-					vi2 = tmp.values[i1];
-
-				} else {
-
+					sgl::numeric vi2 = 0;
 
 					for (sgl::natural i2 = tmp.col_ptrs[k]; i2 < tmp.col_ptrs[k + 1]; ++i2)
 					{
 
 						sgl::natural row2 = tmp.row_indices[i2];
 
-						if(row1 == row2) {
-							vi2 = tmp.values[i2];
+						if (row1 != row2)
+						{
+							continue;
 						}
 
-						if(row1 <= row2) { //assumes row indices are ordered
-							break;
-						}
-
+						vi2 += tmp.values[i2];
 					}
 
+					if (vi2 != 0)
+					{
+						J += vi2 * tmp.values[i1]*T::hessians(row1);
+
+	//					hessian_diag_mat(block_index).submat(j * n_groups, k * n_groups,
+	//							(j + 1) * n_groups - 1, (k + 1) * n_groups - 1) += vi2 * tmp.values[i1]
+	//							* T::hessians(row1);
+					}
 				}
 
-				if (vi2 != 0)
-				{
-					J_non_zero = true;
-					J += vi2 * tmp.values[i1] * T::hessians(row1);
-				}
-			}
-
-			if(J_non_zero) {
 				hessian_type::diag(hessian_diag_mat(block_index), j, k, n_groups, J);
 			}
 		}
-	}
 
-	hessian_diag_mat(block_index) = symmatu(hessian_diag_mat(block_index));
+		hessian_diag_mat(block_index) = symmatu(hessian_diag_mat(block_index));
 
-	hessian_diag_mat_computed(block_index) = 1;
+		hessian_diag_mat_computed(block_index) = 1;
 
-	return hessian_diag_mat(block_index);
+		return hessian_diag_mat(block_index);
+
 }
 
 #endif /* SGL_GL_LOSS_SPARSE_H_ */

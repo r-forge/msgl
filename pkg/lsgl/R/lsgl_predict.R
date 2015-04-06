@@ -77,6 +77,7 @@ predict.lsgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...)
 	object$beta <- lapply(object$beta, t)
 	
 	data <- list()
+	data$sparseX <- FALSE
 	
 	if(is(x, "kron")) {
 		
@@ -93,8 +94,8 @@ predict.lsgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...)
 				
 	} else if(sparse.data) {
 		
-		x <- as(x, "CsparseMatrix")
-		data$X <- list(dim(x), x@p, x@i, x@x)
+		data$X <- as(x, "CsparseMatrix")
+		data$sparseX <- TRUE
 		
 		res <- sgl_predict("lsgl_xs_yd", "lsgl", object, data)
 		

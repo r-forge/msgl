@@ -248,7 +248,7 @@ lsgl.lambda <- function(x, y, intercept = TRUE,
 	group.names <- if(is.null(colnames(y))) 1:ncol(y) else colnames(y)
 	data <- create.sgldata(x, y, weights = weights, group.names = group.names)
 	
-	# call SglOptimizer function
+	# call SglOptim function
 	if(is(x, "kron")) {
 		
 		if(length(x) == 2) {
@@ -266,7 +266,7 @@ lsgl.lambda <- function(x, y, intercept = TRUE,
 		} else {
 			obj <- "lsgl_"
 		}
-		
+			
 		callsym <- paste(obj, if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
 		
 	}

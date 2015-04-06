@@ -38,4 +38,4 @@ lambda <- lsgl.lambda(X1, Y1, alpha = 1, d = 25, lambda.min = 0.5, intercept = F
 fit.cv <- lsgl.cv(X1, Y1, alpha = 1, lambda = lambda, intercept = FALSE, max.threads = 1)
 
 ## Cross validation errors (estimated expected generalization error)
-if(min(Err(fit.cv)) > 0.05) stop()
+if(min(Err(fit.cv, loss = "SOVE")) > 0.05) stop()

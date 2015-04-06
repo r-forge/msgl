@@ -22,16 +22,26 @@
 #' @title Compute error rates 
 #' 
 #' @description
-#' Compute and return the error
-#' \deqn{\frac{1}{NK}\|Y - X\hat B\|_F}
-#' for each model.
+#' Compute and return an error for each model. The error may be spicifed in the \code{loss} argument.
 #' 
-#' @param object a lsgl object
-#' @param data a design matrix (the \eqn{X} matrix)
-#' @param response redirected to \code{y}
-#' @param y a matrix of the true responses (the \eqn{Y} matrix)
-#' @param ... ignored
-#' @return a vector of error rates
+#' The root-mean-square error (RMSE) is
+#' \deqn{\frac{1}{K}\sum_{i = 1}^K \sqrt{\frac{1}{N}\sum_{j=1}^N Y_{ji}-(X\hat B)_{ji}}}
+#' RMSE is the default error.
+#' 
+#' The objective value error (OVE) is
+#' \deqn{\|Y - X\hat B\|_F}
+#' 
+#' The scaled objective value error (SOVE) is
+#' \deqn{\frac{1}{NK}\|Y - X\hat B\|_F}
+#' 
+#' @param object a lsgl object.
+#' @param data a design matrix (the \eqn{X} matrix).
+#' @param response redirected to \code{y}.
+#' @param y a matrix of the true responses (the \eqn{Y} matrix).
+#' @param loss the loss (error) function. Either a function taking two arguments or 
+#' one of the following character strings \code{RMSE}, \code{OVE} or \code{SOVE}.
+#' @param ... ignored.
+#' @return a vector of errors.
 #' 
 #' @author Martin Vincent
 #' @examples
@@ -66,11 +76,23 @@
 #' 
 #' ## Cross validation errors (estimated expected generalization error)
 #' Err(fit.cv)
-#' 
+#'
+#' ## Cross validation errors using objective value error measures
+#' Err(fit.cv, loss = "OVE")
+#'
 #' @method Err lsgl
 #' @import sglOptim
 #' @export
-Err.lsgl <- function(object, data = NULL, response = object$Y.true, y = response, loss = function(x,y) mean(sqrt(colMeans((x - y)^2))), ... ) {
+Err.lsgl <- function(object, data = NULL, response = object$Y.true, y = response, loss = "RMSE", ... ) {
+	
+	if(!is.function(loss)) {
+		loss <- switch(loss, 
+			RMSE = function(x,y) mean(sqrt(colMeans((x - y)^2))), 
+			OVE = function(x,y) sqrt(sum((x - y)^2)),
+			SOVE = function(x,y) 1/length(x)*sqrt(sum((x - y)^2)),
+			stop("Unknown loss"))
+	}
+
 	return(compute_error(object, data = data, response.name = "Yhat", response = y, loss = loss))
 }
 

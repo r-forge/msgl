@@ -23,7 +23,7 @@
 //#define PRINT_BACKTRACE
 
 //Should the timers be activated (only needed for profiling the code)
-#define SGL_TIMING
+//#define SGL_TIMING
 
 //Configuration
 //Debugging

@@ -187,7 +187,7 @@ features.sgl <- function(object, ...) {
 		stop("object contains no models")
 	}
 	
-	if(is.null(colnames(object$beta[[1]])) || any(duplicated(colnames(X)))) {
+	if(is.null(colnames(object$beta[[1]])) || any(duplicated(colnames(object$beta[[1]])))) {
 		res <- lapply(object$beta, function(beta) which(colSums(beta != 0) != 0))
 	} else {
 		res <- lapply(object$beta, function(beta) colnames(beta)[colSums(beta != 0) != 0])

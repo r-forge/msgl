@@ -196,9 +196,11 @@ GenralizedLinearLossBase < T , E >::GenralizedLinearLossBase(data_type const& da
 		throw std::runtime_error("GenralizedLinearLossBase - no data");
 	}
 
-	sgl::vector css(sqrt(colSumsSquare(X)));
 
 	//Initialize x_norm
+
+	sgl::vector css(sqrt(colSumsSquare(X)));
+
 	for (sgl::natural j = 0; j < dim_config.n_blocks; ++j)
 	{
 
@@ -208,7 +210,6 @@ GenralizedLinearLossBase < T , E >::GenralizedLinearLossBase(data_type const& da
 	}
 
 	x_norm_max = x_norm.max();
-
 
 	at_zero();
 }

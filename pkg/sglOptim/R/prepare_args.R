@@ -197,17 +197,6 @@ create.sgldata <- function(x, y, weights = NULL, sampleGrouping = NULL, group.na
 	
 	data$n.groups <- as.integer(length(data$group.names))
 	
-
-	### sparse X format
-	if(data$sparseX) {
-		data$X <- list(dim(data$X), data$X@p, data$X@i, data$X@x)
-	}
-		
-	### sparse Y format
-	if(data$sparseY) {
-		data$Y <- list(dim(data$Y), data$Y@p, data$Y@i, data$Y@x)
-	}
-	
 	class(data) <- "sgldata"
 	return(data)
 }
@@ -258,7 +247,7 @@ create.sgldata <- function(x, y, weights = NULL, sampleGrouping = NULL, group.na
 #' @author Martin Vincent
 prepare.args.sgldata <- function(data, parameterGrouping, groupWeights, parameterWeights, alpha, ...) {
 	
-	#If Lasso then ignore grouping
+	# If Lasso then ignore grouping
 	if(alpha == 1) {
 		parameterGrouping <- factor(1:data$n.covariate)
 		groupWeights <- rep(1, data$n.covariate)
@@ -269,15 +258,26 @@ prepare.args.sgldata <- function(data, parameterGrouping, groupWeights, paramete
 		
 	group.order <- order(parameterGrouping)
 	
-	#Reorder data
+	### Reorder data
 	data <- rearrange(data, group.order)
 	
 	parameterWeights <- parameterWeights[,group.order, drop = FALSE]
 			
-	#Compute block dim
+	### Compute block dim
 	block.dim <- ngrp*as.integer(table(parameterGrouping))
 	
-	#args list
+	### Prepare data format
+	# sparse X format
+	if(data$sparseX) {
+		data$X <- list(dim(data$X), data$X@p, data$X@i, data$X@x)
+	}
+	
+	# sparse Y format
+	if(data$sparseY) {
+		data$Y <- list(dim(data$Y), data$Y@p, data$Y@i, data$Y@x)
+	}
+	
+	### Create args list
 	args <- list()
 	args$block.dim <- block.dim
 	args$groupWeights <- groupWeights

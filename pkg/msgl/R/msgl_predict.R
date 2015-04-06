@@ -47,13 +47,14 @@ predict.msgl <- function(object, x, sparse.data = is(x, "sparseMatrix"), ...) {
 	}	
 
         data <- list()
-
+		data$sparseX <- FALSE
+				
         if(sparse.data) {
 
-                x <- as(x, "CsparseMatrix")
-                data$X <- list(dim(x), x@p, x@i, x@x)
+                data$X <- as(x, "CsparseMatrix")
 				data$sample.names <- rownames(x)
-
+				data$sparseX <- TRUE
+				
                 res <- sgl_predict("msgl_sparse", "msgl", object, data)
 
         } else {
