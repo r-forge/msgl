@@ -137,10 +137,4 @@ typedef sgl::ObjectiveFunctionType <
 		sgl::GenralizedLinearLossSparse < LinearLoss < sgl::sparse_matrix > > ,
 		LinearLoss < sgl::sparse_matrix >::data_type > linear_test_spx;
 
-typedef sgl::ObjectiveFunctionType < sgl::GenralizedLinearLossKron < LinearLoss < sgl::dual_kronecker_matrix >, sgl::dual_kronecker_matrix > ,
-		LinearLoss < sgl::dual_kronecker_matrix >::data_type > linear_test_kronecker_dual;
-
-typedef sgl::ObjectiveFunctionType < sgl::GenralizedLinearLossKron < LinearLoss < sgl::triple_kronecker_matrix >,  sgl::triple_kronecker_matrix> ,
-		LinearLoss < sgl::triple_kronecker_matrix >::data_type > linear_test_kronecker_triple;
-
 #endif /* TEST_OBJECTIVE_H_ */

@@ -3,10 +3,11 @@
 \alias{lsgl.lambda}
 \title{Compute a lambda sequence for the regularization path}
 \usage{
-lsgl.lambda(x, y, intercept = TRUE, grouping = factor(1:ncol(x)),
-  groupWeights = c(sqrt(ncol(y) * table(grouping))),
-  parameterWeights = matrix(1, nrow = ncol(y), ncol = ncol(x)), alpha = 1,
-  d = 100L, lambda.min, algorithm.config = lsgl.standard.config)
+lsgl.lambda(x, y, intercept = TRUE, weights = NULL,
+  grouping = factor(1:ncol(x)), groupWeights = c(sqrt(ncol(y) *
+  table(grouping))), parameterWeights = matrix(1, nrow = ncol(y), ncol =
+  ncol(x)), alpha = 1, d = 100L, lambda.min,
+  algorithm.config = lsgl.standard.config)
 }
 \arguments{
 \item{x}{design matrix, matrix of size \eqn{N \times p}.}

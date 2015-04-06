@@ -3,7 +3,7 @@
 \alias{lsgl}
 \title{Fit a linear multiple output model using sparse group lasso}
 \usage{
-lsgl(x, y, intercept = TRUE, grouping = factor(1:ncol(x)),
+lsgl(x, y, intercept = TRUE, weights = NULL, grouping = factor(1:ncol(x)),
   groupWeights = c(sqrt(ncol(y) * table(grouping))),
   parameterWeights = matrix(1, nrow = ncol(y), ncol = ncol(x)), alpha = 1,
   lambda, algorithm.config = lsgl.standard.config)

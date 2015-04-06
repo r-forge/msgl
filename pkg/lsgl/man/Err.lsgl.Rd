@@ -4,26 +4,37 @@
 \title{Compute error rates}
 \usage{
 \method{Err}{lsgl}(object, data = NULL, response = object$Y.true,
-  y = response, ...)
+  y = response, loss = "RMSE", ...)
 }
 \arguments{
-\item{object}{a lsgl object}
+\item{object}{a lsgl object.}
 
-\item{data}{a design matrix (the \eqn{X} matrix)}
+\item{data}{a design matrix (the \eqn{X} matrix).}
 
-\item{response}{redirected to \code{y}}
+\item{response}{redirected to \code{y}.}
 
-\item{y}{a matrix of the true responses (the \eqn{Y} matrix)}
+\item{y}{a matrix of the true responses (the \eqn{Y} matrix).}
 
-\item{...}{ignored}
+\item{loss}{the loss (error) function. Either a function taking two arguments or
+one of the following character strings \code{RMSE}, \code{OVE} or \code{SOVE}.}
+
+\item{...}{ignored.}
 }
 \value{
-a vector of error rates
+a vector of errors.
 }
 \description{
-Compute and return the error
+Compute and return an error for each model. The error may be spicifed in the \code{loss} argument.
+
+The root-mean-square error (RMSE) is
+\deqn{\frac{1}{K}\sum_{i = 1}^K \sqrt{\frac{1}{N}\sum_{j=1}^N Y_{ji}-(X\hat B)_{ji}}}
+RMSE is the default error.
+
+The objective value error (OVE) is
+\deqn{\|Y - X\hat B\|_F}
+
+The scaled objective value error (SOVE) is
 \deqn{\frac{1}{NK}\|Y - X\hat B\|_F}
-for each model.
 }
 \examples{
 set.seed(100) # This may be removed, it ensures consistency of the daily tests
@@ -56,6 +67,9 @@ fit.cv <- lsgl.cv(X1, Y1, alpha = 1, lambda = lambda, intercept = FALSE)
 
 ## Cross validation errors (estimated expected generalization error)
 Err(fit.cv)
+
+## Cross validation errors using objective value error measures
+Err(fit.cv, loss = "OVE")
 }
 \author{
 Martin Vincent

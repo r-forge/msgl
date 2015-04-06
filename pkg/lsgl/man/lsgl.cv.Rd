@@ -3,11 +3,11 @@
 \alias{lsgl.cv}
 \title{Linear multiple output cross validation using multiple possessors}
 \usage{
-lsgl.cv(x, y, intercept = TRUE, grouping = factor(1:ncol(x)),
-  groupWeights = c(sqrt(ncol(y) * table(grouping))),
-  parameterWeights = matrix(1, nrow = ncol(y), ncol = ncol(x)), alpha = 1,
-  lambda, fold = 10L, cv.indices = list(), max.threads = 2L,
-  algorithm.config = lsgl.standard.config)
+lsgl.cv(x, y, intercept = TRUE, weights = NULL,
+  grouping = factor(1:ncol(x)), groupWeights = c(sqrt(ncol(y) *
+  table(grouping))), parameterWeights = matrix(1, nrow = ncol(y), ncol =
+  ncol(x)), alpha = 1, lambda, fold = 10L, cv.indices = list(),
+  max.threads = 2L, algorithm.config = lsgl.standard.config)
 }
 \arguments{
 \item{x}{design matrix, matrix of size \eqn{N \times p}.}
