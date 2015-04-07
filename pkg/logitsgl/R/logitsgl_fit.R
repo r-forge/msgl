@@ -49,74 +49,25 @@
 #' \item{objective}{the values of the objective function (i.e. loss + penalty).}
 #' \item{lambda}{the lambda values used.}
 #' @author Martin Vincent
-#' @examples
-#' 
-#' set.seed(100) # This may be removed, it ensures consistency of the daily tests
-#'
-#' ## Simulate from Y=XB+E, the dimension of Y is N x K, X is N x p, B is p x K 
-#' 
-#' N <- 50 #number of samples
-#' p <- 50 #number of features
-#' K <- 25  #number of groups
-#' 
-#' B<-matrix(sample(c(rep(1,p*K*0.1),rep(0, p*K-as.integer(p*K*0.1)))),nrow=p,ncol=K) 
-#' 
-#' X<-matrix(rnorm(N*p,1,1),nrow=N,ncol=p)
-#' Y<-X%*%B+matrix(rnorm(N*K,0,1),N,K)	
-#' 
-#' lambda<-lsgl.lambda(X,Y, alpha=1, lambda.min=.5, intercept=FALSE)
-#' 
-#' fit <-lsgl(X,Y, alpha=1, lambda = lambda, intercept=FALSE)
-#' 
-#' ## ||B - \beta||_F
-#' sapply(fit$beta, function(beta) sum((B - beta)^2))
-#' 
-#' ## Plot
-#' par(mfrow = c(3,1))
-#' image(B, main = "True B")
-#' image(as.matrix(fit$beta[[100]]), main = "Lasso estimate (lambda = 0.5)")
-#' image(solve(t(X)%*%X)%*%t(X)%*%Y, main = "Least squares estimate")
-#' 
-#' # The training error of the models
-#' Err(fit, X)
-#' # In this cases this is simply the loss function
-#' 1/(sqrt(N)*K)*sqrt(fit$loss)
-#'
-#' @useDynLib lsgl .registration=TRUE
+#' @useDynLib logitsgl .registration=TRUE
 #' @export
 #' @import Matrix
 #' @import sglOptim
-lsgl <- function(x, y, intercept = TRUE, 
-		weights = NULL,
+logitsgl <- function(x, y, intercept = TRUE, 
 		grouping = factor(1:ncol(x)), 
 		groupWeights = c(sqrt(ncol(y)*table(grouping))), 
 		parameterWeights =  matrix(1, nrow = ncol(y), ncol = ncol(x)), 
-		alpha = 1, lambda, algorithm.config = lsgl.standard.config) 
+		alpha = 1, lambda, algorithm.config = logitsgl.standard.config) 
 {
 	# Get call
 	cl <- match.call()
-	
-	if(!is.matrix(y)) {
-		y <- as.matrix(y)
-	}
 	
 	if(nrow(x) != nrow(y)) {
 		stop("x and y must have the same number of rows")
 	}
 	
-	if(!is.null(weights)) {
-		if(!all(dim(y) == dim(weights))) {
-			stop("w and y must have the same dimensions")
-		}
-	}
-	
 	# cast
 	grouping <- factor(grouping)
-	
-	#FIXME kron intercept
-	if(intercept & is(x, "kron")) {
-		stop("intercept not yet implemented for kron")
-	}
 	
 	if(intercept) {
 		# add intercept
@@ -128,58 +79,40 @@ lsgl <- function(x, y, intercept = TRUE,
 	
 	# create data
 	group.names <- if(is.null(colnames(y))) 1:ncol(y) else colnames(y)
-	data <- create.sgldata(x, y, weights = weights, group.names = group.names)
-	
-	# Print info
-	if(algorithm.config$verbose) {
-		
-		cat("\nRunning lsgl ")
-		if(data$sparseX & data$sparseY) {
-			cat("(sparse design and response matrices)")
-		}
-		if(data$sparseX & !data$sparseY) {
-			cat("(sparse design matrix)")
-		}
-		if(!data$sparseX & data$sparseY) {
-			cat("(sparse response matrix)")
-		}
-		
-		cat("\n\n")
-		
-		print(data.frame('Samples: ' = print_with_metric_prefix(nrow(x)), 
-						'Features: ' = print_with_metric_prefix(data$n.covariate), 
-						'Models: ' = print_with_metric_prefix(ncol(y)), 
-						'Groups: ' = print_with_metric_prefix(length(unique(grouping))), 
-						'Parameters: ' = print_with_metric_prefix(length(parameterWeights)),
-						check.names = FALSE), 
-				row.names = FALSE, digits = 2, right = TRUE)
-		cat("\n")
-	}
+	data <- create.sgldata(x, y, group.names = group.names)
 
-	# call SglOptimizer function
-	if(!is.null(weights)) {
-			obj <- "lsgl_w_"
-	} else {
-			obj <- "lsgl_"
+	# Print some info
+	cat("\nRunning logitsgl ")
+	if(data$sparseX & data$sparseY) {
+		cat("(sparse design and response matrices)\n\n")
 	}
-		
-	callsym <- paste(obj, if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+	if(data$sparseX & !data$sparseY) {
+		cat("(sparse design matrix)\n\n")
+	}
+	if(!data$sparseX & data$sparseY) {
+		cat("(sparse response matrix)\n\n")
+	}
+	print(data.frame('Samples: ' = print_with_metric_prefix(nrow(x)), 
+					'Features: ' = print_with_metric_prefix(data$n.covariate), 
+					'Models: ' = print_with_metric_prefix(ncol(y)), 
+					'Groups: ' = print_with_metric_prefix(length(unique(grouping))), 
+					'Parameters: ' = print_with_metric_prefix(length(parameterWeights)),
+					check.names = FALSE), 
+			row.names = FALSE, digits = 2, right = TRUE)
+	cat("\n")
 	
-	res <- sgl_fit(callsym, "lsgl", data, grouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
+	# Call sglOptim function
+	callsym <- paste("logitsgl_", if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+	res <- sgl_fit(callsym, "logitsgl", data, grouping, groupWeights, parameterWeights, alpha, lambda, return = 1:length(lambda), algorithm.config)
 
-	# Add weights
-	res$weights <- weights
-	
 	# Add true response
 	res$Y.true <- y
 	
-	res$beta <- lapply(res$beta, t) # Transpose all beta 
-	
 	res$intercept <- intercept
-	res$lsgl_version <- packageVersion("lsgl")
+	res$logitsgl_version <- packageVersion("logitsgl")
 	res$call <- cl
 	
-	class(res) <- "lsgl"
+	class(res) <- "logitsgl"
 	return(res)
 }
 
@@ -201,37 +134,22 @@ lsgl <- function(x, y, intercept = TRUE,
 #' @param algorithm.config the algorithm configuration to be used. 
 #' @return a vector of length \code{d} containing the compute lambda sequence.
 #' @author Martin Vincent
-#' @useDynLib lsgl .registration=TRUE
+#' @useDynLib logitsgl .registration=TRUE
 #' @export
-lsgl.lambda <- function(x, y, intercept = TRUE, 
-		weights = NULL,
+logitsgl.lambda <- function(x, y, intercept = TRUE, 
 		grouping = factor(1:ncol(x)), 
 		groupWeights = c(sqrt(ncol(y)*table(grouping))), 
 		parameterWeights =  matrix(1, nrow = ncol(y), ncol = ncol(x)), 
-		alpha = 1, d = 100L, lambda.min, algorithm.config = lsgl.standard.config) 
+		alpha = 1, d = 100L, lambda.min, algorithm.config = logitsgl.standard.config) 
 {
 	
-	if(!is.matrix(y)) {
-		y <- as.matrix(y)
-	}
-
 	if(nrow(x) != nrow(y)) {
 		stop("x and y must have the same number of rows")
-	}
-	
-	if(!is.null(weights)) {
-		if(!all(dim(y) == dim(weights))) {
-			stop("w and y must have the same dimensions")
-		}
 	}
 	
 	# cast
 	grouping <- factor(grouping)
 	
-	#FIXME kron intercept
-	if(intercept & is(x, "kron")) {
-		stop("intercept not yet implemented for kron")
-	}
 	# add intercept
 	if(intercept) {
 		x <- cBind(Intercept = rep(1, nrow(x)), x)
@@ -242,33 +160,11 @@ lsgl.lambda <- function(x, y, intercept = TRUE,
 	
 	# create data
 	group.names <- if(is.null(colnames(y))) 1:ncol(y) else colnames(y)
-	data <- create.sgldata(x, y, weights = weights, group.names = group.names)
+	data <- create.sgldata(x, y, group.names = group.names)
 	
-	# call SglOptim function
-	if(is(x, "kron")) {
-		
-		if(length(x) == 2) {
-			callsym <- "lsgl_kdx"
-		} else if(length(x) == 3) {
-			callsym <- "lsgl_ktx"
-		} else {
-			stop("unsupported kron")
-		}
-		
-	} else {
-
-		if(!is.null(weights)) {
-			obj <- "lsgl_w_"
-		} else {
-			obj <- "lsgl_"
-		}
-			
-		callsym <- paste(obj, if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
-		
-	}
-	
-	lambda <- sgl_lambda_sequence(callsym, "lsgl", data, grouping, groupWeights, parameterWeights, alpha = alpha, d = d, lambda.min, algorithm.config)		
-	
+	# call SglOptimizer function
+	callsym <- paste("logitsgl_", if(data$sparseX) "xs_" else "xd_", if(data$sparseY) "ys" else "yd", sep = "")
+	lambda <- sgl_lambda_sequence(callsym, "logitsgl", data, grouping, groupWeights, parameterWeights, alpha = alpha, d = d, lambda.min, algorithm.config)
 	
 	return(lambda)
 }

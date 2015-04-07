@@ -35,15 +35,7 @@ Y1 <-X1%*%B+matrix(rnorm(N*K,0,1),N,K)
 
 ##Do cross validation
 lambda <- lsgl.lambda(X1, Y1, alpha = 1, d = 25, lambda.min = 0.5, intercept = FALSE)
-fit.cv <- lsgl.cv(X1, Y1, alpha = 1, lambda = lambda, intercept = FALSE, max.threads = 1)
+fit.cv <- lsgl.cv(X1, Y1, alpha = 1, lambda = lambda, intercept = FALSE, max.threads = 2)
 
 ## Cross validation errors (estimated expected generalization error)
-if(min(Err(fit.cv, loss = "SOVE")) > 0.05) stop()
-
-
-## Test single fit i.e. K = 1
-y <- Y1[,1]
-
-lambda <- lsgl.lambda(X1, y, alpha = 1, d = 25, lambda.min = 0.5, intercept = FALSE)
-fit.cv <- lsgl.cv(X1, y, alpha = 1, lambda = lambda, intercept = FALSE, max.threads = 1)
-
+if(min(Err(fit.cv)) > 0.05) stop()

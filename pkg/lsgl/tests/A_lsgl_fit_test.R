@@ -40,3 +40,12 @@ fit <-lsgl(X,Y, alpha=1, lambda = lambda, intercept=FALSE)
 
 ## ||B - \beta||_F
 if(min(sapply(fit$beta, function(beta) sum((B - beta)^2))) > 11) stop()
+
+
+
+## Test single fit i.e. K = 1
+y <- Y[,1]
+
+lambda<-lsgl.lambda(X,y, alpha=1, lambda.min=.5, intercept=FALSE)
+fit <-lsgl(X, y, alpha=1, lambda = lambda, intercept=FALSE)
+res <- predict(fit, X)

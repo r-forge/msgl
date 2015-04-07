@@ -76,3 +76,4 @@ sgl_fit <- function(module_name, PACKAGE, data, parameterGrouping, groupWeights,
 	
 	return(res)
 }
+

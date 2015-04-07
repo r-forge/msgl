@@ -78,7 +78,7 @@ prepare.args <- function(data, ...) UseMethod("prepare.args")
 rearrange.sgldata <- function(data, covariate.order, ...) 
 {
 	
-	data$X <- data$X[,covariate.order]
+	data$X <- data$X[,covariate.order, drop = FALSE]
 	data$covariate.names <- data$covariate.names[covariate.order]
 	
 	return(data)
@@ -102,10 +102,6 @@ rearrange.sgldata <- function(data, covariate.order, ...)
 create.sgldata <- function(x, y, weights = NULL, sampleGrouping = NULL, group.names = NULL, sparseX = is(x, "sparseMatrix"), sparseY = is(y, "sparseMatrix")) {
 	
 	#TODO dim checks
-	### Checks
-	if(is(x, "kron") & sparseX) {
-		stop("Sparse Kronecker products not supported")
-	}
 	
 	### Data 
 	data <- list()
@@ -114,46 +110,21 @@ create.sgldata <- function(x, y, weights = NULL, sampleGrouping = NULL, group.na
 	data$n.covariate <- ncol(x)
 	data$n.samples <- nrow(x)		
 	
-	### Dim-names
-	if(is(x, "kron")) {
-		if(data$n.samples < 5e5)
-		{
-			data$sample.names <- .kron_names(x, rownames)
-		
-		} else {
-			warning("discarding Kronecker product row names (sample names) to save memory -- dimension to high")
-			data$sample.names <- NULL
-		
-		}
-		
-		if(data$n.covariate < 5e5)
-		{
-			data$covariate.names <- .kron_names(x, colnames)
-			
-		} else {
-			warning("discarding Kronecker product col names (covariate names) to save memory -- dimension to high")
-			data$covariate.names <- NULL
-		
-		}
-		
-	} else if(is(x, "matrix") || is(x, "sparseMatrix")) {
-		data$sample.names <- rownames(x)
-		data$covariate.names <- colnames(x)
-	}
-	
 	### X data
 	data$sparseX <- sparseX
 
 	if(data$sparseX) {
 		data$X <- as(x, "CsparseMatrix")
-	} else if(is(x, "kron")){
-		data$X <- x
 	} else if(is(x, "matrix") || is(x, "sparseMatrix")){
 		data$X <- as.matrix(x)
 	} else {
 		stop("design matrix of unkown type")
 	}
 
+	# Dim-names
+	data$sample.names <- rownames(x)
+	data$covariate.names <- colnames(x)
+	
 	### Y data
 	data$sparseY <- sparseY
 		

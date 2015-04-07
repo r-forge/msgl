@@ -45,7 +45,7 @@ sgl_lambda_sequence <- function(module_name, PACKAGE, data, parameterGrouping, g
 	d <- as.integer(d)
 		
 	args <- prepare.args(data, parameterGrouping, groupWeights, parameterWeights, alpha)
-
+		
 	call_sym <- paste(module_name, "sgl_lambda", sep="_")
 	res <- .Call(call_sym, PACKAGE = PACKAGE, args$data, args$block.dim, args$groupWeights, args$parameterWeights, args$alpha, d, lambda.min, algorithm.config)
 	
