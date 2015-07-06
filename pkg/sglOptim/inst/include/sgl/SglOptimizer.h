@@ -562,7 +562,7 @@ void SglOptimizer::optimize_inner(sgl::vector const& gradient_at_x0,
 	//Start timer, only active if SGL_TIMING is defined
 	TIMER_START;
 
-	//Initialise converges checker
+	//Initialize converges checker
 	CONVERGENCE_CHECK(sgl.config.inner_loop_convergence_limit);
 
 	const sgl::natural dim = x0.n_elem;
@@ -593,7 +593,7 @@ void SglOptimizer::optimize_inner(sgl::vector const& gradient_at_x0,
 			ASSERT_IS_FINITE(x_new);
 
 			//Update gradient and x
-			if (x_new != xi)
+			if (abs(x_new - xi)/abs(xi) > 1e-8) //TODO configable
 			{
 				gradient += (x_new - xi) * second_order_term.col(i);
 				sumsq += sgl::square(x_new) - sgl::square(xi);
