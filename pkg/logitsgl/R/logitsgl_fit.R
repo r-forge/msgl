@@ -92,9 +92,6 @@ logitsgl <- function(x, y, intercept = TRUE,
 	if(!data$sparseX & data$sparseY) {
 		cat("(sparse response matrix)\n\n")
 	}
-	if(!data$sparseX & !data$sparseY) {
-		cat("(dense design and response matrix)\n\n")
-	}
 	print(data.frame('Samples: ' = print_with_metric_prefix(nrow(x)), 
 					'Features: ' = print_with_metric_prefix(data$n.covariate), 
 					'Models: ' = print_with_metric_prefix(ncol(y)), 
